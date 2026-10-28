@@ -9,6 +9,7 @@
 <meta name="theme-color" content="#EC0016">
 <title>Streckenkunde 🚆</title>
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%23EC0016"/><text x="50" y="70" font-size="54" text-anchor="middle">🚆</text></svg>'>
+<link rel="apple-touch-icon" href="icon.png">
 <style>
   :root { --red: #EC0016; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,7 +22,8 @@
   .content { padding-top: 12px; }
   .card { background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(15,23,42,.06); margin: 0 16px 10px; }
   .qlabel { font-weight: 600; margin-bottom: 10px; font-size: 16px; }
-  .opt { display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; color: #334155; font-size: 16px; margin-bottom: 8px; cursor: pointer; font-family: inherit; }
+  .opt { display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; color: #334155; font-size: 16px; margin-bottom: 8px; cursor: p
+ointer; font-family: inherit; }
   .opt:last-child { margin-bottom: 0; }
   .opt.on { background: #fef2f2; border-color: var(--red); color: #b91c1c; font-weight: 600; }
   .btn-main { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: var(--red); color: #fff; border: none; border-radius: 16px; padding: 15px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; }
@@ -39,7 +41,8 @@
   .big-emoji { font-size: 54px; margin-bottom: 12px; }
   .muted { color: #64748b; font-size: 15px; }
   .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 16px 6px; -webkit-overflow-scrolling: touch; }
-  .chip { flex: none; border-radius: 99px; padding: 8px 14px; font-size: 14px; font-weight: 600; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-family: inherit; cursor: pointer; }
+  .chip { flex: none; border-radius: 99px; padding: 8px 14px; font-size: 14px; font-weight: 600; border: 1px solid #e2e8f0; backg
+round: #fff; color: #475569; font-family: inherit; cursor: pointer; }
   .chip.on { background: var(--red); border-color: var(--red); color: #fff; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px 10px; }
   .stat { background: #fff; border-radius: 16px; padding: 14px; text-align: center; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
@@ -58,7 +61,8 @@
   .dot { width: 10px; height: 10px; border-radius: 99px; display: inline-block; margin-right: 4px; }
   .section-t { font-size: 14px; font-weight: 600; color: #64748b; margin: 14px 16px 8px; }
   .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 6; background: #fff; border-top: 1px solid #e2e8f0; display: flex; max-width: 480px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom); }
-  .tab { flex: 1; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #94a3b8; background: none; border: none; cursor: pointer; font-family: inherit; }
+  .tab { flex: 1; padding: 8px 0 10px; disp
+lay: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #94a3b8; background: none; border: none; cursor: pointer; font-family: inherit; }
   .tab.on { color: var(--red); }
   .tab .ico { font-size: 21px; line-height: 1; }
   .flexrow { display: flex; gap: 8px; margin-top: 8px; }
@@ -90,7 +94,8 @@ var SCORE_MAP = {
   fahrdienst: { "Sehr gut": 100, "Gut": 75, "Okay": 50, "Zäh": 25, "Anstrengend": 0 },
   kollegen: { "Top": 100, "Gut": 80, "Normal": 55, "Anstrengend": 20, "Kaum Kontakt": 50 },
   belastung: { "Entspannt": 100, "Normal": 75, "Viel los": 50, "Grenzwertig": 20 },
-  zustand: { "Topfit": 100, "Okay": 75, "Müde": 45, "Richtig erschlagen": 10 }
+  zustand: { "Topfit": 100, "Okay"
+: 75, "Müde": 45, "Richtig erschlagen": 10 }
 };
 
 var PIE_COLORS = ["#EC0016", "#F59E0B", "#3B82F6", "#8B5CF6", "#10B981", "#64748B"];
@@ -146,7 +151,8 @@ var state = {
 /* ============ SVG-Diagramme ============ */
 
 function lineChartSVG(data) {
-  var W = 340, H = 195, L = 34, R = 14, T = 16, B = 30;
+  var W = 340, H = 195, L = 34, R = 14, T = 16
+, B = 30;
   var iw = W - L - R, ih = H - T - B;
   var grid = [0, 50, 100].map(function (v) {
     var y = T + ih - (v / 100) * ih;
@@ -183,7 +189,8 @@ function donutSVG(items) {
     acc += frac;
     return '<circle r="' + r + '" cx="90" cy="90" fill="none" stroke="' + it.color + '" stroke-width="24" stroke-dasharray="' + dash.toFixed(2) + ' ' + (C - dash).toFixed(2) + '" stroke-dashoffset="' + off.toFixed(2) + '" transform="rotate(-90 90 90)"/>';
   }).join("");
-  return '<svg viewBox="0 0 180 180" style="width:100%;max-width:220px;height:auto;display:block;margin:0 auto">' + segs +
+  return '<svg viewBox="0 0 180 180" style="width:100%;max-wid
+th:220px;height:auto;display:block;margin:0 auto">' + segs +
     '<text x="90" y="87" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">' + total + '</text>' +
     '<text x="90" y="106" text-anchor="middle" font-size="11" fill="#94a3b8">Einträge</text></svg>';
 }
@@ -219,7 +226,8 @@ function viewForm() {
   });
 
   html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
-    '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis, Gedanken …" oninput="setNote(this.value)"></textarea></div>';
+    '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis, Gedanken …" oninput="setNote(this.value)"></textare
+a></div>';
   html += '<button type="button" class="btn-main" id="saveBtn" onclick="submitForm()" disabled>Noch ' + QUESTIONS.length + ' Frage(n) offen</button>';
   html += '</div>';
   return html;
@@ -255,7 +263,8 @@ function backupCard() {
 function viewStats() {
   if (!state.entries.length) {
     return '<div class="center"><div class="big-emoji">📊</div><h2 style="margin:0 0 6px;font-size:20px">Noch keine Daten</h2>' +
-      '<p class="muted">Sobald du ein paar Fragebögen ausgefüllt hast, siehst du hier deine Monatsauswertung mit Diagrammen.</p></div>';
+      '<p class="muted">Sobald du ein paar Fragebögen ausgefüllt hast, siehst du hier de
+ine Monatsauswertung mit Diagrammen.</p></div>';
   }
   var monthKeys = [];
   state.entries.forEach(function (e) {
@@ -294,7 +303,8 @@ function viewStats() {
     if (a) dienstartCounts[a] = (dienstartCounts[a] || 0) + 1;
   });
   var pieItems = Object.keys(dienstartCounts).map(function (name, i) {
-    return { name: name, value: dienstartCounts[name], color: PIE_COLORS[i % PIE_COLORS.length] };
+    return { name: name, value: dienstartCounts[name], color: PIE_COLORS[i 
+% PIE_COLORS.length] };
   });
   if (pieItems.length) {
     html += '<div class="card"><div class="qlabel">🕐 Deine Dienstarten</div>' + donutSVG(pieItems);
@@ -337,7 +347,8 @@ function viewLog() {
     });
     if (e.note) html += '<div class="note">„' + esc(e.note) + '“</div>';
     if (state.confirmId === e.id) {
-      html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</button>' +
+      html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</butto
+n>' +
         '<button type="button" class="btn-sm btn-grey" onclick="cancelDelete()">Abbrechen</button></div>';
     } else {
       html += '<button type="button" class="del" onclick="askDelete(\'' + e.id + '\')">Eintrag löschen</button>';
@@ -389,7 +400,8 @@ function pick(qid, idx) {
     if (b) {
       var on = state.answers[qid] === o;
       b.className = "opt" + (on ? " on" : "");
-      b.textContent = (on ? "✓ " : "") + o;
+   
+   b.textContent = (on ? "✓ " : "") + o;
     }
   });
   updateProgress();
@@ -458,7 +470,8 @@ function backupMsg(text) {
 
 function copyBackup() {
   var text = (state.backupText || "").trim() || JSON.stringify(state.entries);
-  var done = function () { backupMsg("Kopiert! ✅"); };
+  var done = function () { backupMsg("Kopiert!
+ ✅"); };
   var fail = function () { backupMsg("Bitte Text manuell markieren und kopieren."); };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done, fail);
