@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Streckenkunde">
+<meta name="theme-color" content="#EC0016">
+<title>Streckenkunde 🚆</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%23EC0016"/><text x="50" y="70" font-size="54" text-anchor="middle">🚆</text></svg>'>
+<style>
+  :root { --red: #EC0016; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; }
+  #wrap { max-width: 480px; margin: 0 auto; padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+  header { position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #f1f5f9; }
+  .logo { width: 40px; height: 40px; border-radius: 14px; background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 21px; flex: none; }
+  h1 { font-size: 17px; margin: 0; line-height: 1.2; }
+  .sub { font-size: 12px; color: #64748b; line-height: 1.2; }
+  .content { padding-top: 12px; }
+  .card { background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(15,23,42,.06); margin: 0 16px 10px; }
+  .qlabel { font-weight: 600; margin-bottom: 10px; font-size: 16px; }
+  .opt { display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; color: #334155; font-size: 16px; margin-bottom: 8px; cursor: pointer; font-family: inherit; }
+  .opt:last-child { margin-bottom: 0; }
+  .opt.on { background: #fef2f2; border-color: var(--red); color: #b91c1c; font-weight: 600; }
+  .btn-main { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: var(--red); color: #fff; border: none; border-radius: 16px; padding: 15px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-main:disabled { background: #e2e8f0; color: #94a3b8; cursor: default; }
+  .btn-ghost { display: block; width: calc(100% - 32px); margin: 0 16px 10px; background: #fff; color: #334155; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-sm { flex: 1; border: none; border-radius: 12px; padding: 10px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-grey { background: #f1f5f9; color: #334155; }
+  .btn-red { background: var(--red); color: #fff; }
+  textarea { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-size: 16px; font-family: inherit; color: #0f172a; }
+  textarea:focus { outline: none; border-color: var(--red); }
+  .bar-outer { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin: 0 16px 14px; }
+  .bar-inner { height: 100%; background: var(--red); border-radius: 99px; transition: width .25s; width: 0%; }
+  .hint { margin: 0 16px 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 12px; font-size: 14px; }
+  .center { text-align: center; padding: 48px 20px; }
+  .big-emoji { font-size: 54px; margin-bottom: 12px; }
+  .muted { color: #64748b; font-size: 15px; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 16px 6px; -webkit-overflow-scrolling: touch; }
+  .chip { flex: none; border-radius: 99px; padding: 8px 14px; font-size: 14px; font-weight: 600; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-family: inherit; cursor: pointer; }
+  .chip.on { background: var(--red); border-color: var(--red); color: #fff; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px 10px; }
+  .stat { background: #fff; border-radius: 16px; padding: 14px; text-align: center; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
+  .stat .num { font-size: 30px; font-weight: 700; }
+  .stat .lbl { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .dist-row { margin-bottom: 8px; }
+  .dist-lbl { display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-bottom: 3px; }
+  .track { height: 8px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+  .fill { height: 100%; background: var(--red); border-radius: 99px; }
+  .tag { display: inline-block; font-size: 12px; background: #f1f5f9; color: #475569; border-radius: 99px; padding: 4px 10px; margin: 2px 4px 2px 0; }
+  .score-badge { font-size: 12px; font-weight: 700; color: #fff; border-radius: 99px; padding: 3px 10px; }
+  .month-h { font-size: 13px; font-weight: 600; color: #64748b; margin: 14px 16px 8px; }
+  .note { font-size: 14px; color: #64748b; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; font-style: italic; }
+  .del { background: none; border: none; color: #94a3b8; font-size: 12px; margin-top: 6px; padding: 0; font-family: inherit; cursor: pointer; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; font-size: 12px; color: #475569; margin-top: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 99px; display: inline-block; margin-right: 4px; }
+  .section-t { font-size: 14px; font-weight: 600; color: #64748b; margin: 14px 16px 8px; }
+  .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 6; background: #fff; border-top: 1px solid #e2e8f0; display: flex; max-width: 480px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom); }
+  .tab { flex: 1; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #94a3b8; background: none; border: none; cursor: pointer; font-family: inherit; }
+  .tab.on { color: var(--red); }
+  .tab .ico { font-size: 21px; line-height: 1; }
+  .flexrow { display: flex; gap: 8px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div id="wrap"></div>
+<noscript><p style="text-align:center;padding:20px">Diese App braucht JavaScript.</p></noscript>
+
+<script>
+"use strict";
+
+/* ============ Daten ============ */
+
+var STORAGE_KEY = "streckenkunde_v1";
+var RED = "#EC0016";
+
+var QUESTIONS = [
+  { id: "dienstart", emoji: "🕐", label: "Welche Dienstart hattest du heute?", options: ["Frühdienst", "Tagdienst", "Spätdienst", "Aushilfe / Umplanung", "Kein Fahrdienst"] },
+  { id: "fahrdienst", emoji: "🚆", label: "Wie lief dein Fahrdienst insgesamt?", options: ["Sehr gut", "Gut", "Okay", "Zäh", "Anstrengend"] },
+  { id: "kollegen", emoji: "👥", label: "Wie war die Stimmung mit den Kollegen?", options: ["Top", "Gut", "Normal", "Anstrengend", "Kaum Kontakt"] },
+  { id: "belastung", emoji: "💪", label: "Wie war die Belastung heute?", options: ["Entspannt", "Normal", "Viel los", "Grenzwertig"] },
+  { id: "ablauf", emoji: "⚠️", label: "Ist alles glatt gelaufen (Züge, Verkehr, Technik)?", options: ["Alles glatt", "Kleinere Sachen", "Größere Probleme"] },
+  { id: "pause", emoji: "🍞", label: "Hast du Pause in Nürnberg gemacht?", options: ["Ja, mit Freunden / Kollegen", "Ja, alleine", "Andere Pause", "Keine Pause"] },
+  { id: "zustand", emoji: "🔋", label: "Wie fühlst du dich jetzt nach dem Dienst?", options: ["Topfit", "Okay", "Müde", "Richtig erschlagen"] }
+];
+
+var SCORE_MAP = {
+  fahrdienst: { "Sehr gut": 100, "Gut": 75, "Okay": 50, "Zäh": 25, "Anstrengend": 0 },
+  kollegen: { "Top": 100, "Gut": 80, "Normal": 55, "Anstrengend": 20, "Kaum Kontakt": 50 },
+  belastung: { "Entspannt": 100, "Normal": 75, "Viel los": 50, "Grenzwertig": 20 },
+  zustand: { "Topfit": 100, "Okay": 75, "Müde": 45, "Richtig erschlagen": 10 }
+};
+
+var PIE_COLORS = ["#EC0016", "#F59E0B", "#3B82F6", "#8B5CF6", "#10B981", "#64748B"];
+
+/* ============ Helfer ============ */
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function loadEntries() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    var parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) { return []; }
+}
+function persist() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries)); } catch (e) {}
+}
+function dayScore(e) {
+  var vals = ["fahrdienst", "kollegen", "belastung", "zustand"].map(function (k) {
+    return (SCORE_MAP[k] || {})[e.answers[k]];
+  }).filter(function (v) { return typeof v === "number"; });
+  if (!vals.length) return null;
+  return Math.round(vals.reduce(function (a, b) { return a + b; }, 0) / vals.length);
+}
+function monthKeyOf(ts) {
+  var d = new Date(ts);
+  return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2);
+}
+function monthLabelOf(key) {
+  var p = key.split("-");
+  return new Date(+p[0], +p[1] - 1, 1).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+}
+function fmtDay(ts) { return new Date(ts).toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" }); }
+function fmtTime(ts) { return new Date(ts).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }); }
+function fmtShort(ts) { return new Date(ts).toLocaleDateString("de-DE", { day: "numeric", month: "numeric" }); }
+function scoreColor(s) { return s >= 75 ? "#10B981" : s >= 50 ? "#F59E0B" : RED; }
+
+/* ============ Zustand ============ */
+
+var state = {
+  tab: "form",
+  entries: loadEntries(),
+  answers: {},
+  note: "",
+  saved: false,
+  month: null,
+  confirmId: null,
+  backupText: ""
+};
+
+/* ============ SVG-Diagramme ============ */
+
+function lineChartSVG(data) {
+  var W = 340, H = 195, L = 34, R = 14, T = 16, B = 30;
+  var iw = W - L - R, ih = H - T - B;
+  var grid = [0, 50, 100].map(function (v) {
+    var y = T + ih - (v / 100) * ih;
+    return '<line x1="' + L + '" y1="' + y + '" x2="' + (W - R) + '" y2="' + y + '" stroke="#e2e8f0" stroke-dasharray="3 3"/>' +
+      '<text x="' + (L - 6) + '" y="' + (y + 4) + '" font-size="10" fill="#94a3b8" text-anchor="end">' + v + '</text>';
+  }).join("");
+  var n = data.length;
+  var pts = data.map(function (d, i) {
+    var x = n === 1 ? L + iw / 2 : L + (i / (n - 1)) * iw;
+    var y = T + ih - (d.score / 100) * ih;
+    return { x: x, y: y };
+  });
+  var poly = pts.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
+  var circles = pts.map(function (p) {
+    return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4" fill="' + RED + '"/>';
+  }).join("");
+  var step = Math.ceil(n / 6);
+  var labels = data.map(function (d, i) {
+    if (i % step !== 0) return "";
+    return '<text x="' + pts[i].x.toFixed(1) + '" y="' + (H - 8) + '" font-size="10" fill="#94a3b8" text-anchor="middle">' + esc(d.label) + '</text>';
+  }).join("");
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto">' + grid +
+    '<polyline points="' + poly + '" fill="none" stroke="' + RED + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+    circles + labels + '</svg>';
+}
+
+function donutSVG(items) {
+  var total = items.reduce(function (a, b) { return a + b.value; }, 0);
+  var r = 52, C = 2 * Math.PI * r, acc = 0;
+  var segs = items.map(function (it) {
+    var frac = it.value / total;
+    var dash = frac * C;
+    var off = -acc * C;
+    acc += frac;
+    return '<circle r="' + r + '" cx="90" cy="90" fill="none" stroke="' + it.color + '" stroke-width="24" stroke-dasharray="' + dash.toFixed(2) + ' ' + (C - dash).toFixed(2) + '" stroke-dashoffset="' + off.toFixed(2) + '" transform="rotate(-90 90 90)"/>';
+  }).join("");
+  return '<svg viewBox="0 0 180 180" style="width:100%;max-width:220px;height:auto;display:block;margin:0 auto">' + segs +
+    '<text x="90" y="87" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">' + total + '</text>' +
+    '<text x="90" y="106" text-anchor="middle" font-size="11" fill="#94a3b8">Einträge</text></svg>';
+}
+
+/* ============ Ansichten ============ */
+
+function viewForm() {
+  if (state.saved) {
+    return '<div class="center">' +
+      '<div class="big-emoji">✅</div>' +
+      '<h2 style="margin:0 0 6px;font-size:22px">Gespeichert!</h2>' +
+      '<p class="muted" style="margin:0 0 24px">Dein Eintrag ist sicher auf dem Handy gespeichert.<br>Mach\'s gut, Jürgen! 👋</p>' +
+      '<button class="btn-main" style="margin-bottom:10px" onclick="newEntry()">Neuer Eintrag</button>' +
+      '<button class="btn-ghost" onclick="go(\'stats\')">Auswertung ansehen 📊</button>' +
+      '</div>';
+  }
+  var alreadyToday = state.entries.some(function (e) {
+    return new Date(e.ts).toDateString() === new Date().toDateString();
+  });
+  var html = '<div class="content">';
+  if (alreadyToday) {
+    html += '<div class="hint">👋 Du hast heute schon einen Eintrag gespeichert – du kannst natürlich trotzdem noch einen ergänzen.</div>';
+  }
+  html += '<div class="dist-lbl" style="margin:0 16px 4px"><span>Fortschritt</span><span id="ptext">0 / ' + QUESTIONS.length + '</span></div>' +
+    '<div class="bar-outer"><div class="bar-inner" id="pbar"></div></div>';
+
+  QUESTIONS.forEach(function (q) {
+    html += '<div class="card"><div class="qlabel">' + q.emoji + ' ' + esc(q.label) + '</div>';
+    q.options.forEach(function (opt, i) {
+      html += '<button type="button" class="opt" id="b-' + q.id + '-' + i + '" onclick="pick(\'' + q.id + '\',' + i + ')">' + esc(opt) + '</button>';
+    });
+    html += '</div>';
+  });
+
+  html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
+    '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis, Gedanken …" oninput="setNote(this.value)"></textarea></div>';
+  html += '<button type="button" class="btn-main" id="saveBtn" onclick="submitForm()" disabled>Noch ' + QUESTIONS.length + ' Frage(n) offen</button>';
+  html += '</div>';
+  return html;
+}
+
+function distributionCard(q, entries) {
+  var counts = {};
+  q.options.forEach(function (o) { counts[o] = 0; });
+  entries.forEach(function (e) {
+    var a = e.answers[q.id];
+    if (a && a in counts) counts[a] += 1;
+  });
+  var total = entries.length;
+  var html = '<div class="card"><div class="qlabel">' + q.emoji + ' ' + esc(q.label) + '</div>';
+  q.options.forEach(function (opt) {
+    var c = counts[opt];
+    var pct = total ? Math.round((c / total) * 100) : 0;
+    html += '<div class="dist-row"><div class="dist-lbl"><span>' + esc(opt) + '</span><span>' + c + '× (' + pct + ' %)</span></div>' +
+      '<div class="track"><div class="fill" style="width:' + pct + '%"></div></div></div>';
+  });
+  return html + '</div>';
+}
+
+function backupCard() {
+  return '<div class="card"><div class="qlabel">💾 Sicherung</div>' +
+    '<p class="muted" style="margin:0 0 10px;font-size:13px">Deine Einträge liegen nur auf diesem Gerät. Kopiere den Block z. B. in deine Notizen als Backup – oder füge hier ein altes Backup ein und tippe auf „Laden“.</p>' +
+    '<textarea rows="4" id="backupArea" style="font-size:11px;font-family:ui-monospace,Menlo,monospace" oninput="setBackup(this.value)"></textarea>' +
+    '<div class="flexrow"><button type="button" class="btn-sm btn-grey" onclick="copyBackup()">Kopieren</button>' +
+    '<button type="button" class="btn-sm btn-red" onclick="restoreBackup()">Laden</button></div>' +
+    '<div id="backupMsg" style="text-align:center;font-size:14px;color:#475569;margin-top:8px"></div></div>';
+}
+
+function viewStats() {
+  if (!state.entries.length) {
+    return '<div class="center"><div class="big-emoji">📊</div><h2 style="margin:0 0 6px;font-size:20px">Noch keine Daten</h2>' +
+      '<p class="muted">Sobald du ein paar Fragebögen ausgefüllt hast, siehst du hier deine Monatsauswertung mit Diagrammen.</p></div>';
+  }
+  var monthKeys = [];
+  state.entries.forEach(function (e) {
+    var k = monthKeyOf(e.ts);
+    if (monthKeys.indexOf(k) === -1) monthKeys.push(k);
+  });
+  monthKeys.sort().reverse();
+  if (!state.month || monthKeys.indexOf(state.month) === -1) state.month = monthKeys[0];
+
+  var monthEntries = state.entries.filter(function (e) { return monthKeyOf(e.ts) === state.month; });
+  var withScore = monthEntries.map(function (e) { return { e: e, s: dayScore(e) }; })
+    .filter(function (x) { return x.s !== null; });
+  var avg = withScore.length ? Math.round(withScore.reduce(function (a, x) { return a + x.s; }, 0) / withScore.length) : null;
+
+  var html = '<div class="chips">';
+  monthKeys.forEach(function (k) {
+    html += '<button type="button" class="chip' + (k === state.month ? ' on' : '') + '" onclick="setMonth(\'' + k + '\')">' + esc(monthLabelOf(k)) + '</button>';
+  });
+  html += '</div>';
+
+  html += '<div class="grid2">' +
+    '<div class="stat"><div class="num">' + monthEntries.length + '</div><div class="lbl">Einträge im Monat</div></div>' +
+    '<div class="stat">' + (avg !== null
+      ? '<div class="num" style="color:' + scoreColor(avg) + '">' + avg + '</div><div class="lbl">Ø Tages-Score</div>'
+      : '<div class="muted" style="padding-top:14px">Keine Bewertung</div>') + '</div></div>';
+
+  if (withScore.length) {
+    var lineData = withScore.map(function (x) { return { label: fmtShort(x.e.ts), score: x.s, ts: x.e.ts }; })
+      .sort(function (a, b) { return a.ts - b.ts; });
+    html += '<div class="card"><div class="qlabel">📈 Tages-Score im Verlauf</div>' + lineChartSVG(lineData) + '</div>';
+  }
+
+  var dienstartCounts = {};
+  monthEntries.forEach(function (e) {
+    var a = e.answers["dienstart"];
+    if (a) dienstartCounts[a] = (dienstartCounts[a] || 0) + 1;
+  });
+  var pieItems = Object.keys(dienstartCounts).map(function (name, i) {
+    return { name: name, value: dienstartCounts[name], color: PIE_COLORS[i % PIE_COLORS.length] };
+  });
+  if (pieItems.length) {
+    html += '<div class="card"><div class="qlabel">🕐 Deine Dienstarten</div>' + donutSVG(pieItems);
+    html += '<div class="legend">' + pieItems.map(function (p) {
+      return '<span><span class="dot" style="background:' + p.color + '"></span>' + esc(p.name) + ' (' + p.value + '×)</span>';
+    }).join("") + '</div></div>';
+  }
+
+  html += '<div class="section-t">Alle Fragen im Überblick</div>';
+  QUESTIONS.filter(function (q) { return q.id !== "dienstart"; }).forEach(function (q) {
+    html += distributionCard(q, monthEntries);
+  });
+
+  html += backupCard();
+  return html;
+}
+
+function viewLog() {
+  if (!state.entries.length) {
+    return '<div class="center"><div class="big-emoji">🗂️</div><h2 style="margin:0 0 6px;font-size:20px">Noch nichts drin</h2>' +
+      '<p class="muted">Deine ausgefüllten Fragebögen landen hier.</p></div>';
+  }
+  var sorted = state.entries.slice().sort(function (a, b) { return b.ts - a.ts; });
+  var html = '<div class="content">';
+  var lastMonth = "";
+  sorted.forEach(function (e) {
+    var mk = monthKeyOf(e.ts);
+    if (mk !== lastMonth) {
+      html += '<div class="month-h">' + esc(monthLabelOf(mk)) + '</div>';
+      lastMonth = mk;
+    }
+    var score = dayScore(e);
+    html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px"><span style="font-weight:600;color:#0f172a">' +
+      fmtDay(e.ts) + ' · ' + fmtTime(e.ts) + '</span>' +
+      (score !== null ? '<span class="score-badge" style="background:' + scoreColor(score) + '">' + score + '</span>' : '') +
+      '</div>';
+    QUESTIONS.forEach(function (q) {
+      var a = e.answers[q.id];
+      if (a) html += '<span class="tag">' + q.emoji + ' ' + esc(a) + '</span>';
+    });
+    if (e.note) html += '<div class="note">„' + esc(e.note) + '“</div>';
+    if (state.confirmId === e.id) {
+      html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</button>' +
+        '<button type="button" class="btn-sm btn-grey" onclick="cancelDelete()">Abbrechen</button></div>';
+    } else {
+      html += '<button type="button" class="del" onclick="askDelete(\'' + e.id + '\')">Eintrag löschen</button>';
+    }
+    html += '</div>';
+  });
+  return html + '</div>';
+}
+
+/* ============ Aktionen ============ */
+
+function render() {
+  var wrap = document.getElementById("wrap");
+  var tabs = [
+    { id: "form", ico: "📝", label: "Fragebogen" },
+    { id: "stats", ico: "📊", label: "Auswertung" },
+    { id: "log", ico: "🗂️", label: "Verlauf" }
+  ];
+  var body = state.tab === "form" ? viewForm() : state.tab === "stats" ? viewStats() : viewLog();
+  var tabbar = '<div class="tabbar">' + tabs.map(function (t) {
+    return '<button type="button" class="tab' + (state.tab === t.id ? ' on' : '') + '" onclick="go(\'' + t.id + '\')">' +
+      '<span class="ico">' + t.ico + '</span>' + t.label + '</button>';
+  }).join("") + '</div>';
+
+  wrap.innerHTML =
+    '<header><div class="logo">🚆</div><div><h1>Streckenkunde</h1><div class="sub">Dein Fahrdienst-Tagebuch</div></div></header>' +
+    body + tabbar;
+
+  if (state.tab === "form" && !state.saved) updateProgress();
+  if (state.tab === "stats") {
+    var ba = document.getElementById("backupArea");
+    if (ba) ba.value = state.backupText || JSON.stringify(state.entries);
+  }
+  if (state.tab === "form" && !state.saved) {
+    var na = document.getElementById("noteArea");
+    if (na && state.note) na.value = state.note;
+  }
+}
+
+function go(tab) { state.tab = tab; render(); window.scrollTo(0, 0); }
+
+function pick(qid, idx) {
+  var q = QUESTIONS.filter(function (x) { return x.id === qid; })[0];
+  var opt = q.options[idx];
+  if (state.answers[qid] === opt) delete state.answers[qid];
+  else state.answers[qid] = opt;
+  q.options.forEach(function (o, i) {
+    var b = document.getElementById("b-" + qid + "-" + i);
+    if (b) {
+      var on = state.answers[qid] === o;
+      b.className = "opt" + (on ? " on" : "");
+      b.textContent = (on ? "✓ " : "") + o;
+    }
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  var done = QUESTIONS.filter(function (q) { return state.answers[q.id]; }).length;
+  var pbar = document.getElementById("pbar");
+  var ptext = document.getElementById("ptext");
+  var btn = document.getElementById("saveBtn");
+  if (!pbar || !btn) return;
+  pbar.style.width = (done / QUESTIONS.length * 100) + "%";
+  ptext.textContent = done + " / " + QUESTIONS.length;
+  if (done === QUESTIONS.length) {
+    btn.disabled = false;
+    btn.textContent = "Speichern 💾";
+  } else {
+    btn.disabled = true;
+    btn.textContent = "Noch " + (QUESTIONS.length - done) + " Frage(n) offen";
+  }
+}
+
+function setNote(v) { state.note = v; }
+
+function submitForm() {
+  var done = QUESTIONS.filter(function (q) { return state.answers[q.id]; }).length;
+  if (done !== QUESTIONS.length) return;
+  state.entries.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    ts: Date.now(),
+    answers: Object.assign({}, state.answers),
+    note: (state.note || "").trim()
+  });
+  persist();
+  state.saved = true;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function newEntry() {
+  state.answers = {};
+  state.note = "";
+  state.saved = false;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function setMonth(k) { state.month = k; render(); }
+
+function askDelete(id) { state.confirmId = id; render(); }
+function cancelDelete() { state.confirmId = null; render(); }
+function deleteEntry(id) {
+  state.entries = state.entries.filter(function (e) { return e.id !== id; });
+  state.confirmId = null;
+  persist();
+  render();
+}
+
+function setBackup(v) { state.backupText = v; }
+
+function backupMsg(text) {
+  var el = document.getElementById("backupMsg");
+  if (el) el.textContent = text;
+  setTimeout(function () { if (el) el.textContent = ""; }, 2600);
+}
+
+function copyBackup() {
+  var text = (state.backupText || "").trim() || JSON.stringify(state.entries);
+  var done = function () { backupMsg("Kopiert! ✅"); };
+  var fail = function () { backupMsg("Bitte Text manuell markieren und kopieren."); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, fail);
+  } else { fail(); }
+}
+
+function restoreBackup() {
+  var text = (state.backupText || "").trim();
+  try {
+    var parsed = JSON.parse(text);
+    if (!Array.isArray(parsed)) throw new Error("kein Array");
+    var byId = {};
+    state.entries.concat(parsed).forEach(function (e) { if (e && e.id) byId[e.id] = e; });
+    state.entries = Object.keys(byId).map(function (k) { return byId[k]; })
+      .sort(function (a, b) { return a.ts - b.ts; });
+    persist();
+    render();
+    backupMsg("Daten geladen! ✅");
+  } catch (err) {
+    backupMsg("Das ist kein gültiger Daten-Block. ❌");
+  }
+}
+
+render();
+</script>
+</body>
+</html>
