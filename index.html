@@ -171,6 +171,16 @@ var RB = {
 
 /* ---------- Baureihen (fahrberechtigt, vom Papierzettel) ---------- */
 var BAUREIHEN = ["101", "1116", "401", "402", "403", "406", "411", "415", "412", "412.7", "S286", "S287", "S296.1", "S296.3", "S8091.7", "S8091.9"];
+/* Gruppierung wie im Streckenkundeblatt (Jürgen 01.11.2026): zusammengehörige Baureihen je Zeile/Block */
+var BR_GROUPS = [
+  ["101", "1116"],
+  ["401", "402"],
+  ["403", "406"],
+  ["411", "415"],
+  ["412", "412.7"],
+  ["S286", "S287", "S296.1", "S296.3"],
+  ["S8091.7", "S8091.9"]
+];
 
 /* ---------- Bahnhöfe ---------- */
 var HBF = {
@@ -952,10 +962,13 @@ function viewForm() {
     }
     html += "</div>";
   } else if (s.k === "br") {
-    html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div><div class="chips wrap">' +
-      BAUREIHEN.map(function (b) {
+    html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div>';
+    /* Gruppierung wie im Streckenkundeblatt (Jürgen 01.11.2026) */
+    BR_GROUPS.forEach(function (grp) {
+      html += '<div class="chips wrap" style="margin-bottom:6px">' + grp.map(function (b) {
         return '<button type="button" class="chip' + (w.baureihen.indexOf(b) >= 0 ? " on" : "") + '" onclick="toggleBaureihe(\'' + b + '\')">' + esc(b) + "</button>";
       }).join("") + "</div>";
+    });
     html += '<div class="muted" style="font-size:13px;margin-top:6px">Mehrfachauswahl – einfach alle antippen, die du heute gefahren bist.</div></div>';
     html += '<button type="button" class="btn-ghost" onclick="nichtsZuEintragen()">Heute gibt es nichts einzutragen</button>';
     if (w.baureihen.length) {
