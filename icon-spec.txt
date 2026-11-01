@@ -1,1 +1,2 @@
 Icon-Spezifikation. Diese Datei nicht loeschen - sie startet die Icon-Erzeugung.
+Design 2 (01.11.2026): weisser Hintergrund, roter Rand (mittlere Dicke), rote Buchstaben SK in der Mitte.

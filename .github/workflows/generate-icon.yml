@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Pillow installieren
+        run: python3 -m pip install --quiet Pillow
       - name: Icon generieren
         run: python3 generate_icon.py
       - name: Icon einchecken
