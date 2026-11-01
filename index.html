@@ -185,6 +185,19 @@ var BR_GROUPS = [
   ["S286", "S287", "S296.1", "S296.3"],
   ["S8091.7", "S8091.9"]
 ];
+/* Anzeige wie im Streckenkundeblatt (Jürgen 01.11.2026): jede Gruppe = EIN Feld.
+   Labels passend zu BR_GROUPS (Index) – getippt wird immer die ganze Gruppe. */
+var BR_LABELS = [
+  "101",
+  "1116",
+  "401+402",
+  "403+406",
+  "411+415",
+  "412",
+  "412.7",
+  "S286/S287/S296.1/S296.3",
+  "S8091.7+S8091.9"
+];
 
 /* ---------- Bahnhöfe ---------- */
 var HBF = {
@@ -721,6 +734,31 @@ function toggleBaureihe(br) {
   else state.w.baureihen.push(br);
   render();
 }
+/* Jede Baureihen-Gruppe = EIN Feld wie im Streckenkundeblatt (Jürgen 01.11.2026):
+   Antippen wählt alle Baureihen der Gruppe zusammen, nochmal tippen nimmt alle raus. */
+function toggleBrGroup(gi) {
+  var grp = BR_GROUPS[gi];
+  var all = grp.every(function (b) { return state.w.baureihen.indexOf(b) >= 0; });
+  grp.forEach(function (b) {
+    var i = state.w.baureihen.indexOf(b);
+    if (all && i >= 0) state.w.baureihen.splice(i, 1);
+    if (!all && i < 0) state.w.baureihen.push(b);
+  });
+  render();
+}
+/* Baureihen eines Eintrags als Gruppen-Labels anzeigen (wie auf der Liste) */
+function brGruppenText(brs) {
+  var shown = [];
+  BR_GROUPS.forEach(function (grp, gi) {
+    if (grp.some(function (b) { return (brs || []).indexOf(b) >= 0; })) shown.push(BR_LABELS[gi]);
+  });
+  var covered = {};
+  BR_GROUPS.forEach(function (grp) { grp.forEach(function (b) { covered[b] = 1; }); });
+  (brs || []).forEach(function (b) {
+    if (!covered[b] && shown.indexOf(b) < 0) shown.push(b);
+  });
+  return shown.join(" · ");
+}
 function nichtsZuEintragen() {
   state.w.nichts = true;
   render();
@@ -1016,13 +1054,12 @@ function viewForm() {
     html += "</div>";
   } else if (s.k === "br") {
     html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div>';
-    /* Gruppierung wie im Streckenkundeblatt (Jürgen 01.11.2026) */
-    BR_GROUPS.forEach(function (grp) {
-      html += '<div class="chips wrap" style="margin-bottom:6px">' + grp.map(function (b) {
-        return '<button type="button" class="chip' + (w.baureihen.indexOf(b) >= 0 ? " on" : "") + '" onclick="toggleBaureihe(\'' + b + '\')">' + esc(b) + "</button>";
-      }).join("") + "</div>";
-    });
-    html += '<div class="muted" style="font-size:13px;margin-top:6px">Mehrfachauswahl – einfach alle antippen, die du heute gefahren bist.</div></div>';
+    /* Wie im Streckenkundeblatt (Jürgen 01.11.2026): jede Gruppe = EIN Feld */
+    html += '<div class="chips wrap">' + BR_GROUPS.map(function (grp, gi) {
+      var all = grp.every(function (b) { return w.baureihen.indexOf(b) >= 0; });
+      return '<button type="button" class="chip' + (all ? " on" : "") + '" onclick="toggleBrGroup(' + gi + ')">' + esc(BR_LABELS[gi]) + "</button>";
+    }).join("") + "</div>";
+    html += '<div class="muted" style="font-size:13px;margin-top:6px">Mehrfachauswahl – jedes Feld steht wie auf der Liste, tippe alle an, die du heute gefahren bist.</div></div>';
     html += '<button type="button" class="btn-ghost" onclick="nichtsZuEintragen()">Heute gibt es nichts einzutragen</button>';
     if (w.baureihen.length) {
       html += '<button class="btn-main" onclick="pushStep({k:\'start\',i:0})">Weiter – Fahrt eintragen</button>';
@@ -1234,7 +1271,7 @@ function viewLog() {
   state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
     html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px">' +
       '<span style="font-weight:600;color:#0f172a">📆 ' + fmtDate(e.date) + "</span>" +
-      '<span class="tag">' + (e.baureihen || []).join(" · ") + "</span></div>";
+      '<span class="tag">' + esc(brGruppenText(e.baureihen)) + "</span></div>";
     (e.fahrten || []).forEach(function (f, fi) {
       html += '<div class="trip"><div class="rt-name" style="margin-top:' + (fi ? 10 : 4) + 'px">' +
         "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
