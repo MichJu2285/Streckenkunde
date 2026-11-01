@@ -107,6 +107,7 @@ var SECTIONS = {
   "S500":       { n: "Süd 500 (VDE 8)", v: "Unterleiterbach", b: "Erfurt Hbf", f: "2027-02-17" },
   "S501":       { n: "Süd 501 (Bogen via Coburg)", v: "—", b: "—", f: null },
   "S50/1":      { n: "Süd 50/1", v: "München Hbf", b: "München Ost Pbf", f: "2027-05-12" },
+  "S50":        { n: "Süd 50", v: "München Süd", b: "München Ost Pbf", f: null },
   "S51":        { n: "Süd 51", v: "München-Laim Rbf", b: "München Süd", f: "2027-07-20" },
   "S57/84":     { n: "Süd 57/84", v: "München Ost Pbf", b: "München-Daglfing", f: "2027-05-12" },
   "S63":        { n: "Süd 63/1 & 30/1 (Gl. Garmisch)", v: "München Hbf", b: "München-Pasing", f: "2026-11-16" },
@@ -163,7 +164,7 @@ var SECTIONS = {
 
 /* ---------- Regionalbereiche (für die Auswertung) ---------- */
 var RB = {
-  "S": ["S1/1","S1/2","S1/3","S153","S6","S32","S310/1","S310/2","S35/1","S35/2","S35/3","S350","S37","S4","S46","S47/2","S48","S500","S501","S50/1","S51","S57/84","S63","S91","S1037","S107","S108","S110","S111","S112","S15/1","S15/2","S15/3","S16","S18","S18a","S21","S23","S231","S24","S31"],
+  "S": ["S1/1","S1/2","S1/3","S153","S6","S32","S310/1","S310/2","S35/1","S35/2","S35/3","S350","S37","S4","S46","S47/2","S48","S500","S501","S50","S50/1","S51","S57/84","S63","S91","S1037","S107","S108","S110","S111","S112","S15/1","S15/2","S15/3","S16","S18","S18a","S21","S23","S231","S24","S31"],
   "M": ["M300/1","M300/2","M300/3","M361","M25/1","M25/2","M25a","M25/3","M35","M21/2","M21/3","M23/1","M23/2","M23/3","M23/4","M23/5","M23/6","M28","M32","M33","M360","M15/1","M12","M11/1","M9&11/2","M15","M372","MFF_FLF"],
   "N": ["N300/4"],
   "SO": ["SO400","SO500"]
@@ -362,6 +363,37 @@ var ROUTES = [
 
 /* Retour-Spiegelung (Grundregel: alle Wege gelten in beide Richtungen) wird
    zur Laufzeit aus den Hinfahrt-Routen erzeugt (mirrorRoute in engine.js). */
+
+/* ---------- Drehfahrten (Fahrzeug-Wenden, Start = Ziel – Jürgen 01.11.2026) ---------- */
+/* Erscheinen im Wizard nur, wenn Start- und Zielbahnhof identisch sind – und nur
+   für München Hbf und München-Laim Rbf. Jede Drehfahrt ist eine Rundfahrt ohne
+   eigene Retour und in BEIDE Richtungen befahrbar (Kette gilt für beide, Abschnitte
+   identisch). Teilfahrten zählen als gefahren (Grundregel 31.10.2026).
+   Drei Runden pro Bahnhof (Jürgen 01.11.2026): über Südbahnhof, Nordring, über Allach. */
+var DREHFAHRTEN = {
+  "muenchen_hbf": [
+    { id: "d_mh_sued", n: "Drehfahrt über Südbahnhof", d: 1,
+      secs: ["S107", "S51", "S50/1"],
+      txt: "107 nach Laim Rbf → dort drehen → 51 nach München Süd → dort drehen → 50/1 zurück in den Hbf" },
+    { id: "d_mh_nordring", n: "Drehfahrt Nordring", d: 0,
+      secs: ["S50/1", "S57/84", "S4", "S110", "S46"],
+      txt: "50/1 nach München Ost → Nordring (57/84 → 4) nach München Nord → 110 bis Moosach → 46 zurück zum Hbf" },
+    { id: "d_mh_allach", n: "Drehfahrt über Allach", d: 0,
+      secs: ["S35/1", "S111", "S110", "S46"],
+      txt: "35/1 bis München-Allach → 111 nach München Nord → 110 bis Moosach → 46 zurück zum Hbf" }
+  ],
+  "laim_rbf": [
+    { id: "d_ml_sued", n: "Drehfahrt über Südbahnhof", d: 1,
+      secs: ["S51", "S50/1", "S107"],
+      txt: "51 nach München Süd → dort drehen → 50/1 zum Hbf → dort drehen → 107 zurück nach Laim" },
+    { id: "d_ml_nordring", n: "Drehfahrt Nordring", d: 0,
+      secs: ["S51", "S50", "S57/84", "S4", "S110"],
+      txt: "51 nach München Süd → 50 nach München Ost → Nordring (57/84 → 4) nach München Nord → 110 zurück nach Laim" },
+    { id: "d_ml_allach", n: "Drehfahrt über Allach", d: 0,
+      secs: ["S108", "S35/1", "S111", "S110"],
+      txt: "108 nach München-Obermenzing → auf die 35/1 → bei Allach auf die 111 nach München Nord → 110 zurück nach Laim" }
+  ]
+};
 /* ============ Streckenkunde v2 – Engine ============ */
 /* Kernidee: Jeder ALW ist ein Muster→Ersetzung-Baustein (sub → rep), der an einer
    bestimmten Stelle der Kette andockt. MEHRERE ALW pro Fahrt sind möglich, solange
@@ -666,7 +698,7 @@ function backStep() {
 }
 function fahrtOf(i) {
   if (!state.w.fahrten[i]) {
-    state.w.fahrten[i] = { start: null, ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false, retour: null };
+    state.w.fahrten[i] = { start: null, ziel: null, routeId: null, drehId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false, retour: null };
   }
   return state.w.fahrten[i];
 }
@@ -704,7 +736,14 @@ function pickZiel(i, h) {
   var f = fahrtOf(i);
   f.ziel = h;
   f.routeId = null; f.alws = []; f.opts = []; f.alwOpen = false;
-  pushStep({ k: "weg", i: i });
+  f.drehId = null;
+  /* Drehfahrt: Start = Ziel → eigene Drehfahrten-Auswahl statt Regelweg (Jürgen 01.11.2026) */
+  pushStep({ k: (h === f.start && DREHFAHRTEN[h]) ? "dreh" : "weg", i: i });
+}
+function setDreh(i, did) {
+  var f = fahrtOf(i);
+  f.drehId = did;
+  render();
 }
 function setRoute(i, rid) {
   var f = fahrtOf(i);
@@ -789,6 +828,17 @@ function submitEntry() {
   if (!w.baureihen.length || !w.fahrten.length) return;
   var fahrten = w.fahrten.map(function (f) {
     var out = { start: f.start, ziel: f.ziel, routeId: f.routeId, alws: f.alws.slice(), opts: f.opts.slice(), chain: [] };
+    /* Drehfahrt: Rundfahrt aus der Drehfahrten-Bibliothek, ohne Retour (Jürgen 01.11.2026) */
+    if (f.start === f.ziel && DREHFAHRTEN[f.start]) {
+      var dlist = DREHFAHRTEN[f.start];
+      var dw = dlist.filter(function (x) { return x.id === f.drehId; })[0] ||
+               dlist.filter(function (x) { return x.d; })[0] || dlist[0];
+      out.routeId = dw.id;
+      out.dreh = 1;
+      out.drehName = dw.n;
+      out.chain = dw.secs.slice();
+      return out;
+    }
     var rs = routesForWithFallback(f.start, f.ziel);
     var r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
     if (r) {
@@ -1022,12 +1072,30 @@ function viewForm() {
         return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
       }).join("") + "</div>";
     }
+    /* Drehfahrt: Start = Ziel, nur für München Hbf / Laim Rbf (Jürgen 01.11.2026) */
+    if (DREHFAHRTEN[fg.start]) {
+      html += '<button type="button" class="opt" style="margin-top:10px" onclick="pickZiel(' + s.i + ',\'' + fg.start + '\')">🔄 Drehfahrt – Fahrzeug wurde in ' + esc(HBF[fg.start]) + " gedreht</button>";
+    }
     html += "</div></div>";
   } else if (s.k === "weg") {
     var f1 = fahrtOf(s.i);
     html += '<div class="card"><div class="qlabel">🛤️ Fahrt ' + (s.i + 1) + ": " + esc(HBF[f1.start]) + " → " + esc(HBF[f1.ziel]) + "</div>";
     html += '<div class="muted" style="font-size:13px">Regelweg ist vorausgewählt. ALW kannst du jetzt <b>mehrfach</b> antippen – einer pro Störung.</div></div>';
     html += wegStepHTML(f1, s.i, false);
+  } else if (s.k === "dreh") {
+    /* Drehfahrten-Auswahl: Rundfahrt Start = Ziel, ohne Retour (Jürgen 01.11.2026) */
+    var fd = fahrtOf(s.i);
+    var dlist = DREHFAHRTEN[fd.start] || [];
+    html += '<div class="card"><div class="qlabel">🔄 Drehfahrt: ' + esc(HBF[fd.start]) + " → " + esc(HBF[fd.ziel]) + "</div>" +
+      '<div class="muted" style="font-size:13px">Das Fahrzeug wurde gedreht – welche Runde wurde gefahren?</div></div>';
+    dlist.forEach(function (d) {
+      var on = fd.drehId === d.id || (!fd.drehId && d.d);
+      html += '<button type="button" class="opt route' + (on ? " on" : "") + '" onclick="setDreh(' + s.i + ',\'' + d.id + '\')">' +
+        '<div class="rt-name">' + (on ? "✓ " : "") + esc(d.n) + " <span class='muted' style='font-size:12px'>(in beide Richtungen befahrbar)</span></div>" +
+        '<div class="muted" style="font-size:12px;margin:2px 0 4px">' + esc(d.txt) + "</div>" +
+        chainChips(d.secs) + "</button>";
+    });
+    html += '<button class="btn-main" onclick="pushStep({k:\'mehr\',i:' + s.i + '})">Weiter</button>';
   } else if (s.k === "ret") {
     var f2 = fahrtOf(s.i);
     if (f2.ziel === "muenchen_hbf" || f2.ziel === "muenchen_ost") {
@@ -1170,6 +1238,9 @@ function viewLog() {
     (e.fahrten || []).forEach(function (f, fi) {
       html += '<div class="trip"><div class="rt-name" style="margin-top:' + (fi ? 10 : 4) + 'px">' +
         "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
+      if (f.dreh && f.drehName) {
+        html += '<div class="muted" style="font-size:12px;margin-top:2px">🔄 ' + esc(f.drehName) + "</div>";
+      }
       if (f.chain && f.chain.length) html += chainChips(f.chain);
       else html += '<div class="warn" style="font-size:12px">ohne Fahrweg gespeichert</div>';
       (f.alwLabels || []).forEach(function (l) {
