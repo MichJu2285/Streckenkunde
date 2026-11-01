@@ -5,8 +5,8 @@ S = 180
 img = Image.new("RGB", (S, S), (255, 255, 255))
 d = ImageDraw.Draw(img)
 
-# Roter Rand: abgerundetes Rechteck, mittlere Dicke (9 px bei 180 px)
-d.rounded_rectangle([3, 3, S - 4, S - 4], radius=40, outline=(236, 0, 22), width=9)
+# Roter Rand: abgerundetes Rechteck, dicker (13 px bei 180 px, Jürgen 01.11.2026)
+d.rounded_rectangle([3, 3, S - 4, S - 4], radius=40, outline=(236, 0, 22), width=13)
 
 # SK in Rot, mittig, fett
 font = None
