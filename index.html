@@ -573,6 +573,8 @@ var state = {
   confirmId: null,
   backupText: "",
   zielGroup: false,  /* Frankfurt-Gruppe aufgeklappt */
+  dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
+  dateEdit: false,   /* Notiz-Schritt: Datum-Änderung offen */
   jahr: new Date().getFullYear()
 };
 
@@ -624,7 +626,7 @@ function routesForWithFallback(start, ziel) {
 /* ---------- Wizard ---------- */
 function startWizard() {
   state.w = {
-    steps: [{ k: "br" }],
+    steps: [{ k: "datum" }],
     baureihen: [],
     nichts: false,
     fahrten: [],
@@ -633,6 +635,8 @@ function startWizard() {
   };
   state.saved = false;
   state.zielGroup = false;
+  state.dateCustom = false;
+  state.dateEdit = false;
 }
 function curStep() { return state.w.steps[state.w.steps.length - 1]; }
 function pushStep(s) { state.w.steps.push(s); render(); window.scrollTo(0, 0); }
@@ -737,6 +741,20 @@ function weitereFahrt(i) {
 function keineWeitere(i) { pushStep({ k: "note" }); }
 function setNote(v) { state.w.note = v; }
 function setDate(v) { state.w.date = v; }
+function pickHeute() {
+  state.w.date = todayISO();
+  state.dateCustom = false;
+  pushStep({ k: "br" });
+}
+function pickDatum(v) {
+  if (!v) return;
+  state.w.date = v;
+  state.dateCustom = false;
+  pushStep({ k: "br" });
+}
+function toggleDatumCustom() { state.dateCustom = !state.dateCustom; render(); }
+function toggleDatumEdit() { state.dateEdit = !state.dateEdit; render(); }
+function setDateLive(v) { if (v) { state.w.date = v; render(); } }
 
 function submitEntry() {
   var w = state.w;
@@ -878,7 +896,16 @@ function viewForm() {
   if (w.steps.length > 1) {
     html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Antwort korrigieren</button>';
   }
-  if (s.k === "br") {
+  if (s.k === "datum") {
+    html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
+      '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
+      '<button type="button" class="opt" onclick="toggleDatumCustom()">📆 Anderer Tag…</button>';
+    if (state.dateCustom) {
+      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="pickDatum(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:16px;background:#f8fafc;color:#0f172a;margin-top:8px">' +
+        '<div class="muted" style="font-size:13px;margin-top:6px">Tag wählen – danach geht es automatisch weiter.</div>';
+    }
+    html += "</div>";
+  } else if (s.k === "br") {
     html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div><div class="chips wrap">' +
       BAUREIHEN.map(function (b) {
         return '<button type="button" class="chip' + (w.baureihen.indexOf(b) >= 0 ? " on" : "") + '" onclick="toggleBaureihe(\'' + b + '\')">' + esc(b) + "</button>";
@@ -966,9 +993,11 @@ function viewForm() {
     var cnt = state.w.fahrten.length;
     html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
       '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
-    html += '<div class="card"><div class="qlabel">📅 Datum</div>' +
-      '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDate(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:16px;background:#f8fafc;color:#0f172a">' +
-      '<div class="muted" style="font-size:13px;margin-top:6px">Für Nachträge einfach ändern.</div></div>';
+    html += '<div class="muted" style="font-size:13px;margin:0 2px 14px">📅 Eintrag für <b>' + fmtDate(state.w.date) + '</b> – <button type="button" class="chip small" onclick="toggleDatumEdit()">ändern</button>';
+    if (state.dateEdit) {
+      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDateLive(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:16px;background:#f8fafc;color:#0f172a;margin-top:8px">';
+    }
+    html += "</div>";
     html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
   }
   html += "</div>";
