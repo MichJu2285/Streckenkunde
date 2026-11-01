@@ -760,8 +760,24 @@ function brGruppenText(brs) {
   return shown.join(" · ");
 }
 function nichtsZuEintragen() {
+  /* Baureihe(n) ohne Fahrt – z. B. Fahrzeug bereitgestellt (Jürgen 01.11.2026):
+     Die Baureihe wird trotzdem als Eintrag gespeichert. */
+  if (state.w.baureihen.length) {
+    state.entries.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      date: state.w.date || todayISO(),
+      baureihen: state.w.baureihen.slice(),
+      fahrten: [],
+      note: ""
+    });
+    persist();
+    state.w.nichtsBrs = state.w.baureihen.slice();
+  } else {
+    state.w.nichtsBrs = null;
+  }
   state.w.nichts = true;
   render();
+  window.scrollTo(0, 0);
 }
 function pickStart(i, h) {
   var f = fahrtOf(i);
@@ -1031,9 +1047,12 @@ function viewForm() {
       '<button class="btn-ghost" onclick="go(\'stats\')">Auswertung ansehen 📊</button></div>';
   }
   if (w.nichts) {
-    return '<div class="center"><div class="big-emoji">👍</div>' +
+    var brOnly = w.nichtsBrs && w.nichtsBrs.length;
+    return '<div class="center"><div class="big-emoji">' + (brOnly ? "✅" : "👍") + '</div>' +
       '<h2 style="margin:0 0 6px;font-size:22px">Notiert!</h2>' +
-      '<p class="muted" style="margin:0 0 24px">Heute gibt es nichts einzutragen – es wurde kein Eintrag gespeichert.</p>' +
+      '<p class="muted" style="margin:0 0 24px">' + (brOnly
+        ? 'Gespeichert – <b>' + esc(brGruppenText(w.nichtsBrs)) + '</b> ohne Fahrt (z. B. Fahrzeug bereitgestellt). Mach\'s gut, Jürgen! 👋'
+        : 'Heute gibt es nichts einzutragen – es wurde kein Eintrag gespeichert.') + '</p>' +
       '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Doch, eintragen</button></div>';
   }
   if (!w) { startWizard(); }
@@ -1060,7 +1079,7 @@ function viewForm() {
       return '<button type="button" class="chip' + (all ? " on" : "") + '" onclick="toggleBrGroup(' + gi + ')">' + esc(BR_LABELS[gi]) + "</button>";
     }).join("") + "</div>";
     html += '<div class="muted" style="font-size:13px;margin-top:6px">Mehrfachauswahl – jedes Feld steht wie auf der Liste, tippe alle an, die du heute gefahren bist.</div></div>';
-    html += '<button type="button" class="btn-ghost" onclick="nichtsZuEintragen()">Heute gibt es nichts einzutragen</button>';
+    html += '<button type="button" class="btn-ghost" onclick="nichtsZuEintragen()">Heute gibt es nichts weiteres einzutragen</button>';
     if (w.baureihen.length) {
       html += '<button class="btn-main" onclick="pushStep({k:\'start\',i:0})">Weiter – Fahrt eintragen</button>';
     }
@@ -1272,6 +1291,9 @@ function viewLog() {
     html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px">' +
       '<span style="font-weight:600;color:#0f172a">📆 ' + fmtDate(e.date) + "</span>" +
       '<span class="tag">' + esc(brGruppenText(e.baureihen)) + "</span></div>";
+    if (!(e.fahrten || []).length) {
+      html += '<div class="muted" style="font-size:12px;margin-top:2px">ohne Fahrt – nur Baureihen eingetragen (z. B. Fahrzeug bereitgestellt)</div>';
+    }
     (e.fahrten || []).forEach(function (f, fi) {
       html += '<div class="trip"><div class="rt-name" style="margin-top:' + (fi ? 10 : 4) + 'px">' +
         "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
