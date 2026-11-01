@@ -17,46 +17,47 @@
   #wrap { max-width: 480px; margin: 0 auto; padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
   header { position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #f1f5f9; }
   .logo { width: 40px; height: 40px; border-radius: 14px; background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 21px; flex: none; }
-  h1 { font-size: 17px; margin: 0; line-height: 1.2; }
-  .sub { font-size: 12px; color: #64748b; line-height: 1.2; }
+  h1 { font-size: 19px; margin: 0; line-height: 1.2; }
+  .sub { font-size: 13px; color: #64748b; line-height: 1.2; }
   .content { padding-top: 12px; }
-  .crumbs { font-size: 12px; font-weight: 700; color: var(--red); margin: 0 16px 6px; }
+  .crumbs { font-size: 13px; font-weight: 700; color: var(--red); margin: 0 16px 6px; }
   .card { background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(15,23,42,.06); margin: 0 16px 10px; }
-  .qlabel { font-weight: 600; margin-bottom: 10px; font-size: 16px; }
-  .welcome { margin: 0 16px 12px; padding: 14px 16px; border-radius: 16px; background: #fff; box-shadow: 0 1px 2px rgba(15,23,42,.06); font-size: 17px; font-weight: 600; color: #0f172a; border-left: 4px solid #EC0016; }
-  .welcome span { display: block; margin-top: 4px; font-weight: 400; font-size: 14px; color: #64748b; }
-  .opt { display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; color: #334155; font-size: 16px; margin-bottom: 8px; cursor: pointer; font-family: inherit; }
+  .qlabel { font-weight: 600; margin-bottom: 10px; font-size: 18px; }
+  .welcome { margin: 0 16px 12px; padding: 14px 16px; border-radius: 16px; background: #fff; box-shadow: 0 1px 2px rgba(15,23,42,.06); font-size: 20px; font-weight: 600; color: #0f172a; border-left: 4px solid #EC0016; }
+  .welcome .w1 { display: block; margin-top: 6px; font-weight: 400; font-size: 17px; color: #64748b; }
+  .welcome .w2 { display: block; margin-top: 22px; font-weight: 600; font-size: 19px; color: #0f172a; }
+  .opt { display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; color: #334155; font-size: 18px; margin-bottom: 8px; cursor: pointer; font-family: inherit; }
   .opt:last-child { margin-bottom: 0; }
   .opt.on { background: #fef2f2; border-color: var(--red); color: #b91c1c; font-weight: 600; }
-  .opt.back { background: #fff; color: #64748b; font-size: 14px; padding: 8px 14px; }
-  .opt.toggle { background: #fff; font-weight: 600; color: #475569; font-size: 14px; }
+  .opt.back { background: #fff; color: #64748b; font-size: 15px; padding: 8px 14px; }
+  .opt.toggle { background: #fff; font-weight: 600; color: #475569; font-size: 16px; }
   .opt.dis { opacity: .5; cursor: default; }
   .opt.route .rt-name, .opt.alw .rt-name { font-weight: 600; margin-bottom: 6px; }
-  .btn-main { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: var(--red); color: #fff; border: none; border-radius: 16px; padding: 15px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; }
-  .btn-ghost { display: block; width: calc(100% - 32px); margin: 0 16px 10px; background: #fff; color: #334155; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; }
-  .btn-sm { flex: 1; border: none; border-radius: 12px; padding: 10px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-main { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: var(--red); color: #fff; border: none; border-radius: 16px; padding: 15px; font-size: 18px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-ghost { display: block; width: calc(100% - 32px); margin: 0 16px 10px; background: #fff; color: #334155; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px; font-size: 18px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-sm { flex: 1; border: none; border-radius: 12px; padding: 10px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
   .btn-grey { background: #f1f5f9; color: #334155; }
   .btn-red { background: var(--red); color: #fff; }
-  textarea { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-size: 16px; font-family: inherit; color: #0f172a; }
+  textarea { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-size: 18px; font-family: inherit; color: #0f172a; }
   textarea:focus { outline: none; border-color: var(--red); }
-  .hint { margin: 0 16px 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 12px; font-size: 14px; }
+  .hint { margin: 0 16px 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 12px; font-size: 15px; }
   .center { text-align: center; padding: 48px 20px; }
   .big-emoji { font-size: 54px; margin-bottom: 12px; }
-  .muted { color: #64748b; font-size: 15px; }
+  .muted { color: #64748b; font-size: 16px; }
   .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; -webkit-overflow-scrolling: touch; }
   .chips.wrap { flex-wrap: wrap; overflow: visible; }
   .chips.static { flex-wrap: wrap; overflow: visible; margin: 0; }
-  .chip { flex: none; border-radius: 99px; padding: 8px 14px; font-size: 14px; font-weight: 600; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-family: inherit; cursor: pointer; }
+  .chip { flex: none; border-radius: 99px; padding: 8px 14px; font-size: 16px; font-weight: 600; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-family: inherit; cursor: pointer; }
   .chip.on { background: var(--red); border-color: var(--red); color: #fff; }
-  .chip.small { padding: 3px 10px; font-size: 12px; margin: 2px 4px 2px 0; background: #f1f5f9; border-color: #f1f5f9; color: #475569; cursor: default; }
+  .chip.small { padding: 3px 10px; font-size: 13px; margin: 2px 4px 2px 0; background: #f1f5f9; border-color: #f1f5f9; color: #475569; cursor: default; }
   .chip.weg { background: #fef2f2; border-color: #fecaca; color: #b91c1c; text-decoration: line-through; }
   .chip.dazu { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
   .delta { margin-top: 2px; }
-  .warn { margin-top: 6px; font-size: 12px; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 6px 10px; }
-  .tag { display: inline-block; font-size: 12px; background: #f1f5f9; color: #475569; border-radius: 99px; padding: 4px 10px; margin: 2px 4px 2px 0; }
-  .note { font-size: 14px; color: #64748b; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; font-style: italic; }
-  .del { background: none; border: none; color: #94a3b8; font-size: 12px; margin-top: 6px; padding: 0; font-family: inherit; cursor: pointer; }
-  .section-t { font-size: 14px; font-weight: 600; color: #64748b; margin: 14px 16px 8px; }
+  .warn { margin-top: 6px; font-size: 13px; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 6px 10px; }
+  .tag { display: inline-block; font-size: 13px; background: #f1f5f9; color: #475569; border-radius: 99px; padding: 4px 10px; margin: 2px 4px 2px 0; }
+  .note { font-size: 15px; color: #64748b; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; font-style: italic; }
+  .del { background: none; border: none; color: #94a3b8; font-size: 13px; margin-top: 6px; padding: 0; font-family: inherit; cursor: pointer; }
+  .section-t { font-size: 16px; font-weight: 600; color: #64748b; margin: 14px 16px 8px; }
   .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 6; background: #fff; border-top: 1px solid #e2e8f0; display: flex; max-width: 480px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom); }
   .tab { flex: 1; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #94a3b8; background: none; border: none; cursor: pointer; font-family: inherit; }
   .tab.on { color: var(--red); }
@@ -899,12 +900,12 @@ function viewForm() {
     html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Antwort korrigieren</button>';
   }
   if (s.k === "datum") {
-    html += '<div class="welcome">Servus Jürgen! 👋<span>Schön, dich zu sehen.<br>Pack ma’s!</span></div>';
+    html += '<div class="welcome">Servus Jürgen! 👋<span class="w1">Schön, dich zu sehen.</span><span class="w2">Pack ma’s!</span></div>';
     html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
       '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
       '<button type="button" class="opt" onclick="toggleDatumCustom()">📆 Anderer Tag…</button>';
     if (state.dateCustom) {
-      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="pickDatum(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:16px;background:#f8fafc;color:#0f172a;margin-top:8px">' +
+      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="pickDatum(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a;margin-top:8px">' +
         '<div class="muted" style="font-size:13px;margin-top:6px">Tag wählen – danach geht es automatisch weiter.</div>';
     }
     html += "</div>";
@@ -998,7 +999,7 @@ function viewForm() {
       '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
     html += '<div class="muted" style="font-size:13px;margin:0 2px 14px">📅 Eintrag für <b>' + fmtDate(state.w.date) + '</b> – <button type="button" class="chip small" onclick="toggleDatumEdit()">ändern</button>';
     if (state.dateEdit) {
-      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDateLive(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:16px;background:#f8fafc;color:#0f172a;margin-top:8px">';
+      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDateLive(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a;margin-top:8px">';
     }
     html += "</div>";
     html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
