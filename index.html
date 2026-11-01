@@ -20,49 +20,53 @@
   h1 { font-size: 17px; margin: 0; line-height: 1.2; }
   .sub { font-size: 12px; color: #64748b; line-height: 1.2; }
   .content { padding-top: 12px; }
+  .crumbs { font-size: 12px; font-weight: 700; color: var(--red); margin: 0 16px 6px; }
   .card { background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(15,23,42,.06); margin: 0 16px 10px; }
   .qlabel { font-weight: 600; margin-bottom: 10px; font-size: 16px; }
   .opt { display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; color: #334155; font-size: 16px; margin-bottom: 8px; cursor: pointer; font-family: inherit; }
   .opt:last-child { margin-bottom: 0; }
   .opt.on { background: #fef2f2; border-color: var(--red); color: #b91c1c; font-weight: 600; }
+  .opt.back { background: #fff; color: #64748b; font-size: 14px; padding: 8px 14px; }
+  .opt.toggle { background: #fff; font-weight: 600; color: #475569; font-size: 14px; }
+  .opt.dis { opacity: .5; cursor: default; }
+  .opt.route .rt-name, .opt.alw .rt-name { font-weight: 600; margin-bottom: 6px; }
   .btn-main { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: var(--red); color: #fff; border: none; border-radius: 16px; padding: 15px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; }
-  .btn-main:disabled { background: #e2e8f0; color: #94a3b8; cursor: default; }
   .btn-ghost { display: block; width: calc(100% - 32px); margin: 0 16px 10px; background: #fff; color: #334155; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; }
   .btn-sm { flex: 1; border: none; border-radius: 12px; padding: 10px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; }
   .btn-grey { background: #f1f5f9; color: #334155; }
   .btn-red { background: var(--red); color: #fff; }
   textarea { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-size: 16px; font-family: inherit; color: #0f172a; }
   textarea:focus { outline: none; border-color: var(--red); }
-  .bar-outer { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin: 0 16px 14px; }
-  .bar-inner { height: 100%; background: var(--red); border-radius: 99px; transition: width .25s; width: 0%; }
   .hint { margin: 0 16px 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 12px; font-size: 14px; }
   .center { text-align: center; padding: 48px 20px; }
   .big-emoji { font-size: 54px; margin-bottom: 12px; }
   .muted { color: #64748b; font-size: 15px; }
-  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 16px 6px; -webkit-overflow-scrolling: touch; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; -webkit-overflow-scrolling: touch; }
+  .chips.wrap { flex-wrap: wrap; overflow: visible; }
+  .chips.static { flex-wrap: wrap; overflow: visible; margin: 0; }
   .chip { flex: none; border-radius: 99px; padding: 8px 14px; font-size: 14px; font-weight: 600; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-family: inherit; cursor: pointer; }
   .chip.on { background: var(--red); border-color: var(--red); color: #fff; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px 10px; }
-  .stat { background: #fff; border-radius: 16px; padding: 14px; text-align: center; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
-  .stat .num { font-size: 30px; font-weight: 700; }
-  .stat .lbl { font-size: 12px; color: #64748b; margin-top: 2px; }
-  .dist-row { margin-bottom: 8px; }
-  .dist-lbl { display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-bottom: 3px; }
-  .track { height: 8px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
-  .fill { height: 100%; background: var(--red); border-radius: 99px; }
+  .chip.small { padding: 3px 10px; font-size: 12px; margin: 2px 4px 2px 0; background: #f1f5f9; border-color: #f1f5f9; color: #475569; cursor: default; }
+  .chip.weg { background: #fef2f2; border-color: #fecaca; color: #b91c1c; text-decoration: line-through; }
+  .chip.dazu { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+  .delta { margin-top: 2px; }
+  .warn { margin-top: 6px; font-size: 12px; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 6px 10px; }
   .tag { display: inline-block; font-size: 12px; background: #f1f5f9; color: #475569; border-radius: 99px; padding: 4px 10px; margin: 2px 4px 2px 0; }
-  .score-badge { font-size: 12px; font-weight: 700; color: #fff; border-radius: 99px; padding: 3px 10px; }
-  .month-h { font-size: 13px; font-weight: 600; color: #64748b; margin: 14px 16px 8px; }
   .note { font-size: 14px; color: #64748b; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; font-style: italic; }
   .del { background: none; border: none; color: #94a3b8; font-size: 12px; margin-top: 6px; padding: 0; font-family: inherit; cursor: pointer; }
-  .legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; font-size: 12px; color: #475569; margin-top: 8px; }
-  .dot { width: 10px; height: 10px; border-radius: 99px; display: inline-block; margin-right: 4px; }
   .section-t { font-size: 14px; font-weight: 600; color: #64748b; margin: 14px 16px 8px; }
   .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 6; background: #fff; border-top: 1px solid #e2e8f0; display: flex; max-width: 480px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom); }
   .tab { flex: 1; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #94a3b8; background: none; border: none; cursor: pointer; font-family: inherit; }
   .tab.on { color: var(--red); }
   .tab .ico { font-size: 21px; line-height: 1; }
   .flexrow { display: flex; gap: 8px; margin-top: 8px; }
+  .ampel { display: inline-block; width: 10px; height: 10px; border-radius: 99px; margin-right: 6px; }
+  .months { display: flex; gap: 3px; margin-top: 4px; }
+  .mo { flex: 1; text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; background: #f1f5f9; border-radius: 6px; padding: 4px 0; }
+  .mo.hit { background: #10B981; color: #fff; }
+  .card.sec { padding: 10px 14px; margin-bottom: 6px; }
+  .trip { margin-top: 4px; }
+  input[type="date"] { font-family: inherit; }
 </style>
 </head>
 <body>
@@ -71,36 +75,508 @@
 
 <script>
 "use strict";
+/* ============ Streckenkunde v2 – Daten (Fahrweg-Bibliothek) ============ */
+/* Quellen: Jürgens Fahrweg-Bibliothek (Stand 31.10.2026), Streckenkundekarte-Betriebsstellen-Abgleich (29.10.2026) */
 
-/* ============ Daten ============ */
-
-var STORAGE_KEY = "streckenkunde_v1";
+var STORAGE_KEY = "streckenkunde_v2";
 var RED = "#EC0016";
 
-var QUESTIONS = [
-  { id: "dienstart", emoji: "🕐", label: "Welche Dienstart hattest du heute?", options: ["Frühdienst", "Tagdienst", "Spätdienst", "Aushilfe / Umplanung", "Kein Fahrdienst"] },
-  { id: "fahrdienst", emoji: "🚆", label: "Wie lief dein Fahrdienst insgesamt?", options: ["Sehr gut", "Gut", "Okay", "Zäh", "Anstrengend"] },
-  { id: "kollegen", emoji: "👥", label: "Wie war die Stimmung mit den Kollegen?", options: ["Top", "Gut", "Normal", "Anstrengend", "Kaum Kontakt"] },
-  { id: "belastung", emoji: "💪", label: "Wie war die Belastung heute?", options: ["Entspannt", "Normal", "Viel los", "Grenzwertig"] },
-  { id: "ablauf", emoji: "⚠️", label: "Ist alles glatt gelaufen (Züge, Verkehr, Technik)?", options: ["Alles glatt", "Kleinere Sachen", "Größere Probleme"] },
-  { id: "pause", emoji: "🍞", label: "Hast du Pause in Nürnberg gemacht?", options: ["Ja, mit Freunden / Kollegen", "Ja, alleine", "Andere Pause", "Keine Pause"] },
-  { id: "zustand", emoji: "🔋", label: "Wie fühlst du dich jetzt nach dem Dienst?", options: ["Topfit", "Okay", "Müde", "Richtig erschlagen"] }
-];
-
-var SCORE_MAP = {
-  fahrdienst: { "Sehr gut": 100, "Gut": 75, "Okay": 50, "Zäh": 25, "Anstrengend": 0 },
-  kollegen: { "Top": 100, "Gut": 80, "Normal": 55, "Anstrengend": 20, "Kaum Kontakt": 50 },
-  belastung: { "Entspannt": 100, "Normal": 75, "Viel los": 50, "Grenzwertig": 20 },
-  zustand: { "Topfit": 100, "Okay": 75, "Müde": 45, "Richtig erschlagen": 10 }
+/* ---------- Streckenabschnitte ---------- */
+/* n = Name, v = Von, b = Bis, f = Kdg-bis-Frist (null = unbekannt / 12-Monats-Logik) */
+var SECTIONS = {
+  "S1/1":       { n: "Süd 1/1", v: "München Hbf", b: "Augsburg Hbf", f: "2027-08-05" },
+  "S1/2":       { n: "Süd 1/2", v: "Augsburg Hbf", b: "Ulm Hbf", f: "2027-08-05" },
+  "S1/3":       { n: "Süd 1/3", v: "Ulm Hbf", b: "Stuttgart-Obertürkheim", f: "2027-08-05" },
+  "S153":       { n: "Süd 153", v: "Stuttgart-Obertürkheim", b: "Stuttgart-Bad Cannstatt", f: "2027-08-05" },
+  "S6":         { n: "Süd 6 (NBS)", v: "Ulm Hbf", b: "Wendlingen (Neckar)", f: "2027-08-01" },
+  "S32":        { n: "Süd 32", v: "Plochingen", b: "Wendlingen (Neckar)", f: "2027-08-01" },
+  "S310/1":     { n: "Süd 310/1", v: "Stuttgart Hbf", b: "Bruchsal Rollenberg", f: "2027-07-24" },
+  "S310/2":     { n: "Süd 310/2", v: "Bruchsal Rollenberg", b: "Mannheim Hbf", f: "2027-07-24" },
+  "S35/1":      { n: "Süd 35/1", v: "München Hbf", b: "Ingolstadt Nord", f: "2027-08-06" },
+  "S35/2":      { n: "Süd 35/2 (Altmühltal)", v: "Ingolstadt Nord", b: "Treuchtlingen", f: "2027-05-23" },
+  "S35/3":      { n: "Süd 35/3", v: "Treuchtlingen", b: "Würzburg Hbf", f: "2027-05-07" },
+  "S350":       { n: "Süd 350", v: "Ingolstadt Nord", b: "Nürnberg Hbf", f: "2027-08-06" },
+  "S37":        { n: "Süd 37", v: "Abzw. München Kanal", b: "München-Pasing Nord", f: "2026-10-15" },
+  "S4":         { n: "Süd 4", v: "München Nord Rbf", b: "München-Daglfing", f: "2027-05-12" },
+  "S46":        { n: "Süd 46", v: "Abzw. München Kanal", b: "München-Moosach", f: "2027-07-21" },
+  "S47/2":      { n: "Süd 47/2", v: "Donauwörth", b: "Neuoffingen", f: "2026-09-30" },
+  "S48":        { n: "Süd 48", v: "Nürnberg Hbf", b: "Unterleiterbach", f: "2027-02-17" },
+  "S500":       { n: "Süd 500 (VDE 8)", v: "Unterleiterbach", b: "Erfurt Hbf", f: "2027-02-17" },
+  "S501":       { n: "Süd 501 (Bogen via Coburg)", v: "—", b: "—", f: null },
+  "S50/1":      { n: "Süd 50/1", v: "München Hbf", b: "München Ost Pbf", f: "2027-05-12" },
+  "S51":        { n: "Süd 51", v: "München-Laim Rbf", b: "München Süd", f: "2027-07-20" },
+  "S57/84":     { n: "Süd 57/84", v: "München Ost Pbf", b: "München-Daglfing", f: "2027-05-12" },
+  "S63":        { n: "Süd 63/1 & 30/1 (Gl. Garmisch)", v: "München Hbf", b: "München-Pasing", f: "2026-11-16" },
+  "S91":        { n: "Süd 91", v: "München-Laim Rbf", b: "München-Pasing", f: "2027-07-20" },
+  "S1037":      { n: "Süd 1037", v: "München-Pasing", b: "München-Pasing Bbf", f: "2026-06-19" },
+  "S107":       { n: "Süd 107", v: "München Hbf", b: "München-Laim Rbf", f: "2026-11-30" },
+  "S108":       { n: "Süd 108", v: "München-Laim Rbf", b: "München-Obermenzing", f: null },
+  "S110":       { n: "Süd 110", v: "München-Laim Rbf", b: "München Nord Rbf", f: "2027-07-21" },
+  "S111":       { n: "Süd 111", v: "München Nord Rbf", b: "München-Allach", f: "2027-07-21" },
+  "S112":       { n: "Süd 112", v: "München Nord Rbf", b: "München-Karlsfeld", f: "2027-05-12" },
+  "S15/1":      { n: "Süd 15/1", v: "Nürnberg Hbf", b: "Ansbach", f: "2026-09-29" },
+  "S15/2":      { n: "Süd 15/2", v: "Ansbach", b: "Aalen Hbf", f: "2027-01-18" },
+  "S15/3":      { n: "Süd 15/3", v: "Aalen Hbf", b: "Stuttgart Hbf", f: "2027-01-18" },
+  "S16":        { n: "Süd 16", v: "Donauwörth", b: "Goldshöfe", f: "2027-01-12" },
+  "S18":        { n: "Süd 18", v: "Augsburg Hbf", b: "Nürnberg Hbf", f: "2027-07-25" },
+  "S18a":       { n: "Süd 18a", v: "Nürnberg Rbf", b: "Nürnberg-Eibach", f: "2027-06-21" },
+  "S21":        { n: "Süd 21", v: "Nürnberg-Eibach", b: "Fürth (Bay) Hbf", f: "2026-11-16" },
+  "S23":        { n: "Süd 23", v: "Nürnberg-Dutzendteich", b: "Nürnberg-Langwasser", f: "2027-06-21" },
+  "S231":       { n: "Süd 231", v: "Nürnberg-Langwasser", b: "Nürnberg Rbf", f: "2027-06-21" },
+  "S24":        { n: "Süd 24", v: "Nürnberg Hbf", b: "Würzburg Hbf", f: "2027-07-24" },
+  "S31":        { n: "Süd 31", v: "München Landsberger Straße", b: "München Friedenheimer Brücke", f: "2027-08-05" },
+  "M300/1":     { n: "Mitte 300/1", v: "Würzburg Hbf", b: "Bronnzell", f: "2027-07-15" },
+  "M300/2":     { n: "Mitte 300/2", v: "Bronnzell", b: "Fulda", f: "2027-07-15" },
+  "M300/3":     { n: "Mitte 300/3", v: "Fulda", b: "Kassel-Wilhelmshöhe", f: "2027-07-15" },
+  "M361":       { n: "Mitte 361", v: "Lohr Bahnhof", b: "Rohrbach", f: "2027-07-24" },
+  "M25/1":      { n: "Mitte 25/1", v: "Würzburg Hbf", b: "Gemünden (Main)", f: "2027-07-21" },
+  "M25/2":      { n: "Mitte 25/2", v: "Gemünden (Main)", b: "Nantenbach", f: null },
+  "M25a":       { n: "Mitte 25a (via Rbf Würzburg)", v: "Würzburg Hbf", b: "Veitshöchheim", f: "2027-07-21" },
+  "M25/3":      { n: "Mitte 25/3", v: "Lohr Bahnhof", b: "Frankfurt (Main) Süd", f: "2027-07-21" },
+  "M35":        { n: "Mitte 35", v: "Aschaffenburg Hbf", b: "Darmstadt-Arheilgen", f: "2026-09-29" },
+  "M21/2":      { n: "Mitte 21/2", v: "Darmstadt-Arheilgen", b: "Neu-Isenburg", f: "2027-07-24" },
+  "M21/3":      { n: "Mitte 21/3", v: "Neu-Isenburg", b: "Frankfurt (Main) Hbf", f: "2027-07-24" },
+  "M23/1":      { n: "Mitte 23/1", v: "Frankfurt (Main) Süd", b: "Frankfurt (Main) Hbf", f: "2027-07-24" },
+  "M23/2":      { n: "Mitte 23/2", v: "Hanau Hbf", b: "Frankfurt (Main) Süd", f: "2027-07-24" },
+  "M23/3":      { n: "Mitte 23/3", v: "Flieden", b: "Hanau Hbf", f: null },
+  "M23/4":      { n: "Mitte 23/4", v: "Flieden", b: "Bronnzell", f: "2027-07-21" },
+  "M23/5":      { n: "Mitte 23/5", v: "Fulda", b: "Bebra", f: "2027-07-21" },
+  "M23/6":      { n: "Mitte 23/6", v: "Bebra", b: "Göttingen", f: "2027-07-21" },
+  "M28":        { n: "Mitte 28", v: "Großkrotzenburg", b: "Wolfgang", f: "2027-07-21" },
+  "M32":        { n: "Mitte 32", v: "Gemünden (Main)", b: "Flieden", f: null },
+  "M33":        { n: "Mitte 33 (Kurve Schlüchtern–Elm)", v: "Schlüchtern Ziegenberg", b: "Elm", f: null },
+  "M360":       { n: "Mitte 360", v: "Burgsinn", b: "Abzw. —", f: null },
+  "M15/1":      { n: "Mitte 15/1", v: "Mannheim Hbf", b: "Frankfurt (Main) Stadion", f: "2027-07-14" },
+  "M12":        { n: "Mitte 12", v: "Frankfurt (Main) Süd", b: "Frankfurt (Main) Stadion", f: "2026-12-08" },
+  "M11/1":      { n: "Mitte 11/1 (via Louisa)", v: "Frankfurt (Main) Süd", b: "Forsthaus", f: "2026-12-08" },
+  "M9&11/2":    { n: "Mitte 9 & 11/2", v: "Frankfurt-Niederrad", b: "Forsthaus", f: "2027-07-21" },
+  "M15":        { n: "Mitte 15", v: "Frankfurt (Main) Hbf", b: "Frankfurt-Niederrad", f: null },
+  "M372":       { n: "Mitte 372", v: "Zeppelinheim", b: "Frankfurt Flughafen Fernbf", f: "2027-07-21" },
+  "MFF_FLF":    { n: "FF–Flughafen (370-Sammelstück)", v: "Frankfurt (Main) Hbf", b: "Frankfurt Flughafen Fernbf", f: "2027-07-14" },
+  "N300/4":     { n: "Nord 300/4", v: "Kassel-Wilhelmshöhe", b: "Hannover Hbf", f: "2027-10-27" },
+  "SO400":      { n: "Südost 400 (Altbaustrecke)", v: "Vieselbach", b: "Erfurt Hbf", f: "2027-02-17" },
+  "SO500":      { n: "Südost 500 (via Flughafen)", v: "Vieselbach", b: "Leipzig Hbf", f: "2027-02-17" }
 };
 
-var PIE_COLORS = ["#EC0016", "#F59E0B", "#3B82F6", "#8B5CF6", "#10B981", "#64748B"];
+/* ---------- Regionalbereiche (für die Auswertung) ---------- */
+var RB = {
+  "S": ["S1/1","S1/2","S1/3","S153","S6","S32","S310/1","S310/2","S35/1","S35/2","S35/3","S350","S37","S4","S46","S47/2","S48","S500","S501","S50/1","S51","S57/84","S63","S91","S1037","S107","S108","S110","S111","S112","S15/1","S15/2","S15/3","S16","S18","S18a","S21","S23","S231","S24","S31"],
+  "M": ["M300/1","M300/2","M300/3","M361","M25/1","M25/2","M25a","M25/3","M35","M21/2","M21/3","M23/1","M23/2","M23/3","M23/4","M23/5","M23/6","M28","M32","M33","M360","M15/1","M12","M11/1","M9&11/2","M15","M372","MFF_FLF"],
+  "N": ["N300/4"],
+  "SO": ["SO400","SO500"]
+};
 
-/* ============ Helfer ============ */
+/* ---------- Baureihen (fahrberechtigt, vom Papierzettel) ---------- */
+var BAUREIHEN = ["101", "1116", "401", "402", "403", "406", "411", "415", "412", "412.7", "S286", "S287", "S296.1", "S296.3", "S8091.7", "S8091.9"];
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+/* ---------- Bahnhöfe ---------- */
+var HBF = {
+  "muenchen_hbf": "München Hbf",
+  "muenchen_ost": "München Ost",
+  "stuttgart": "Stuttgart Hbf",
+  "nuernberg": "Nürnberg Hbf",
+  "wuerzburg": "Würzburg Hbf",
+  "ff_hbf": "Frankfurt am Main Hbf",
+  "ff_ffs": "Frankfurt Süd (FFS)",
+  "ff_flh": "Frankfurt Flughafen",
+  "hannover": "Hannover Hbf",
+  "kassel": "Kassel-Wilhelmshöhe",
+  "fulda": "Fulda",
+  "erfurt": "Erfurt Hbf",
+  "leipzig": "Leipzig Hbf",
+  "augsburg": "Augsburg Hbf",
+  "mannheim": "Mannheim Hbf",
+  "laim_rbf": "München-Laim Rbf",
+  "pasing_bbf": "München-Pasing Bbf"
+};
+
+/* ---------- ALW-Regeln (Muster → Ersetzung), beide Richtungen ---------- */
+/* sub = zu ersetzende Abschnittsfolge (Hinfahrt-Richtung), rep = Ersetzung.
+   v = Abweichungsbahnhof Hinfahrt, vr = Abweichungsbahnhof Retour. */
+var ALW = {
+  /* Stuttgart */
+  "st_wendlingen":  { n: "via Wendlingen (NBS)", v: "Ulm", vr: "Ulm", sub: ["S1/3"], rep: ["S6", "S32", "S1/3"] },
+  "st_donauwoerth": { n: "via Donauwörth", v: "Augsburg", vr: "Neuoffingen", sub: ["S1/2"], rep: ["S18", "S47/2", "S1/2"] },
+  "st_noerdlingen": { n: "via Nördlingen", v: "Augsburg", vr: "Stuttgart Hbf", sub: ["S1/2", "S1/3", "S153"], rep: ["S18", "S16", "S15/2", "S15/3"] },
+  "st_ansbach":     { n: "via Ansbach → Aalen", v: "Augsburg", vr: "Stuttgart Hbf", sub: ["S1/2", "S1/3", "S153"], rep: ["S18", "S35/3", "S15/2", "S15/3"] },
+  /* Nürnberg / Würzburg / über Würzburg (Baustein-Prinzip) */
+  "nn_altmuehltal": { n: "via Altmühltal", v: "Ingolstadt Nord", vr: "Nürnberg Hbf", sub: ["S350"], rep: ["S35/2", "S18"] },
+  "wue_ansbach":    { n: "via Ansbach", v: "Nürnberg Hbf", vr: "Würzburg Hbf", sub: ["S24"], rep: ["S15/1", "S35/3"] },
+  "wue_altmuehltal":{ n: "via Altmühltal", v: "Ingolstadt Nord", vr: "Treuchtlingen", sub: ["S350", "S24"], rep: ["S35/2", "S35/3"] },
+  "wue_fuerth":     { n: "via Fürth und Augsburg", v: "München Hbf", vr: "Fürth (Bay) Hbf", sub: ["S35/1", "S350"], rep: ["S1/1", "S18", "S21"] },
+  /* Frankfurt-Gruppe */
+  "ff_gemuenden":   { n: "via Gemünden", v: "Würzburg Hbf", vr: "Nantenbach", sub: ["M300/1", "M361"], rep: ["M25/1", "M25/2"] },
+  "ff_darmstadt":   { n: "via Darmstadt", v: "Aschaffenburg", vr: "Frankfurt Hbf", sub: ["M23/2", "M23/1"], rep: ["M35", "M21/2", "M21/3"] },
+  "ff_darmstadt_flh": { n: "via Darmstadt", v: "Aschaffenburg", vr: "Frankfurt Flughafen", sub: ["M23/2"], rep: ["M35", "M21/2", "M9&11/2"] },
+  "ff_ostbahn":     { n: "via Frankfurt Ostbahnhof", v: "Hanau Südseite", vr: "Frankfurt Süd", sub: ["M23/2"], rep: [] },
+  "ff_schluechtern":{ n: "via Schlüchtern und Elm (die ganz große Runde)", v: "Würzburg Hbf", vr: "Frankfurt Hbf", sub: ["M361", "M25/3"], rep: ["M360", "M32", "M33", "M23/3"] },
+  /* Fulda / Kassel / Hannover */
+  "ful_gemuenden":  { n: "via Gemünden–Sinntal–Burgsinn", v: "Würzburg Hbf", vr: "Burgsinn", sub: ["M300/1"], rep: ["M25/1", "M32", "M360", "M300/1"] },
+  "ff_flieden":     { n: "via Flieden", v: "Würzburg Hbf", vr: "Fulda", sub: ["M300/1"], rep: ["M300/1", "M360", "M32", "M23/4"] },
+  "ful_altbau":     { n: "via Altbau (durchgehende 32)", v: "Würzburg Hbf", vr: "Fulda", sub: ["M300/1"], rep: ["M25/1", "M32", "M23/4"] },
+  "ful_wolfgang":   { n: "via Wolfgang (ohne Hanau)", v: "Würzburg Hbf", vr: "Fulda", sub: ["M300/1"], rep: ["M361", "M25/3", "M28", "M23/3", "M23/4"] },
+  "bebra":          { n: "via Bebra (umgeht Kassel)", v: "Fulda", vr: "Hannover Hbf", sub: ["M300/3", "N300/4"], rep: ["M23/5", "M23/6", "N300/4"] },
+  /* München-Knoten: ALW auf der 1/1 (M5, M16) */
+  "m5":             { n: "via Kanal/Pasing Nord auf die 1/1 (35 → 37)", v: "München Hbf", vr: "Pasing Nord", sub: ["S1/1"], rep: ["S35/1", "S37", "S1/1"] },
+  "m16":            { n: "via Gl. Garmisch nach Pasing (63/1 & 30/1)", v: "München Hbf", vr: "München-Pasing", sub: ["S1/1"], rep: ["S63", "S1/1"] },
+  /* München-Knoten: ALW auf der 35 (vier Nordring-ALW) */
+  "nr1":            { n: "via Nordring im Uhrzeigersinn (107 → 110 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S107", "S110", "S112", "S35/1"] },
+  "nr2":            { n: "via Nordring im Uhrzeigersinn, 46 direkt (46 → 110 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S46", "S110", "S112", "S35/1"] },
+  "nr3":            { n: "via Nordring im Uhrzeigersinn, via Kanal (35 → 46 → 110 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S35/1", "S46", "S110", "S112", "S35/1"] },
+  "nr4":            { n: "via Nordring gegen den Uhrzeigersinn (50/1 → 57/84 → 4 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S50/1", "S57/84", "S4", "S112", "S35/1"] },
+  /* München-Pasing Bbf */
+  "mpb_augsburg":   { n: "via Augsburg-Linie (1+30 → Weiche → 1037)", v: "München Hbf", vr: "München-Pasing Bbf", sub: ["S107", "S91"], rep: ["S1/1"] },
+  /* München Ost: Alternativen auf dem Weg Laim → Pasing */
+  "o_fhb":          { n: "via Friedenheimer Brücke/31", v: "München Süd", vr: "München-Pasing", sub: ["S51", "S91"], rep: ["S51", "S31"] },
+  "o_landsberger":  { n: "via Landsberger Straße auf die 1+30", v: "München Süd", vr: "München-Pasing", sub: ["S51", "S91"], rep: ["S51", "S31"] }
+};
+
+/* ---------- Optionen (kein kompletter Laufweg – nur zusätzlich anwählbar) ---------- */
+var OPT = {
+  "nn_rbf":       { n: "Über Rangierbahnhof Nürnberg (Zugdrehung)", add: ["S23", "S231", "S18a"], at: "end" },
+  "ff_niederrad": { n: "Über Niederrad (Hbf → FFS)", add: ["M15", "M9&11/2"], at: "end" },
+  "opt_25a":      { n: "Über Rangierbahnhof Würzburg (25a)", add: ["M25a"], at: "beforeSection", ref: "M25/1", cond: "chainHas:M25/1" },
+  "opt_coburg":   { n: "Über Coburg (501-Bogen)", add: ["S501", "S500"], at: "afterSection", ref: "S500", cond: "chainHas:S500" },
+  "opt_11_1":     { n: "Via 11/1 (Louisa) zusätzlich zur 12", add: ["M11/1"], at: "beforeSection", ref: "M12" }
+};
+
+/* ---------- Regelwege (Routen) ---------- */
+/* start: Bahnhof-ID, ziel: Bahnhof-ID, d: Standard.
+   secs: Kette Hinfahrt (vom Start zum Ziel).
+   alws: verfügbare ALW (Baustein-Prinzip: angedockt, wo die Kette das Muster enthält).
+   opts: verfügbare Optionen. */
+
+var SUED_WUE = ["wue_ansbach", "wue_altmuehltal", "wue_fuerth"];   /* alle Ziele über Würzburg (RW über NN) */
+var NORDRING = ["nr1", "nr2", "nr3", "nr4"];                        /* alle Ziele über die Süd 35 */
+var AUF_11 = ["m5", "m16"];                                         /* alle Ziele über die Süd 1/1 */
+
+var ROUTES = [
+  /* ===== Start München Hbf ===== */
+  { id: "m_st",  start: "muenchen_hbf", ziel: "stuttgart", n: "Regelweg via Augsburg–Ulm", d: true,  secs: ["S1/1", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"].concat(AUF_11), opts: [] },
+  { id: "m_nn1", start: "muenchen_hbf", ziel: "nuernberg", n: "Regelweg 1 via Ingolstadt", d: true,  secs: ["S35/1", "S350"], alws: ["nn_altmuehltal"].concat(NORDRING), opts: [] },
+  { id: "m_nn2", start: "muenchen_hbf", ziel: "nuernberg", n: "Regelweg 2 via Augsburg", d: false, secs: ["S1/1", "S18"], alws: AUF_11.slice(), opts: ["nn_rbf"] },
+  { id: "m_wue1", start: "muenchen_hbf", ziel: "wuerzburg", n: "Regelweg 1 via Nürnberg", d: true,  secs: ["S35/1", "S350", "S24"], alws: SUED_WUE.concat(NORDRING), opts: [] },
+  { id: "m_wue2", start: "muenchen_hbf", ziel: "wuerzburg", n: "Regelweg 2 via Augsburg/Treuchtlingen", d: false, secs: ["S1/1", "S18", "S35/3"], alws: AUF_11.slice(), opts: [] },
+  { id: "m_ff",  start: "muenchen_hbf", ziel: "ff_hbf", n: "Regelweg via Würzburg–Aschaffenburg", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING), opts: ["ff_niederrad", "opt_25a"] },
+  { id: "m_ffs", start: "muenchen_hbf", ziel: "ff_ffs", n: "Regelweg via Würzburg–Aschaffenburg", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["ff_gemuenden", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING), opts: ["opt_25a"] },
+  { id: "m_flh", start: "muenchen_hbf", ziel: "ff_flh", n: "Regelweg via FFS → 12 → Flughafen", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING), opts: ["opt_25a"] },
+  { id: "m_kas", start: "muenchen_hbf", ziel: "kassel", n: "Regelweg via Fulda", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2", "M300/3"], alws: ["ff_flieden"].concat(SUED_WUE).concat(NORDRING), opts: [] },
+  { id: "m_han", start: "muenchen_hbf", ziel: "hannover", n: "Regelweg via Kassel", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2", "M300/3", "N300/4"], alws: ["ff_flieden", "bebra"].concat(SUED_WUE).concat(NORDRING), opts: [] },
+  { id: "m_ful", start: "muenchen_hbf", ziel: "fulda", n: "Regelweg über die SFS", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2"], alws: ["ful_gemuenden", "ff_flieden", "ful_altbau", "ful_wolfgang"].concat(SUED_WUE).concat(NORDRING), opts: ["opt_25a"] },
+  { id: "m_erf", start: "muenchen_hbf", ziel: "erfurt", n: "Regelweg via VDE 8", d: true, secs: ["S35/1", "S350", "S48", "S500"], alws: ["wue_fuerth"].concat(NORDRING), opts: ["opt_coburg"] },
+  { id: "m_lep", start: "muenchen_hbf", ziel: "leipzig", n: "Regelweg via VDE 8", d: true, secs: ["S35/1", "S350", "S48", "S500", "SO400", "SO500"], alws: ["wue_fuerth"].concat(NORDRING), opts: ["opt_coburg"] },
+  { id: "m_aug", start: "muenchen_hbf", ziel: "augsburg", n: "Regelweg", d: true, secs: ["S1/1"], alws: AUF_11.slice(), opts: [] },
+  { id: "m_mos", start: "muenchen_hbf", ziel: "muenchen_ost", n: "Regelweg via München Süd", d: true, secs: ["S50/1"], alws: [], opts: [] },
+  { id: "m_mlr", start: "muenchen_hbf", ziel: "laim_rbf", n: "Regelweg (die 107)", d: true, secs: ["S107"], alws: [], opts: [] },
+  { id: "m_mpb", start: "muenchen_hbf", ziel: "pasing_bbf", n: "Regelweg (107 → 91 → 1037)", d: true, secs: ["S107", "S91", "S1037"], alws: ["mpb_augsburg"], opts: [] },
+
+  /* ===== Start München Ost ===== */
+  { id: "o_st",  start: "muenchen_ost", ziel: "stuttgart", n: "via Laim → Augsburg–Ulm", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach", "o_fhb", "o_landsberger"], opts: [] },
+  { id: "o_nn",  start: "muenchen_ost", ziel: "nuernberg", n: "via Laim → Augsburg", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S18"], alws: ["o_fhb", "o_landsberger"], opts: ["nn_rbf"] },
+  { id: "o_wue", start: "muenchen_ost", ziel: "wuerzburg", n: "via Laim → Augsburg/Treuchtlingen", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S18", "S35/3"], alws: ["o_fhb", "o_landsberger"], opts: [] },
+  { id: "o_aug", start: "muenchen_ost", ziel: "augsburg", n: "via Laim (oft gefahren)", d: true, secs: ["S50/1", "S51", "S91", "S1/1"], alws: ["o_fhb", "o_landsberger"], opts: [] },
+  { id: "o_mlr", start: "muenchen_ost", ziel: "laim_rbf", n: "via München Süd → 51", d: true, secs: ["S50/1", "S51"], alws: [], opts: [] },
+  { id: "o_mpb", start: "muenchen_ost", ziel: "pasing_bbf", n: "via Laim → 91 → 1037", d: true, secs: ["S50/1", "S51", "S91", "S1037"], alws: ["o_fhb", "o_landsberger"], opts: [] },
+
+  /* ===== Start Stuttgart (Fahrtenkette) ===== */
+  { id: "st_mah", start: "stuttgart", ziel: "mannheim", n: "Regelweg via Stuttgart Nordbahnhof", d: true, secs: ["S310/1", "S310/2"], alws: [], opts: [] },
+  { id: "st_ff",  start: "stuttgart", ziel: "ff_hbf", n: "via Mannheim → Mitte 15", d: true, secs: ["S310/1", "S310/2", "M15/1"], alws: [], opts: [] },
+  { id: "st_ffs", start: "stuttgart", ziel: "ff_ffs", n: "via Mannheim → 15 → 12", d: true, secs: ["S310/1", "S310/2", "M15/1", "M12"], alws: [], opts: ["opt_11_1"] },
+  { id: "st_flh", start: "stuttgart", ziel: "ff_flh", n: "via Mannheim → 15 → 372", d: true, secs: ["S310/1", "S310/2", "M15/1", "M372"], alws: [], opts: [] },
+
+  /* ===== Start Mannheim ===== */
+  { id: "mah_ff",  start: "mannheim", ziel: "ff_hbf", n: "Regelweg Mitte 15", d: true, secs: ["M15/1"], alws: [], opts: [] },
+  { id: "mah_ffs", start: "mannheim", ziel: "ff_ffs", n: "15 → 12", d: true, secs: ["M15/1", "M12"], alws: [], opts: ["opt_11_1"] },
+  { id: "mah_flh", start: "mannheim", ziel: "ff_flh", n: "15 → 372", d: true, secs: ["M15/1", "M372"], alws: [], opts: [] },
+
+  /* ===== Start Fulda (Fahrtenkette / Pausenbahnhof) ===== */
+  { id: "ful_ff",  start: "fulda", ziel: "ff_hbf", n: "Regelweg über die Altstrecke", d: true, secs: ["M300/2", "M23/4", "M23/3", "M23/2", "M23/1"], alws: ["ff_ostbahn"], opts: ["ff_niederrad"] },
+  { id: "ful_ffs", start: "fulda", ziel: "ff_ffs", n: "Regelweg (endet im FFS)", d: true, secs: ["M300/2", "M23/4", "M23/3", "M23/2"], alws: ["ff_ostbahn"], opts: [] },
+  { id: "ful_flh", start: "fulda", ziel: "ff_flh", n: "via FFS → 12 → Flughafen", d: true, secs: ["M300/2", "M23/4", "M23/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_ostbahn"], opts: [] }
+];
+
+/* ===== Generierte Routen: München Ost auf die 35/1 (drei Ost-Exits) =====
+   Doku 31.10.2026: Einstieg auf die 35/1 ab Ost für Frankfurt/FFS/Flughafen/Fulda/
+   Kassel/Hannover/Erfurt/Leipzig + Nürnberg RW1 / Würzburg RW1 – drei Exits:
+   1. via Nordring (57/84 → 4 → 112) – vorausgewählt bei den 35er-Zielen
+   2. via Laim → Süd 108 → Obermenzing (M17)
+   3. via Augsburg/Fürth (Basis = Fürth-Baustein-Kette) */
+(function () {
+  var head = {
+    nordring: ["S57/84", "S4", "S112", "S35/1"],
+    laim108:  ["S50/1", "S51", "S108", "S35/1"],
+    fuerth:   ["S1/1", "S18", "S21"]
+  };
+  var tails = [
+    { ziel: "ff_hbf", t: ["S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern", "wue_ansbach", "wue_altmuehltal"], opts: ["ff_niederrad", "opt_25a"] },
+    { ziel: "ff_ffs", t: ["S350", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["ff_gemuenden", "ff_ostbahn", "ff_schluechtern", "wue_ansbach", "wue_altmuehltal"], opts: ["opt_25a"] },
+    { ziel: "ff_flh", t: ["S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern", "wue_ansbach", "wue_altmuehltal"], opts: ["opt_25a"] },
+    { ziel: "fulda",   t: ["S350", "S24", "M300/1", "M300/2"], alws: ["ful_gemuenden", "ff_flieden", "ful_altbau", "ful_wolfgang", "wue_ansbach", "wue_altmuehltal"], opts: ["opt_25a"] },
+    { ziel: "kassel",  t: ["S350", "S24", "M300/1", "M300/2", "M300/3"], alws: ["ff_flieden", "wue_ansbach", "wue_altmuehltal"], opts: [] },
+    { ziel: "hannover",t: ["S350", "S24", "M300/1", "M300/2", "M300/3", "N300/4"], alws: ["ff_flieden", "bebra", "wue_ansbach", "wue_altmuehltal"], opts: [] },
+    { ziel: "erfurt",  t: ["S350", "S48", "S500"], alws: [], opts: ["opt_coburg"] },
+    { ziel: "leipzig", t: ["S350", "S48", "S500", "SO400", "SO500"], alws: [], opts: ["opt_coburg"] },
+    { ziel: "nuernberg",t: ["S350"], alws: ["nn_altmuehltal"], opts: [] },
+    { ziel: "wuerzburg",t: ["S24"], alws: ["wue_ansbach"], opts: [] }
+  ];
+  var ex = [
+    { key: "n", name: "via Nordring auf die 35 (57/84 → 4 → 112)", h: head.nordring, d35: true },
+    { key: "l", name: "via Laim → Süd 108 → Obermenzing (M17)", h: head.laim108, d35: true },
+    { key: "f", name: "via Augsburg/Fürth (1/1 → 18 → 21)", h: head.fuerth, d35: false }
+  ];
+  tails.forEach(function (T) {
+    ex.forEach(function (E) {
+      /* Exit „via Fürth" nur für Ziele hinter Fürth bzw. Würzburg – nicht für Nürnberg RW1 */
+      if (E.key === "f" && T.ziel === "nuernberg") return;
+      ROUTES.push({
+        id: "o35_" + E.key + "_" + T.ziel,
+        start: "muenchen_ost", ziel: T.ziel,
+        n: "Einstieg " + E.name,
+        d: E.key === "n",
+        secs: E.h.concat(T.t),
+        alws: T.alws.slice(),
+        opts: T.opts.slice()
+      });
+    });
+  });
+})();
+
+/* Retour-Spiegelung (Grundregel: alle Wege gelten in beide Richtungen) wird
+   zur Laufzeit aus den Hinfahrt-Routen erzeugt (mirrorRoute in engine.js). */
+/* ============ Streckenkunde v2 – Engine ============ */
+/* Kernidee: Jeder ALW ist ein Muster→Ersetzung-Baustein (sub → rep), der an einer
+   bestimmten Stelle der Kette andockt. MEHRERE ALW pro Fahrt sind möglich, solange
+   sie verschiedene Stellen der Kette ersetzen (keine Überlappung). Überlappende
+   ALW bleiben wählbar, werden aber mit Warnung markiert (Jürgen, 01.11.2026).
+   Retour = gleiche Regeln an der gespiegelten Kette (sub/rep rückwärts). */
+
+function findRun(chain, run) {
+  if (!run.length) return -1;
+  outer: for (var i = 0; i + run.length <= chain.length; i++) {
+    for (var j = 0; j < run.length; j++) if (chain[i + j] !== run[j]) continue outer;
+    return i;
+  }
+  return -1;
 }
+
+function rev(a) { return a.slice().reverse(); }
+
+function routeById(id) {
+  for (var i = 0; i < ROUTES.length; i++) if (ROUTES[i].id === id) return ROUTES[i];
+  return null;
+}
+
+function routesFor(start, ziel) {
+  return ROUTES.filter(function (r) { return r.start === start && r.ziel === ziel; });
+}
+
+/* Gespiegelte Route (Retour): X -> München wird aus München -> X erzeugt. */
+function mirrorRoute(route, ruckziel, appendLeg) {
+  var secs = rev(route.secs);
+  if (appendLeg) secs = secs.concat([appendLeg]);
+  return {
+    id: route.id + "_r" + (appendLeg ? "_x" : ""),
+    start: route.ziel, ziel: ruckziel,
+    n: route.n, d: false,
+    secs: secs,
+    alws: route.alws.slice(),
+    opts: route.opts.slice(),
+    mirrored: true
+  };
+}
+
+/* Retour-Routen von "von" nach "ruckziel": Spiegelung aller Hinfahrt-Routen
+   ruckziel -> von. Für Rückziel München Ost zusätzlich die via-Hbf-Variante
+   (gespiegelte Hbf-Route + 50/1-Bein, kein Durchschleifen). */
+function retourRoutes(von, ruckziel) {
+  var out = [];
+  var direct = ROUTES.filter(function (r) { return r.start === ruckziel && r.ziel === von; });
+  direct.forEach(function (r) { out.push(mirrorRoute(r, ruckziel)); });
+  if (ruckziel === "muenchen_ost") {
+    var viaHbf = ROUTES.filter(function (r) { return r.start === "muenchen_hbf" && r.ziel === von; });
+    viaHbf.forEach(function (r) {
+      var m = mirrorRoute(r, ruckziel, "S50/1");
+      m.n = "via Hbf (50/1-Bein)";
+      out.push(m);
+    });
+    /* Standard-Rückroute ab Ost = gespiegelte Ost-Route (via Laim etc.) */
+    var ostStd = out.filter(function (r) { return r.id.indexOf("_r") === 0 || r.id.indexOf("o") === 0; });
+    ostStd.forEach(function (r) { r.d = false; });
+    var firstOst = out.filter(function (r) { return ROUTES.some(function (o) { return o.id + "_r" === r.id && o.start === "muenchen_ost"; }); });
+    if (firstOst.length) firstOst[0].d = true;
+    else if (out.length) out[out.length - 1].d = true;
+  }
+  if (out.length && !out.some(function (r) { return r.d; })) out[0].d = true;
+  return out;
+}
+
+/* ALW-Anwendungsplan: Sucht die Muster aller gewählten ALW in der Basiskette.
+   - Nicht überlappende ALW werden alle angewendet (Mehrfach-ALW!).
+   - Überlappende ALW: nur der erste (links in der Kette) wirkt, der Rest bekommt
+     eine Konflikt-Warnung (bleibt aber wählbar – Jürgens Entscheidung 01.11.2026). */
+function planAlws(base, alwIds, mirrored) {
+  var rules = alwIds.map(function (id) {
+    var a = ALW[id];
+    return {
+      id: id, n: a.n, v: mirrored ? a.vr : a.v,
+      sub: mirrored ? rev(a.sub) : a.sub.slice(),
+      rep: mirrored ? rev(a.rep) : a.rep.slice()
+    };
+  });
+  var found = [], noMatch = [];
+  rules.forEach(function (r) {
+    var idx = findRun(base, r.sub);
+    if (idx >= 0) found.push({ r: r, idx: idx });
+    else noMatch.push(r.id);
+  });
+  found.sort(function (a, b) { return a.idx - b.idx; });
+  var applied = [], conflicts = [];
+  var lastEnd = -1, lastId = null;
+  found.forEach(function (m) {
+    var end = m.idx + m.r.sub.length;
+    if (m.idx < lastEnd) {
+      conflicts.push({ id: m.r.id, withId: lastId });
+    } else {
+      applied.push(m);
+      if (end > lastEnd) { lastEnd = end; lastId = m.r.id; }
+    }
+  });
+  return { applied: applied, conflicts: conflicts, noMatch: noMatch };
+}
+
+/* Kette aus Plan bauen: Ersetzungen von rechts nach links anwenden. */
+function composeChain(base, plan) {
+  var chain = base.slice();
+  plan.applied.slice().sort(function (a, b) { return b.idx - a.idx; }).forEach(function (m) {
+    var args = [m.idx, m.r.sub.length].concat(m.r.rep);
+    Array.prototype.splice.apply(chain, args);
+  });
+  return chain;
+}
+
+/* Optionen anwenden (kein kompletter Laufweg – Abschnitte kommen hinzu). */
+function optAvailable(optId, chain) {
+  var o = OPT[optId];
+  if (!o) return false;
+  if (o.cond) {
+    var parts = o.cond.split(":");
+    if (parts[0] === "chainHas" && chain.indexOf(parts[1]) === -1) return false;
+  }
+  return true;
+}
+function applyOpts(chain, optIds) {
+  var out = chain.slice();
+  optIds.forEach(function (id) {
+    var o = OPT[id];
+    if (!o || !optAvailable(id, out)) return;
+    if (o.at === "end") out = out.concat(o.add);
+    else if (o.at === "beforeSection") {
+      var i = out.indexOf(o.ref);
+      if (i >= 0) out = out.slice(0, i).concat(o.add).concat(out.slice(i));
+    } else if (o.at === "afterSection") {
+      var j = out.indexOf(o.ref);
+      if (j >= 0) out = out.slice(0, j + 1).concat(o.add).concat(out.slice(j + 1));
+    }
+  });
+  return out;
+}
+
+/* Multiset-Delta: was kommt dazu, was entfällt (für die ALW-Karten-Anzeige). */
+function delta(base, result) {
+  var rest = {};
+  result.forEach(function (s) { rest[s] = (rest[s] || 0) + 1; });
+  var entf = [];
+  base.forEach(function (s) {
+    if ((rest[s] || 0) > 0) rest[s]--;
+    else entf.push(s);
+  });
+  var dazu = [];
+  result.forEach(function (s) {
+    if ((rest[s] || 0) > 0) { dazu.push(s); rest[s]--; }
+  });
+  return { entf: entf, dazu: dazu };
+}
+
+/* Komplette Fahrweg-Auswertung einer Richtung (Hin- oder Rückfahrt). */
+function composeLeg(route, alwIds, optIds) {
+  /* Gespiegelte Routen speichern ihre Kette bereits in Fahrtrichtung. */
+  var base = route.secs;
+  var mir = !!route.mirrored;
+  var plan = planAlws(base, alwIds || [], mir);
+  var chain = composeChain(base, plan);
+  /* Konflikt-Warnung: überlappende ALW zeigen, welche nicht gewirkt haben */
+  var chainAfterConflicts = chain.slice();
+  var warnings = plan.conflicts.map(function (c) {
+    return { typ: "konflikt", id: c.id, withId: c.withId };
+  });
+  plan.noMatch.forEach(function (id) {
+    warnings.push({ typ: "keinTreffer", id: id });
+  });
+  var finalChain = applyOpts(chain, optIds || []);
+  /* Delta pro gewähltem ALW (gegen die Basiskette gerechnet) */
+  var deltas = {};
+  (alwIds || []).forEach(function (id) {
+    var single = planAlws(base, [id], mir);
+    var singleChain = composeChain(base, single);
+    deltas[id] = delta(base, singleChain);
+  });
+  return {
+    base: base, chain: finalChain, plan: plan,
+    warnings: warnings, deltas: deltas,
+    appliedIds: plan.applied.map(function (m) { return m.r.id; }),
+    alwLabels: (alwIds || []).map(function (id) {
+      var a = ALW[id];
+      return "Ab " + (mir ? a.vr : a.v) + " " + a.n;
+    })
+  };
+}
+
+/* ---------- Auswertung / Ampel ---------- */
+var MONTHS_MS = 1000 * 60 * 60 * 24 * 30.44;
+
+function monthDiff(dFrom, dTo) {
+  if (!dFrom) return null;
+  var a = new Date(dFrom), b = new Date(dTo);
+  return (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+}
+
+/* Grün = frisch, Gelb = ab 9 Monaten (innerhalb von 3 Monaten fällig),
+   Rot = über 12 Monate ohne Fahrt. */
+function ampelOf(lastFahrt, todayStr) {
+  var m = monthDiff(lastFahrt, todayStr);
+  if (m === null) return "none";
+  if (m >= 12) return "rot";
+  if (m >= 9) return "gelb";
+  return "gruen";
+}
+
+/* Startwert aus der Kdg-Frist der Bibliothek: letzte Fahrt = Frist − 12 Monate. */
+function seedFromFrist(frist) {
+  if (!frist) return null;
+  var d = new Date(frist);
+  d.setFullYear(d.getFullYear() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function fmtDate(iso) {
+  if (!iso) return "—";
+  var p = iso.split("-");
+  return p[2] + "." + p[1] + "." + p[0];
+}
+/* ============ Streckenkunde v2 – App-Oberfläche ============ */
+
+var state = {
+  tab: "form",
+  entries: loadEntries(),
+  w: null,          /* Wizard-Zustand */
+  saved: false,
+  confirmId: null,
+  backupText: "",
+  zielGroup: false,  /* Frankfurt-Gruppe aufgeklappt */
+  jahr: new Date().getFullYear()
+};
+
+/* ---------- Helfer ---------- */
 function loadEntries() {
   try {
     var raw = localStorage.getItem(STORAGE_KEY);
@@ -108,321 +584,190 @@ function loadEntries() {
     return Array.isArray(parsed) ? parsed : [];
   } catch (e) { return []; }
 }
-function persist() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries)); } catch (e) {}
+function todayISO() {
+  var d = new Date();
+  return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
 }
-function dayScore(e) {
-  var vals = ["fahrdienst", "kollegen", "belastung", "zustand"].map(function (k) {
-    return (SCORE_MAP[k] || {})[e.answers[k]];
-  }).filter(function (v) { return typeof v === "number"; });
-  if (!vals.length) return null;
-  return Math.round(vals.reduce(function (a, b) { return a + b; }, 0) / vals.length);
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
-function monthKeyOf(ts) {
-  var d = new Date(ts);
-  return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2);
+function secName(id) { return SECTIONS[id] ? SECTIONS[id].n : id; }
+function chainChips(secs) {
+  return '<span class="chips static">' + secs.map(function (s) {
+    return '<span class="chip small">' + esc(secName(s)) + "</span>";
+  }).join("") + "</span>";
 }
-function monthLabelOf(key) {
-  var p = key.split("-");
-  return new Date(+p[0], +p[1] - 1, 1).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
-}
-function fmtDay(ts) { return new Date(ts).toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" }); }
-function fmtTime(ts) { return new Date(ts).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }); }
-function fmtShort(ts) { return new Date(ts).toLocaleDateString("de-DE", { day: "numeric", month: "numeric" }); }
-function scoreColor(s) { return s >= 75 ? "#10B981" : s >= 50 ? "#F59E0B" : RED; }
-
-/* ============ Zustand ============ */
-
-var state = {
-  tab: "form",
-  entries: loadEntries(),
-  answers: {},
-  note: "",
-  saved: false,
-  month: null,
-  confirmId: null,
-  backupText: ""
-};
-
-/* ============ SVG-Diagramme ============ */
-
-function lineChartSVG(data) {
-  var W = 340, H = 195, L = 34, R = 14, T = 16, B = 30;
-  var iw = W - L - R, ih = H - T - B;
-  var grid = [0, 50, 100].map(function (v) {
-    var y = T + ih - (v / 100) * ih;
-    return '<line x1="' + L + '" y1="' + y + '" x2="' + (W - R) + '" y2="' + y + '" stroke="#e2e8f0" stroke-dasharray="3 3"/>' +
-      '<text x="' + (L - 6) + '" y="' + (y + 4) + '" font-size="10" fill="#94a3b8" text-anchor="end">' + v + '</text>';
+function deltaChips(d) {
+  var h = "";
+  if (d.entf.length) h += d.entf.map(function (s) {
+    return '<span class="chip small weg">' + esc(secName(s)) + "</span>";
   }).join("");
-  var n = data.length;
-  var pts = data.map(function (d, i) {
-    var x = n === 1 ? L + iw / 2 : L + (i / (n - 1)) * iw;
-    var y = T + ih - (d.score / 100) * ih;
-    return { x: x, y: y };
-  });
-  var poly = pts.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
-  var circles = pts.map(function (p) {
-    return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4" fill="' + RED + '"/>';
+  if (d.dazu.length) h += d.dazu.map(function (s) {
+    return '<span class="chip small dazu">' + esc(secName(s)) + "</span>";
   }).join("");
-  var step = Math.ceil(n / 6);
-  var labels = data.map(function (d, i) {
-    if (i % step !== 0) return "";
-    return '<text x="' + pts[i].x.toFixed(1) + '" y="' + (H - 8) + '" font-size="10" fill="#94a3b8" text-anchor="middle">' + esc(d.label) + '</text>';
-  }).join("");
-  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto">' + grid +
-    '<polyline points="' + poly + '" fill="none" stroke="' + RED + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
-    circles + labels + '</svg>';
+  return h;
+}
+function ampelHTML(a) {
+  var c = a === "gruen" ? "#10B981" : a === "gelb" ? "#F59E0B" : a === "rot" ? RED : "#94a3b8";
+  return '<span class="ampel" style="background:' + c + '"></span>';
 }
 
-function donutSVG(items) {
-  var total = items.reduce(function (a, b) { return a + b.value; }, 0);
-  var r = 52, C = 2 * Math.PI * r, acc = 0;
-  var segs = items.map(function (it) {
-    var frac = it.value / total;
-    var dash = frac * C;
-    var off = -acc * C;
-    acc += frac;
-    return '<circle r="' + r + '" cx="90" cy="90" fill="none" stroke="' + it.color + '" stroke-width="24" stroke-dasharray="' + dash.toFixed(2) + ' ' + (C - dash).toFixed(2) + '" stroke-dashoffset="' + off.toFixed(2) + '" transform="rotate(-90 90 90)"/>';
-  }).join("");
-  return '<svg viewBox="0 0 180 180" style="width:100%;max-width:220px;height:auto;display:block;margin:0 auto">' + segs +
-    '<text x="90" y="87" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">' + total + '</text>' +
-    '<text x="90" y="106" text-anchor="middle" font-size="11" fill="#94a3b8">Einträge</text></svg>';
+/* Routen für Start → Ziel, mit Spiegelungs-Fallback (Grundregel: beide Richtungen). */
+function routesForWithFallback(start, ziel) {
+  var direct = routesFor(start, ziel);
+  if (direct.length) return direct;
+  var back = routesFor(ziel, start);
+  if (back.length) return back.map(function (r) { return mirrorRoute(r, start); });
+  return [];
 }
 
-/* ============ Ansichten ============ */
-
-function viewForm() {
-  if (state.saved) {
-    return '<div class="center">' +
-      '<div class="big-emoji">✅</div>' +
-      '<h2 style="margin:0 0 6px;font-size:22px">Gespeichert!</h2>' +
-      '<p class="muted" style="margin:0 0 24px">Dein Eintrag ist sicher auf dem Handy gespeichert.<br>Mach\'s gut, Jürgen! 👋</p>' +
-      '<button class="btn-main" style="margin-bottom:10px" onclick="newEntry()">Neuer Eintrag</button>' +
-      '<button class="btn-ghost" onclick="go(\'stats\')">Auswertung ansehen 📊</button>' +
-      '</div>';
+/* ---------- Wizard ---------- */
+function startWizard() {
+  state.w = {
+    steps: [{ k: "br" }],
+    baureihen: [],
+    nichts: false,
+    fahrten: [],
+    note: "",
+    date: todayISO()
+  };
+  state.saved = false;
+  state.zielGroup = false;
+}
+function curStep() { return state.w.steps[state.w.steps.length - 1]; }
+function pushStep(s) { state.w.steps.push(s); render(); window.scrollTo(0, 0); }
+function backStep() {
+  if (state.w.steps.length > 1) { state.w.steps.pop(); render(); window.scrollTo(0, 0); }
+}
+function fahrtOf(i) {
+  if (!state.w.fahrten[i]) {
+    state.w.fahrten[i] = { start: null, ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, retour: null };
   }
-  var alreadyToday = state.entries.some(function (e) {
-    return new Date(e.ts).toDateString() === new Date().toDateString();
-  });
-  var html = '<div class="content">';
-  if (alreadyToday) {
-    html += '<div class="hint">👋 Du hast heute schon einen Eintrag gespeichert – du kannst natürlich trotzdem noch einen ergänzen.</div>';
+  return state.w.fahrten[i];
+}
+function letztesZiel() {
+  /* Ziel der letzten Fahrt (heute oder im letzten Eintrag) – für die Fahrtenkette */
+  if (state.w && state.w.fahrten.length) {
+    var f = state.w.fahrten[state.w.fahrten.length - 1];
+    if (f && f.ziel) return f.ziel;
   }
-  html += '<div class="dist-lbl" style="margin:0 16px 4px"><span>Fortschritt</span><span id="ptext">0 / ' + QUESTIONS.length + '</span></div>' +
-    '<div class="bar-outer"><div class="bar-inner" id="pbar"></div></div>';
-
-  QUESTIONS.forEach(function (q) {
-    html += '<div class="card"><div class="qlabel">' + q.emoji + ' ' + esc(q.label) + '</div>';
-    q.options.forEach(function (opt, i) {
-      html += '<button type="button" class="opt" id="b-' + q.id + '-' + i + '" onclick="pick(\'' + q.id + '\',' + i + ')">' + esc(opt) + '</button>';
-    });
-    html += '</div>';
-  });
-
-  html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
-    '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis, Gedanken …" oninput="setNote(this.value)"></textarea></div>';
-  html += '<button type="button" class="btn-main" id="saveBtn" onclick="submitForm()" disabled>Noch ' + QUESTIONS.length + ' Frage(n) offen</button>';
-  html += '</div>';
-  return html;
+  if (state.entries.length) {
+    var e = state.entries[state.entries.length - 1];
+    if (e && e.fahrten && e.fahrten.length) return e.fahrten[e.fahrten.length - 1].ziel;
+  }
+  return null;
 }
 
-function distributionCard(q, entries) {
-  var counts = {};
-  q.options.forEach(function (o) { counts[o] = 0; });
-  entries.forEach(function (e) {
-    var a = e.answers[q.id];
-    if (a && a in counts) counts[a] += 1;
-  });
-  var total = entries.length;
-  var html = '<div class="card"><div class="qlabel">' + q.emoji + ' ' + esc(q.label) + '</div>';
-  q.options.forEach(function (opt) {
-    var c = counts[opt];
-    var pct = total ? Math.round((c / total) * 100) : 0;
-    html += '<div class="dist-row"><div class="dist-lbl"><span>' + esc(opt) + '</span><span>' + c + '× (' + pct + ' %)</span></div>' +
-      '<div class="track"><div class="fill" style="width:' + pct + '%"></div></div></div>';
-  });
-  return html + '</div>';
+function toggleBaureihe(br) {
+  var i = state.w.baureihen.indexOf(br);
+  if (i >= 0) state.w.baureihen.splice(i, 1);
+  else state.w.baureihen.push(br);
+  render();
 }
-
-function backupCard() {
-  return '<div class="card"><div class="qlabel">💾 Sicherung</div>' +
-    '<p class="muted" style="margin:0 0 10px;font-size:13px">Deine Einträge liegen nur auf diesem Gerät. Kopiere den Block z. B. in deine Notizen als Backup – oder füge hier ein altes Backup ein und tippe auf „Laden“.</p>' +
-    '<textarea rows="4" id="backupArea" style="font-size:11px;font-family:ui-monospace,Menlo,monospace" oninput="setBackup(this.value)"></textarea>' +
-    '<div class="flexrow"><button type="button" class="btn-sm btn-grey" onclick="copyBackup()">Kopieren</button>' +
-    '<button type="button" class="btn-sm btn-red" onclick="restoreBackup()">Laden</button></div>' +
-    '<div id="backupMsg" style="text-align:center;font-size:14px;color:#475569;margin-top:8px"></div></div>';
+function nichtsZuEintragen() {
+  state.w.nichts = true;
+  render();
 }
-
-function viewStats() {
-  if (!state.entries.length) {
-    return '<div class="center"><div class="big-emoji">📊</div><h2 style="margin:0 0 6px;font-size:20px">Noch keine Daten</h2>' +
-      '<p class="muted">Sobald du ein paar Fragebögen ausgefüllt hast, siehst du hier deine Monatsauswertung mit Diagrammen.</p></div>';
-  }
-  var monthKeys = [];
-  state.entries.forEach(function (e) {
-    var k = monthKeyOf(e.ts);
-    if (monthKeys.indexOf(k) === -1) monthKeys.push(k);
-  });
-  monthKeys.sort().reverse();
-  if (!state.month || monthKeys.indexOf(state.month) === -1) state.month = monthKeys[0];
-
-  var monthEntries = state.entries.filter(function (e) { return monthKeyOf(e.ts) === state.month; });
-  var withScore = monthEntries.map(function (e) { return { e: e, s: dayScore(e) }; })
-    .filter(function (x) { return x.s !== null; });
-  var avg = withScore.length ? Math.round(withScore.reduce(function (a, x) { return a + x.s; }, 0) / withScore.length) : null;
-
-  var html = '<div class="chips">';
-  monthKeys.forEach(function (k) {
-    html += '<button type="button" class="chip' + (k === state.month ? ' on' : '') + '" onclick="setMonth(\'' + k + '\')">' + esc(monthLabelOf(k)) + '</button>';
-  });
-  html += '</div>';
-
-  html += '<div class="grid2">' +
-    '<div class="stat"><div class="num">' + monthEntries.length + '</div><div class="lbl">Einträge im Monat</div></div>' +
-    '<div class="stat">' + (avg !== null
-      ? '<div class="num" style="color:' + scoreColor(avg) + '">' + avg + '</div><div class="lbl">Ø Tages-Score</div>'
-      : '<div class="muted" style="padding-top:14px">Keine Bewertung</div>') + '</div></div>';
-
-  if (withScore.length) {
-    var lineData = withScore.map(function (x) { return { label: fmtShort(x.e.ts), score: x.s, ts: x.e.ts }; })
-      .sort(function (a, b) { return a.ts - b.ts; });
-    html += '<div class="card"><div class="qlabel">📈 Tages-Score im Verlauf</div>' + lineChartSVG(lineData) + '</div>';
-  }
-
-  var dienstartCounts = {};
-  monthEntries.forEach(function (e) {
-    var a = e.answers["dienstart"];
-    if (a) dienstartCounts[a] = (dienstartCounts[a] || 0) + 1;
-  });
-  var pieItems = Object.keys(dienstartCounts).map(function (name, i) {
-    return { name: name, value: dienstartCounts[name], color: PIE_COLORS[i % PIE_COLORS.length] };
-  });
-  if (pieItems.length) {
-    html += '<div class="card"><div class="qlabel">🕐 Deine Dienstarten</div>' + donutSVG(pieItems);
-    html += '<div class="legend">' + pieItems.map(function (p) {
-      return '<span><span class="dot" style="background:' + p.color + '"></span>' + esc(p.name) + ' (' + p.value + '×)</span>';
-    }).join("") + '</div></div>';
-  }
-
-  html += '<div class="section-t">Alle Fragen im Überblick</div>';
-  QUESTIONS.filter(function (q) { return q.id !== "dienstart"; }).forEach(function (q) {
-    html += distributionCard(q, monthEntries);
-  });
-
-  html += backupCard();
-  return html;
+function pickStart(i, h) {
+  var f = fahrtOf(i);
+  f.start = h;
+  state.zielGroup = false;
+  pushStep({ k: "ziel", i: i });
 }
+function pickZiel(i, h) {
+  var f = fahrtOf(i);
+  f.ziel = h;
+  f.routeId = null; f.alws = []; f.opts = []; f.alwOpen = false;
+  pushStep({ k: "weg", i: i });
+}
+function setRoute(i, rid) {
+  var f = fahrtOf(i);
+  f.routeId = rid;
+  f.alws = []; f.opts = [];
+  render();
+}
+function toggleAlw(i, aid, isRet) {
+  var f = fahrtOf(i);
+  var sel = isRet && f.retour ? f.retour.alws : f.alws;
+  var p = sel.indexOf(aid);
+  if (p >= 0) sel.splice(p, 1); else sel.push(aid);
+  render();
+}
+function toggleOpt(i, oid, isRet) {
+  var f = fahrtOf(i);
+  var sel = isRet && f.retour ? f.retour.opts : f.opts;
+  var p = sel.indexOf(oid);
+  if (p >= 0) sel.splice(p, 1); else sel.push(oid);
+  render();
+}
+function toggleAlwOpen(i, isRet) {
+  var f = fahrtOf(i);
+  if (isRet && f.retour) f.retour.alwOpen = !f.retour.alwOpen;
+  else f.alwOpen = !f.alwOpen;
+  render();
+}
+function startRetour(i) {
+  var f = fahrtOf(i);
+  f.retour = { ziel: null, routeId: null, alws: [], opts: [], alwOpen: false };
+  pushStep({ k: "rziel", i: i });
+}
+function keineRetour(i) {
+  var f = fahrtOf(i);
+  f.retour = null;
+  pushStep({ k: "mehr", i: i });
+}
+function pickRuckziel(i, h) {
+  var f = fahrtOf(i);
+  f.retour.ziel = h;
+  f.retour.routeId = null; f.retour.alws = []; f.retour.opts = [];
+  pushStep({ k: "rweg", i: i });
+}
+function setRetourRoute(i, rid) {
+  var f = fahrtOf(i);
+  f.retour.routeId = rid;
+  f.retour.alws = []; f.retour.opts = [];
+  render();
+}
+function weitereFahrt(i) {
+  var letzte = fahrtOf(i);
+  var nf = fahrtOf(i + 1);
+  nf.start = letzte.ziel;
+  pushStep({ k: "start", i: i + 1 });
+}
+function keineWeitere(i) { pushStep({ k: "note" }); }
+function setNote(v) { state.w.note = v; }
+function setDate(v) { state.w.date = v; }
 
-function viewLog() {
-  if (!state.entries.length) {
-    return '<div class="center"><div class="big-emoji">🗂️</div><h2 style="margin:0 0 6px;font-size:20px">Noch nichts drin</h2>' +
-      '<p class="muted">Deine ausgefüllten Fragebögen landen hier.</p></div>';
-  }
-  var sorted = state.entries.slice().sort(function (a, b) { return b.ts - a.ts; });
-  var html = '<div class="content">';
-  var lastMonth = "";
-  sorted.forEach(function (e) {
-    var mk = monthKeyOf(e.ts);
-    if (mk !== lastMonth) {
-      html += '<div class="month-h">' + esc(monthLabelOf(mk)) + '</div>';
-      lastMonth = mk;
+function submitEntry() {
+  var w = state.w;
+  if (!w.baureihen.length || !w.fahrten.length) return;
+  var fahrten = w.fahrten.map(function (f) {
+    var out = { start: f.start, ziel: f.ziel, routeId: f.routeId, alws: f.alws.slice(), opts: f.opts.slice(), chain: [] };
+    var rs = routesForWithFallback(f.start, f.ziel);
+    var r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
+    if (r) {
+      var leg = composeLeg(r, f.alws, f.opts);
+      out.routeId = r.id;
+      out.chain = leg.chain;
+      out.alwLabels = leg.alwLabels;
+      out.warnings = leg.warnings;
     }
-    var score = dayScore(e);
-    html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px"><span style="font-weight:600;color:#0f172a">' +
-      fmtDay(e.ts) + ' · ' + fmtTime(e.ts) + '</span>' +
-      (score !== null ? '<span class="score-badge" style="background:' + scoreColor(score) + '">' + score + '</span>' : '') +
-      '</div>';
-    QUESTIONS.forEach(function (q) {
-      var a = e.answers[q.id];
-      if (a) html += '<span class="tag">' + q.emoji + ' ' + esc(a) + '</span>';
-    });
-    if (e.note) html += '<div class="note">„' + esc(e.note) + '“</div>';
-    if (state.confirmId === e.id) {
-      html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</button>' +
-        '<button type="button" class="btn-sm btn-grey" onclick="cancelDelete()">Abbrechen</button></div>';
-    } else {
-      html += '<button type="button" class="del" onclick="askDelete(\'' + e.id + '\')">Eintrag löschen</button>';
+    if (f.retour && f.retour.ziel) {
+      var rrs = retourRoutes(f.ziel, f.retour.ziel);
+      var rr = rrs.filter(function (x) { return x.id === f.retour.routeId; })[0] || rrs.filter(function (x) { return x.d; })[0] || rrs[0];
+      if (rr) {
+        var rleg = composeLeg(rr, f.retour.alws, f.retour.opts);
+        out.retour = { ziel: f.retour.ziel, routeId: rr.id, alws: f.retour.alws.slice(), opts: f.retour.opts.slice(), chain: rleg.chain, alwLabels: rleg.alwLabels, warnings: rleg.warnings };
+      }
     }
-    html += '</div>';
+    return out;
   });
-  return html + '</div>';
-}
-
-/* ============ Aktionen ============ */
-
-function render() {
-  var wrap = document.getElementById("wrap");
-  var tabs = [
-    { id: "form", ico: "📝", label: "Fragebogen" },
-    { id: "stats", ico: "📊", label: "Auswertung" },
-    { id: "log", ico: "🗂️", label: "Verlauf" }
-  ];
-  var body = state.tab === "form" ? viewForm() : state.tab === "stats" ? viewStats() : viewLog();
-  var tabbar = '<div class="tabbar">' + tabs.map(function (t) {
-    return '<button type="button" class="tab' + (state.tab === t.id ? ' on' : '') + '" onclick="go(\'' + t.id + '\')">' +
-      '<span class="ico">' + t.ico + '</span>' + t.label + '</button>';
-  }).join("") + '</div>';
-
-  wrap.innerHTML =
-    '<header><div class="logo">🚆</div><div><h1>Streckenkunde</h1><div class="sub">Dein Fahrdienst-Tagebuch</div></div></header>' +
-    body + tabbar;
-
-  if (state.tab === "form" && !state.saved) updateProgress();
-  if (state.tab === "stats") {
-    var ba = document.getElementById("backupArea");
-    if (ba) ba.value = state.backupText || JSON.stringify(state.entries);
-  }
-  if (state.tab === "form" && !state.saved) {
-    var na = document.getElementById("noteArea");
-    if (na && state.note) na.value = state.note;
-  }
-}
-
-function go(tab) { state.tab = tab; render(); window.scrollTo(0, 0); }
-
-function pick(qid, idx) {
-  var q = QUESTIONS.filter(function (x) { return x.id === qid; })[0];
-  var opt = q.options[idx];
-  if (state.answers[qid] === opt) delete state.answers[qid];
-  else state.answers[qid] = opt;
-  q.options.forEach(function (o, i) {
-    var b = document.getElementById("b-" + qid + "-" + i);
-    if (b) {
-      var on = state.answers[qid] === o;
-      b.className = "opt" + (on ? " on" : "");
-      b.textContent = (on ? "✓ " : "") + o;
-    }
-  });
-  updateProgress();
-}
-
-function updateProgress() {
-  var done = QUESTIONS.filter(function (q) { return state.answers[q.id]; }).length;
-  var pbar = document.getElementById("pbar");
-  var ptext = document.getElementById("ptext");
-  var btn = document.getElementById("saveBtn");
-  if (!pbar || !btn) return;
-  pbar.style.width = (done / QUESTIONS.length * 100) + "%";
-  ptext.textContent = done + " / " + QUESTIONS.length;
-  if (done === QUESTIONS.length) {
-    btn.disabled = false;
-    btn.textContent = "Speichern 💾";
-  } else {
-    btn.disabled = true;
-    btn.textContent = "Noch " + (QUESTIONS.length - done) + " Frage(n) offen";
-  }
-}
-
-function setNote(v) { state.note = v; }
-
-function submitForm() {
-  var done = QUESTIONS.filter(function (q) { return state.answers[q.id]; }).length;
-  if (done !== QUESTIONS.length) return;
   state.entries.push({
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-    ts: Date.now(),
-    answers: Object.assign({}, state.answers),
-    note: (state.note || "").trim()
+    date: w.date || todayISO(),
+    baureihen: w.baureihen.slice(),
+    fahrten: fahrten,
+    note: (w.note || "").trim()
   });
   persist();
   state.saved = true;
@@ -430,42 +775,349 @@ function submitForm() {
   window.scrollTo(0, 0);
 }
 
-function newEntry() {
-  state.answers = {};
-  state.note = "";
-  state.saved = false;
-  render();
-  window.scrollTo(0, 0);
+/* ---------- Fahrweg-Schritt (Hin- und Rückfahrt) ---------- */
+function wegStepHTML(f, i, isRet) {
+  var rs, r, sel, alws, opts, alwSel, optSel, alwOpen;
+  if (isRet) {
+    rs = retourRoutes(f.ziel, f.retour.ziel);
+    r = rs.filter(function (x) { return x.id === f.retour.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
+    sel = f.retour; alwSel = f.retour.alws; optSel = f.retour.opts; alwOpen = f.retour.alwOpen;
+  } else {
+    rs = routesForWithFallback(f.start, f.ziel);
+    r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
+    sel = f; alwSel = f.alws; optSel = f.opts; alwOpen = f.alwOpen;
+  }
+  var html = "";
+  if (!rs.length) {
+    return '<div class="hint">⚠️ Für <b>' + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) +
+      '</b> ist noch kein Fahrweg in der Bibliothek. Speichere die Fahrt trotzdem – und sag mir danach den Fahrweg, dann lege ich ihn an.</div>' +
+      '<button class="btn-main" onclick="pushStep({k:\'' + (isRet ? "mehr" : "ret") + "',i:" + i + '})">Weiter ohne Fahrweg</button>';
+  }
+  /* Regelweg(e) / Routen-Auswahl */
+  html += '<div class="section-t">' + (rs.length > 1 ? "Welcher Regelweg?" : "Regelweg") + "</div>";
+  rs.forEach(function (rt) {
+    var on = r && rt.id === r.id;
+    html += '<button type="button" class="opt route' + (on ? " on" : "") + '" onclick="' +
+      (isRet ? "setRetourRoute(" : "setRoute(") + i + ",'" + rt.id + '\')">' +
+      '<div class="rt-name">' + (on ? "✓ " : "") + esc(rt.n) + "</div>" + chainChips(rt.secs) + "</button>";
+  });
+  if (!r) return html;
+  var leg = composeLeg(r, alwSel, optSel);
+  /* ALW – einklappbar, MEHRFACHAUSWAHL */
+  var avail = r.alws.filter(function (aid) { return !!ALW[aid]; });
+  html += '<div class="section-t">Alternative Laufwege (ALW)</div>';
+  if (!avail.length) {
+    html += '<div class="muted" style="margin:0 16px 8px;font-size:14px">Keine ALW verfügbar</div>';
+  } else {
+    var toggleTxt = (alwSel.length ? alwSel.length + " ausgewählt – " : "") + avail.length + " ALW verfügbar";
+    html += '<button type="button" class="opt toggle" onclick="toggleAlwOpen(' + i + "," + (isRet ? "true" : "false") + ')">' +
+      (alwOpen ? "▴" : "▾") + " " + esc(toggleTxt) + "</button>";
+    if (alwOpen) {
+      avail.forEach(function (aid) {
+        var a = ALW[aid];
+        var ab = isRet ? a.vr : a.v;
+        var on = alwSel.indexOf(aid) >= 0;
+        var conf = leg.warnings.filter(function (wx) { return wx.id === aid; })[0];
+        var nm = leg.warnings.filter(function (wx) { return wx.withId === aid; })[0];
+        var d = leg.deltas[aid] || { entf: [], dazu: [] };
+        html += '<button type="button" class="opt alw' + (on ? " on" : "") + '" onclick="toggleAlw(' + i + ",'" + aid + "'," + (isRet ? "true" : "false") + ')">' +
+          '<div class="rt-name">' + (on ? "☑ " : "☐ ") + "Ab " + esc(ab) + " " + esc(a.n) + "</div>" +
+          (d.entf.length || d.dazu.length ? '<div class="delta">' + deltaChips(d) + "</div>" : '<div class="muted" style="font-size:12px">ergänzt den Regelweg</div>') +
+          (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „Ab " + esc(isRet ? ALW[conf.withId].vr : ALW[conf.withId].v) + " " + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
+          (nm ? '<div class="warn">⚠️ Eine andere Auswahl verdrängt diesen ALW</div>' : "") +
+          "</button>";
+      });
+    }
+  }
+  /* Optionen */
+  var oavail = r.opts.filter(function (oid) { return !!OPT[oid]; });
+  if (oavail.length) {
+    html += '<div class="section-t">Zusätzlich anwählbare Optionen</div>';
+    oavail.forEach(function (oid) {
+      var o = OPT[oid];
+      var on = optSel.indexOf(oid) >= 0;
+      var ok2 = optAvailable(oid, leg.chain);
+      html += '<button type="button" class="opt alw' + (on && ok2 ? " on" : "") + (ok2 ? "" : " dis") + '" ' +
+        (ok2 ? "" : "disabled ") + 'onclick="toggleOpt(' + i + ",'" + oid + "'," + (isRet ? "true" : "false") + ')">' +
+        '<div class="rt-name">' + (on && ok2 ? "☑ " : "☐ ") + esc(o.n) + "</div>" +
+        (!ok2 ? '<div class="muted" style="font-size:12px">erst verfügbar, wenn der passende Fahrweg/ALW gewählt ist</div>' : "") +
+        "</button>";
+    });
+  }
+  /* Ergebnis-Kette */
+  html += '<div class="section-t">Deine Fahrt</div><div class="card">' + chainChips(leg.chain);
+  leg.warnings.forEach(function (wx) {
+    if (!ALW[wx.id]) return;
+    html += '<div class="warn">⚠️ „Ab ' + esc(isRet ? ALW[wx.id].vr : ALW[wx.id].v) + " " + esc(ALW[wx.id].n) + "“ überschneidet sich mit einer anderen Auswahl – wirkt hier nicht</div>";
+  });
+  html += "</div>";
+  var next = isRet ? "mehr" : "ret";
+  html += '<button class="btn-main" onclick="pushStep({k:\'' + next + "',i:" + i + '})">Weiter</button>';
+  return html;
 }
 
-function setMonth(k) { state.month = k; render(); }
-
-function askDelete(id) { state.confirmId = id; render(); }
-function cancelDelete() { state.confirmId = null; render(); }
-function deleteEntry(id) {
-  state.entries = state.entries.filter(function (e) { return e.id !== id; });
-  state.confirmId = null;
-  persist();
-  render();
+/* ---------- Eintragen-Ansicht ---------- */
+function viewForm() {
+  var w = state.w;
+  if (state.saved) {
+    return '<div class="center"><div class="big-emoji">✅</div>' +
+      '<h2 style="margin:0 0 6px;font-size:22px">Gespeichert!</h2>' +
+      '<p class="muted" style="margin:0 0 24px">Alle Fahrten sind eingetragen. Mach\'s gut, Jürgen! 👋</p>' +
+      '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Neuer Eintrag</button>' +
+      '<button class="btn-ghost" onclick="go(\'stats\')">Auswertung ansehen 📊</button></div>';
+  }
+  if (w.nichts) {
+    return '<div class="center"><div class="big-emoji">👍</div>' +
+      '<h2 style="margin:0 0 6px;font-size:22px">Notiert!</h2>' +
+      '<p class="muted" style="margin:0 0 24px">Heute gibt es nichts einzutragen – es wurde kein Eintrag gespeichert.</p>' +
+      '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Doch, eintragen</button></div>';
+  }
+  if (!w) { startWizard(); }
+  var s = curStep();
+  var html = '<div class="content">';
+  if (w.steps.length > 1) {
+    html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Antwort korrigieren</button>';
+  }
+  if (s.k === "br") {
+    html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div><div class="chips wrap">' +
+      BAUREIHEN.map(function (b) {
+        return '<button type="button" class="chip' + (w.baureihen.indexOf(b) >= 0 ? " on" : "") + '" onclick="toggleBaureihe(\'' + b + '\')">' + esc(b) + "</button>";
+      }).join("") + "</div>";
+    html += '<div class="muted" style="font-size:13px;margin-top:6px">Mehrfachauswahl – einfach alle antippen, die du heute gefahren bist.</div></div>';
+    html += '<button type="button" class="btn-ghost" onclick="nichtsZuEintragen()">Heute gibt es nichts einzutragen</button>';
+    if (w.baureihen.length) {
+      html += '<button class="btn-main" onclick="pushStep({k:\'start\',i:0})">Weiter – Fahrt eintragen</button>';
+    }
+  } else if (s.k === "start") {
+    var f0 = fahrtOf(s.i);
+    var auto = f0.start && s.i > 0;
+    html += '<div class="card"><div class="qlabel">🚉 Fahrt ' + (s.i + 1) + ' – Wo hast du begonnen?</div>';
+    if (auto) html += '<div class="muted" style="font-size:13px;margin-bottom:8px">📍 Start automatisch übernommen: <b>' + esc(HBF[f0.start]) + "</b></div>";
+    var lz = letztesZiel();
+    if (lz && !auto) html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + lz + '\')">📍 ' + esc(HBF[lz]) + " <span class='muted'>(letztes Ziel)</span></button>";
+    ["muenchen_hbf", "muenchen_ost"].forEach(function (h) {
+      html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+    });
+    html += '<button type="button" class="opt" onclick="state.anderer=!state.anderer;render()">🚉 Anderer Hbf…</button>';
+    if (state.anderer) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + Object.keys(HBF).map(function (h) {
+        return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+      }).join("") + "</div>";
+    }
+    html += "</div>";
+    if (auto) {
+      html += '<button class="btn-main" onclick="pushStep({k:\'ziel\',i:' + s.i + '})">Weiter mit ' + esc(HBF[f0.start]) + "</button>";
+    }
+  } else if (s.k === "ziel") {
+    var fg = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🎯 Fahrt ' + (s.i + 1) + " – Wohin ging es?</div>" +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Von: <b>' + esc(HBF[fg.start]) + "</b></div>";
+    var targets = ["stuttgart", "nuernberg", "wuerzburg", "hannover", "kassel", "fulda", "erfurt", "leipzig", "augsburg", "mannheim", "laim_rbf", "pasing_bbf"];
+    html += '<div class="chips wrap">' + targets.map(function (t) {
+      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+    }).join("");
+    html += '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;render()">Frankfurt ▸</button>';
+    if (fg.start !== "muenchen_hbf") html += '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'muenchen_hbf\')">München Hbf</button>';
+    if (fg.start !== "muenchen_ost") html += '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'muenchen_ost\')">München Ost</button>';
+    html += "</div>";
+    if (state.zielGroup) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + ["ff_hbf", "ff_ffs", "ff_flh"].map(function (t) {
+        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+      }).join("") + "</div>";
+    }
+    html += "</div>";
+  } else if (s.k === "weg") {
+    var f1 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🛤️ Fahrt ' + (s.i + 1) + ": " + esc(HBF[f1.start]) + " → " + esc(HBF[f1.ziel]) + "</div>";
+    html += '<div class="muted" style="font-size:13px">Regelweg ist vorausgewählt. ALW kannst du jetzt <b>mehrfach</b> antippen – einer pro Störung.</div></div>';
+    html += wegStepHTML(f1, s.i, false);
+  } else if (s.k === "ret") {
+    var f2 = fahrtOf(s.i);
+    if (f2.ziel === "muenchen_hbf" || f2.ziel === "muenchen_ost") {
+      /* endet in München → Retour entfällt */
+      f2.retour = null;
+      return { html: html, skip: { k: "mehr", i: s.i } };
+    }
+    html += '<div class="card"><div class="qlabel">↩️ Und retour?</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Die Rückfahrt bekommt ihren eigenen Fahrweg – eine Umleitung kann auch nur retour gelten.</div>' +
+      '<button type="button" class="opt" onclick="startRetour(' + s.i + ')">Ja, retour nach München</button>' +
+      '<button type="button" class="opt" onclick="keineRetour(' + s.i + ')">Nein, ohne Retour</button></div>';
+  } else if (s.k === "rziel") {
+    var f3 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🏠 Rückziel?</div>';
+    ["muenchen_hbf", "muenchen_ost"].forEach(function (h) {
+      html += '<button type="button" class="opt" onclick="pickRuckziel(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+    });
+    if (f3.start !== "muenchen_hbf" && f3.start !== "muenchen_ost") {
+      html += '<button type="button" class="opt" onclick="pickRuckziel(' + s.i + ',\'' + f3.start + '\')">Zurück nach ' + esc(HBF[f3.start]) + "</button>";
+    }
+    html += "</div>";
+  } else if (s.k === "rweg") {
+    var f4 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🛤️ Retour: ' + esc(HBF[f4.ziel]) + " → " + esc(HBF[f4.retour.ziel]) + "</div>";
+    html += '<div class="muted" style="font-size:13px">ALW gelten automatisch retour gespiegelt – die Abweichungsbahnhöfe passen sich an.</div></div>';
+    html += wegStepHTML(f4, s.i, true);
+  } else if (s.k === "mehr") {
+    html += '<div class="card"><div class="qlabel">🔁 Gab es heute noch eine weitere Fahrt?</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Der Startbahnhof der nächsten Fahrt wird automatisch übernommen.</div>' +
+      '<button type="button" class="opt" onclick="weitereFahrt(' + s.i + ')">Ja, weitere Fahrt</button>' +
+      '<button type="button" class="opt" onclick="keineWeitere(' + s.i + ')">Nein, das war alles</button></div>';
+  } else if (s.k === "note") {
+    var cnt = state.w.fahrten.length;
+    html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
+      '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
+    html += '<div class="card"><div class="qlabel">📅 Datum</div>' +
+      '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDate(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:16px;background:#f8fafc;color:#0f172a">' +
+      '<div class="muted" style="font-size:13px;margin-top:6px">Für Nachträge einfach ändern.</div></div>';
+    html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
+  }
+  html += "</div>";
+  return html;
 }
 
-function setBackup(v) { state.backupText = v; }
+/* ---------- Auswertung ---------- */
+function collectDriven() {
+  var driven = {}; /* secId -> [dates] */
+  state.entries.forEach(function (e) {
+    (e.fahrten || []).forEach(function (f) {
+      (f.chain || []).forEach(function (s) { (driven[s] = driven[s] || []).push(e.date); });
+      if (f.retour) (f.retour.chain || []).forEach(function (s) { (driven[s] = driven[s] || []).push(e.date); });
+    });
+  });
+  return driven;
+}
+function lastOf(dates) {
+  return dates && dates.length ? dates.slice().sort().pop() : null;
+}
+function viewStats() {
+  var driven = collectDriven();
+  var today = todayISO();
+  var html = '<div class="content">';
+  /* Fristen-Alarm */
+  var rows = [];
+  Object.keys(SECTIONS).forEach(function (sid) {
+    var lf = lastOf(driven[sid]) || seedFromFrist(SECTIONS[sid].f);
+    if (!lf) return;
+    var frist = new Date(lf);
+    frist.setFullYear(frist.getFullYear() + 1);
+    rows.push({ sid: sid, lf: lf, frist: frist.toISOString().slice(0, 10), a: ampelOf(lf, today) });
+  });
+  rows.sort(function (a, b) { return a.frist < b.frist ? -1 : 1; });
+  html += '<div class="card"><div class="qlabel">⏰ Nächste Fristen (12-Monats-Regel)</div>';
+  rows.slice(0, 6).forEach(function (r2) {
+    html += '<div class="dist-lbl" style="margin-bottom:5px"><span>' + ampelHTML(r2.a) + " " + esc(SECTIONS[r2.sid].n) + "</span>" +
+      '<span class="muted">Frist ' + fmtDate(r2.frist) + "</span></div>";
+  });
+  html += '<div class="muted" style="font-size:12px;margin-top:6px">Rot = über 12 Monate ohne Fahrt → mit dem Dienstplaner sprechen. Gelb = in ~3 Monaten fällig.</div></div>';
+  /* Abschnitte nach Regionalbereich */
+  var year = state.jahr;
+  ["S", "M", "N", "SO"].forEach(function (rb) {
+    html += '<div class="section-t">' + ({ S: "Süd", M: "Mitte", N: "Nord", SO: "Südost" })[rb] + "</div>";
+    RB[rb].forEach(function (sid) {
+      var sec = SECTIONS[sid];
+      var lf = lastOf(driven[sid]) || seedFromFrist(sec.f);
+      var a = lf ? ampelOf(lf, today) : "none";
+      var months = "";
+      for (var m = 0; m < 12; m++) {
+        var hit = (driven[sid] || []).some(function (d) {
+          return +d.slice(0, 4) === year && +d.slice(5, 7) === m + 1;
+        });
+        months += '<span class="mo' + (hit ? " hit" : "") + '">' + ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m] + "</span>";
+      }
+      html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
+        '<span>' + ampelHTML(a) + " <b>" + esc(sec.n) + "</b> <span class='muted' style='font-size:12px'>" + esc(sec.v) + " → " + esc(sec.b) + "</span></span>" +
+        '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nie gefahren") + "</span></div>" +
+        '<div class="months">' + months + "</div></div>";
+    });
+  });
+  /* Baureihen */
+  html += '<div class="section-t">Baureihen</div>';
+  var brDriven = {};
+  state.entries.forEach(function (e) {
+    (e.baureihen || []).forEach(function (b) { (brDriven[b] = brDriven[b] || []).push(e.date); });
+  });
+  BAUREIHEN.forEach(function (b) {
+    var lf = lastOf(brDriven[b]);
+    var a = lf ? ampelOf(lf, today) : "none";
+    var months = "";
+    for (var m = 0; m < 12; m++) {
+      var hit = (brDriven[b] || []).some(function (d) {
+        return +d.slice(0, 4) === year && +d.slice(5, 7) === m + 1;
+      });
+      months += '<span class="mo' + (hit ? " hit" : "") + '">' + ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m] + "</span>";
+    }
+    html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
+      '<span>' + ampelHTML(a) + " <b>" + esc(b) + "</b></span>" +
+      '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
+      '<div class="months">' + months + "</div></div>";
+  });
+  /* Sicherung */
+  html += backupCard();
+  html += "</div>";
+  return html;
+}
 
+/* ---------- Verlauf ---------- */
+function viewLog() {
+  if (!state.entries.length) {
+    return '<div class="center"><div class="big-emoji">🗂️</div><h2 style="margin:0 0 6px;font-size:20px">Noch nichts drin</h2>' +
+      '<p class="muted">Deine eingetragenen Fahrten landen hier.</p></div>';
+  }
+  var html = '<div class="content">';
+  state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
+    html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px">' +
+      '<span style="font-weight:600;color:#0f172a">📆 ' + fmtDate(e.date) + "</span>" +
+      '<span class="tag">' + (e.baureihen || []).join(" · ") + "</span></div>";
+    (e.fahrten || []).forEach(function (f, fi) {
+      html += '<div class="trip"><div class="rt-name" style="margin-top:' + (fi ? 10 : 4) + 'px">' +
+        "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
+      if (f.chain && f.chain.length) html += chainChips(f.chain);
+      else html += '<div class="warn" style="font-size:12px">ohne Fahrweg gespeichert</div>';
+      (f.alwLabels || []).forEach(function (l) {
+        html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+      });
+      if (f.retour) {
+        html += '<div class="rt-name" style="margin-top:8px">↩️ Retour → ' + esc(HBF[f.retour.ziel]) + "</div>";
+        if (f.retour.chain) html += chainChips(f.retour.chain);
+        (f.retour.alwLabels || []).forEach(function (l) {
+          html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+        });
+      }
+      html += "</div>";
+    });
+    if (e.note) html += '<div class="note">„' + esc(e.note) + "“</div>";
+    if (state.confirmId === e.id) {
+      html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</button>' +
+        '<button type="button" class="btn-sm btn-grey" onclick="state.confirmId=null;render()">Abbrechen</button></div>';
+    } else {
+      html += '<button type="button" class="del" onclick="state.confirmId=\'' + e.id + '\';render()">Eintrag löschen</button>';
+    }
+    html += "</div>";
+  });
+  return html + "</div>";
+}
+
+/* ---------- Backup ---------- */
+function backupCard() {
+  return '<div class="card"><div class="qlabel">💾 Sicherung</div>' +
+    '<p class="muted" style="margin:0 0 10px;font-size:13px">Deine Einträge liegen nur auf diesem Gerät. Kopiere den Block als Backup – oder füge ein altes Backup ein und tippe auf „Laden“.</p>' +
+    '<textarea rows="4" id="backupArea" style="font-size:11px;font-family:ui-monospace,Menlo,monospace" oninput="state.backupText=this.value"></textarea>' +
+    '<div class="flexrow"><button type="button" class="btn-sm btn-grey" onclick="copyBackup()">Kopieren</button>' +
+    '<button type="button" class="btn-sm btn-red" onclick="restoreBackup()">Laden</button></div>' +
+    '<div id="backupMsg" style="text-align:center;font-size:14px;color:#475569;margin-top:8px"></div></div>';
+}
 function backupMsg(text) {
   var el = document.getElementById("backupMsg");
   if (el) el.textContent = text;
   setTimeout(function () { if (el) el.textContent = ""; }, 2600);
 }
-
 function copyBackup() {
   var text = (state.backupText || "").trim() || JSON.stringify(state.entries);
   var done = function () { backupMsg("Kopiert! ✅"); };
   var fail = function () { backupMsg("Bitte Text manuell markieren und kopieren."); };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(done, fail);
-  } else { fail(); }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+  else fail();
 }
-
 function restoreBackup() {
   var text = (state.backupText || "").trim();
   try {
@@ -474,16 +1126,65 @@ function restoreBackup() {
     var byId = {};
     state.entries.concat(parsed).forEach(function (e) { if (e && e.id) byId[e.id] = e; });
     state.entries = Object.keys(byId).map(function (k) { return byId[k]; })
-      .sort(function (a, b) { return a.ts - b.ts; });
+      .sort(function (a, b) { return (a.date || "") < (b.date || "") ? -1 : 1; });
     persist();
     render();
     backupMsg("Daten geladen! ✅");
-  } catch (err) {
-    backupMsg("Das ist kein gültiger Daten-Block. ❌");
+  } catch (err) { backupMsg("Das ist kein gültiger Daten-Block. ❌"); }
+}
+
+/* ---------- Aktionen / Persistenz ---------- */
+function persist() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries)); } catch (e) {}
+}
+function go(tab) { state.tab = tab; render(); window.scrollTo(0, 0); }
+
+function render() {
+  var wrap = document.getElementById("wrap");
+  if (state.tab === "form" && !state.w && !state.saved) startWizard();
+  /* Auto-Skip: Fahrt endet in München → Retour entfällt */
+  if (state.tab === "form" && state.w && state.w.steps.length) {
+    var cs = curStep();
+    if (cs.k === "ret") {
+      var f = fahrtOf(cs.i);
+      if (f.ziel === "muenchen_hbf" || f.ziel === "muenchen_ost") {
+        f.retour = null;
+        state.w.steps.push({ k: "mehr", i: cs.i });
+      }
+    }
+  }
+  var body = state.tab === "form" ? viewForm() : state.tab === "stats" ? viewStats() : viewLog();
+  if (typeof body === "object" && body.skip) { state.w.steps.push(body.skip); return render(); }
+  var tabs = [
+    { id: "form", ico: "📝", label: "Eintragen" },
+    { id: "stats", ico: "📊", label: "Auswertung" },
+    { id: "log", ico: "🗂️", label: "Verlauf" }
+  ];
+  var tabbar = '<div class="tabbar">' + tabs.map(function (t) {
+    return '<button type="button" class="tab' + (state.tab === t.id ? " on" : "") + '" onclick="go(\'' + t.id + '\')">' +
+      '<span class="ico">' + t.ico + "</span>" + t.label + "</button>";
+  }).join("") + "</div>";
+  var stepsH = "";
+  if (state.tab === "form" && state.w && !state.saved && state.w.fahrten.length) {
+    stepsH = '<div class="crumbs">' + state.w.fahrten.length + ". Fahrt" + "</div>";
+  }
+  wrap.innerHTML =
+    '<header><div class="logo">🚆</div><div><h1>Streckenkunde</h1><div class="sub">Dein digitales Streckenkunde-Heft</div></div></header>' +
+    body + tabbar;
+  if (state.tab === "stats") {
+    var ba = document.getElementById("backupArea");
+    if (ba && !state.backupText) ba.value = JSON.stringify(state.entries);
+  }
+  if (state.tab === "form" && state.w && !state.saved) {
+    var na = document.getElementById("noteArea");
+    if (na) na.value = state.w.note || "";
+    var da = document.getElementById("dateArea");
+    if (da) da.value = state.w.date;
   }
 }
 
 render();
+
 </script>
 </body>
 </html>
