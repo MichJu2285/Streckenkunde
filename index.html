@@ -899,7 +899,7 @@ function viewForm() {
     html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Antwort korrigieren</button>';
   }
   if (s.k === "datum") {
-    html += '<div class="welcome">Servus Jürgen! 👋<span>Schön, dich zu sehen. Los geht’s – Pack ma’s!</span></div>';
+    html += '<div class="welcome">Servus Jürgen! 👋<span>Schön, dich zu sehen.<br>Los geht’s – Pack ma’s!</span></div>';
     html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
       '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
       '<button type="button" class="opt" onclick="toggleDatumCustom()">📆 Anderer Tag…</button>';
