@@ -206,7 +206,7 @@ var ALW = {
   "nn_altmuehltal": { n: "via Altmühltal", v: "Ingolstadt Nord", vr: "Nürnberg Hbf", sub: ["S350"], rep: ["S35/2", "S18"] },
   "wue_ansbach":    { n: "via Ansbach", v: "Nürnberg Hbf", vr: "Würzburg Hbf", sub: ["S24"], rep: ["S15/1", "S35/3"] },
   "wue_altmuehltal":{ n: "via Altmühltal", v: "Ingolstadt Nord", vr: "Treuchtlingen", sub: ["S350", "S24"], rep: ["S35/2", "S35/3"] },
-  "wue_fuerth":     { n: "via Fürth und Augsburg", v: "München Hbf", vr: "Fürth (Bay) Hbf", sub: ["S35/1", "S350"], rep: ["S1/1", "S18", "S21"] },
+  "wue_fuerth":     { n: "via Fürth und Augsburg", v: "München Hbf", vr: "Fürth (Bay) Hbf", sub: ["S35/1", "S350"], rep: ["S1/1", "S18", "S21"], excl: 1 },
   /* Frankfurt-Gruppe */
   "ff_gemuenden":   { n: "via Gemünden", v: "Würzburg Hbf", vr: "Nantenbach", sub: ["M300/1", "M361"], rep: ["M25/1", "M25/2"] },
   "ff_darmstadt":   { n: "via Darmstadt", v: "Aschaffenburg", vr: "Frankfurt Hbf", sub: ["M23/2", "M23/1"], rep: ["M35", "M21/2", "M21/3"] },
@@ -219,8 +219,9 @@ var ALW = {
   "ful_altbau":     { n: "via Altbau (durchgehende 32)", v: "Würzburg Hbf", vr: "Fulda", sub: ["M300/1"], rep: ["M25/1", "M32", "M23/4"] },
   "ful_wolfgang":   { n: "via Wolfgang (ohne Hanau)", v: "Würzburg Hbf", vr: "Fulda", sub: ["M300/1"], rep: ["M361", "M25/3", "M28", "M23/3", "M23/4"] },
   "bebra":          { n: "via Bebra (umgeht Kassel)", v: "Fulda", vr: "Hannover Hbf", sub: ["M300/3", "N300/4"], rep: ["M23/5", "M23/6", "N300/4"] },
-  /* München-Knoten: ALW auf der 1/1 (M5, M16) */
+  /* München-Knoten: ALW auf der 1/1 (M5, M5 via 46, M16) */
   "m5":             { n: "via Kanal/Pasing Nord auf die 1/1 (35 → 37)", v: "München Hbf", vr: "Pasing Nord", sub: ["S1/1"], rep: ["S35/1", "S37", "S1/1"] },
+  "m5_46":          { n: "via Kanal/Pasing Nord auf die 1/1 (46 → 37)", v: "München Hbf", vr: "Pasing Nord", sub: ["S1/1"], rep: ["S46", "S37", "S1/1"] },
   "m16":            { n: "via Gl. Garmisch nach Pasing (63/1 & 30/1)", v: "München Hbf", vr: "München-Pasing", sub: ["S1/1"], rep: ["S63", "S1/1"] },
   /* München-Knoten: ALW auf der 35 (vier Nordring-ALW) */
   "nr1":            { n: "via Nordring im Uhrzeigersinn (107 → 110 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S107", "S110", "S112", "S35/1"] },
@@ -251,7 +252,9 @@ var OPT = {
 
 var SUED_WUE = ["wue_ansbach", "wue_altmuehltal", "wue_fuerth"];   /* alle Ziele über Würzburg (RW über NN) */
 var NORDRING = ["nr1", "nr2", "nr3", "nr4"];                        /* alle Ziele über die Süd 35 */
-var AUF_11 = ["m5", "m16"];                                         /* alle Ziele über die Süd 1/1 */
+var AUF_11 = ["m5", "m5_46", "m16"];                               /* alle Ziele über die Süd 1/1 */
+/* München-Knoten-ALW (in der App als eigene Gruppe vor allen anderen ALW) */
+var MUC_ALW = { m5: 1, m5_46: 1, m16: 1, nr1: 1, nr2: 1, nr3: 1, nr4: 1, mpb_augsburg: 1, o_fhb: 1, o_landsberger: 1 };
 
 var ROUTES = [
   /* ===== Start München Hbf ===== */
@@ -576,6 +579,7 @@ var state = {
   confirmId: null,
   backupText: "",
   zielGroup: false,  /* Frankfurt-Gruppe aufgeklappt */
+  muenchenGroup: false, /* München-Gruppe aufgeklappt */
   dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
   dateEdit: false,   /* Notiz-Schritt: Datum-Änderung offen */
   jahr: new Date().getFullYear()
@@ -638,6 +642,7 @@ function startWizard() {
   };
   state.saved = false;
   state.zielGroup = false;
+  state.muenchenGroup = false;
   state.dateCustom = false;
   state.dateEdit = false;
 }
@@ -648,7 +653,7 @@ function backStep() {
 }
 function fahrtOf(i) {
   if (!state.w.fahrten[i]) {
-    state.w.fahrten[i] = { start: null, ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, retour: null };
+    state.w.fahrten[i] = { start: null, ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false, retour: null };
   }
   return state.w.fahrten[i];
 }
@@ -679,6 +684,7 @@ function pickStart(i, h) {
   var f = fahrtOf(i);
   f.start = h;
   state.zielGroup = false;
+  state.muenchenGroup = false;
   pushStep({ k: "ziel", i: i });
 }
 function pickZiel(i, h) {
@@ -713,9 +719,15 @@ function toggleAlwOpen(i, isRet) {
   else f.alwOpen = !f.alwOpen;
   render();
 }
+function toggleAlwOpen2(i, isRet) {
+  var f = fahrtOf(i);
+  if (isRet && f.retour) f.retour.alwOpen2 = !f.retour.alwOpen2;
+  else f.alwOpen2 = !f.alwOpen2;
+  render();
+}
 function startRetour(i) {
   var f = fahrtOf(i);
-  f.retour = { ziel: null, routeId: null, alws: [], opts: [], alwOpen: false };
+  f.retour = { ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false };
   pushStep({ k: "rziel", i: i });
 }
 function keineRetour(i) {
@@ -798,15 +810,15 @@ function submitEntry() {
 
 /* ---------- Fahrweg-Schritt (Hin- und Rückfahrt) ---------- */
 function wegStepHTML(f, i, isRet) {
-  var rs, r, sel, alws, opts, alwSel, optSel, alwOpen;
+  var rs, r, sel, alws, opts, alwSel, optSel, alwOpen, alwOpen2;
   if (isRet) {
     rs = retourRoutes(f.ziel, f.retour.ziel);
     r = rs.filter(function (x) { return x.id === f.retour.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
-    sel = f.retour; alwSel = f.retour.alws; optSel = f.retour.opts; alwOpen = f.retour.alwOpen;
+    sel = f.retour; alwSel = f.retour.alws; optSel = f.retour.opts; alwOpen = f.retour.alwOpen; alwOpen2 = f.retour.alwOpen2;
   } else {
     rs = routesForWithFallback(f.start, f.ziel);
     r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
-    sel = f; alwSel = f.alws; optSel = f.opts; alwOpen = f.alwOpen;
+    sel = f; alwSel = f.alws; optSel = f.opts; alwOpen = f.alwOpen; alwOpen2 = f.alwOpen2;
   }
   var html = "";
   if (!rs.length) {
@@ -824,30 +836,60 @@ function wegStepHTML(f, i, isRet) {
   });
   if (!r) return html;
   var leg = composeLeg(r, alwSel, optSel);
-  /* ALW – einklappbar, MEHRFACHAUSWAHL */
+  /* ALW – einklappbar, MEHRFACHAUSWAHL; München-Knoten als eigene Gruppe zuerst */
   var avail = r.alws.filter(function (aid) { return !!ALW[aid]; });
+  var muc = avail.filter(function (aid) { return !!MUC_ALW[aid]; });
+  var rest = avail.filter(function (aid) { return !MUC_ALW[aid]; });
+  var mir = !!r.mirrored;
+  var exclSel = alwSel.filter(function (aid) { return ALW[aid] && ALW[aid].excl; })[0] || null;
+  function alwBtn(aid) {
+    var a = ALW[aid];
+    var ab = isRet ? a.vr : a.v;
+    var on = alwSel.indexOf(aid) >= 0;
+    var conf = leg.warnings.filter(function (wx) { return wx.id === aid; })[0];
+    var nm = leg.warnings.filter(function (wx) { return wx.withId === aid; })[0];
+    var d;
+    if (on) { d = leg.deltas[aid] || { entf: [], dazu: [] }; }
+    else {
+      var single = planAlws(r.secs, [aid], mir);
+      d = delta(r.secs, composeChain(r.secs, single));
+    }
+    var dis = false, disTxt = "";
+    if (!on) {
+      var probe = planAlws(r.secs, alwSel.concat([aid]), mir);
+      var pc = probe.conflicts.filter(function (c) { return c.id === aid; })[0];
+      if (pc) { dis = true; disTxt = "Überschneidet sich mit einer gewählten ALW – nur eine der beiden wirkt"; }
+      else if (probe.noMatch.indexOf(aid) >= 0) { dis = true; disTxt = "passt nicht zum gewählten Fahrweg"; }
+      else if (exclSel && aid !== exclSel) { dis = true; disTxt = "durch „Ab " + esc(isRet ? ALW[exclSel].vr : ALW[exclSel].v) + " " + esc(ALW[exclSel].n) + "“ ausgeschlossen"; }
+    }
+    var h = '<button type="button" class="opt alw' + (on ? " on" : "") + (dis ? " dis" : "") + '" ' + (dis ? "disabled " : "") +
+      'onclick="toggleAlw(' + i + ",'" + aid + "'," + (isRet ? "true" : "false") + ')">' +
+      '<div class="rt-name">' + (on ? "☑ " : "☐ ") + "Ab " + esc(ab) + " " + esc(a.n) +
+      (a.excl ? " <span class='muted' style='font-size:13px'>(schließt andere ALW aus)</span>" : "") + "</div>" +
+      (d.entf.length || d.dazu.length ? '<div class="delta">' + deltaChips(d) + "</div>" : '<div class="muted" style="font-size:12px">ergänzt den Regelweg</div>') +
+      (dis ? '<div class="muted" style="font-size:12px">' + disTxt + "</div>" : "") +
+      (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „Ab " + esc(isRet ? ALW[conf.withId].vr : ALW[conf.withId].v) + " " + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
+      (nm ? '<div class="warn">⚠️ Dieser ALW verdrängt eine andere Auswahl</div>' : "") +
+      "</button>";
+    return h;
+  }
+  function groupToggle(list, open, fn, label) {
+    var sel = alwSel.filter(function (a2) { return list.indexOf(a2) >= 0; }).length;
+    var txt = (sel ? sel + " ausgewählt – " : "") + list.length + " " + label;
+    return '<button type="button" class="opt toggle" onclick="' + fn + '(' + i + "," + (isRet ? "true" : "false") + ')">' +
+      (open ? "▴" : "▾") + " " + esc(txt) + "</button>";
+  }
   html += '<div class="section-t">Alternative Laufwege (ALW)</div>';
   if (!avail.length) {
     html += '<div class="muted" style="margin:0 16px 8px;font-size:14px">Keine ALW verfügbar</div>';
   } else {
-    var toggleTxt = (alwSel.length ? alwSel.length + " ausgewählt – " : "") + avail.length + " ALW verfügbar";
-    html += '<button type="button" class="opt toggle" onclick="toggleAlwOpen(' + i + "," + (isRet ? "true" : "false") + ')">' +
-      (alwOpen ? "▴" : "▾") + " " + esc(toggleTxt) + "</button>";
-    if (alwOpen) {
-      avail.forEach(function (aid) {
-        var a = ALW[aid];
-        var ab = isRet ? a.vr : a.v;
-        var on = alwSel.indexOf(aid) >= 0;
-        var conf = leg.warnings.filter(function (wx) { return wx.id === aid; })[0];
-        var nm = leg.warnings.filter(function (wx) { return wx.withId === aid; })[0];
-        var d = leg.deltas[aid] || { entf: [], dazu: [] };
-        html += '<button type="button" class="opt alw' + (on ? " on" : "") + '" onclick="toggleAlw(' + i + ",'" + aid + "'," + (isRet ? "true" : "false") + ')">' +
-          '<div class="rt-name">' + (on ? "☑ " : "☐ ") + "Ab " + esc(ab) + " " + esc(a.n) + "</div>" +
-          (d.entf.length || d.dazu.length ? '<div class="delta">' + deltaChips(d) + "</div>" : '<div class="muted" style="font-size:12px">ergänzt den Regelweg</div>') +
-          (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „Ab " + esc(isRet ? ALW[conf.withId].vr : ALW[conf.withId].v) + " " + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
-          (nm ? '<div class="warn">⚠️ Eine andere Auswahl verdrängt diesen ALW</div>' : "") +
-          "</button>";
-      });
+    if (muc.length) {
+      html += groupToggle(muc, alwOpen, "toggleAlwOpen", "München-ALW");
+      if (alwOpen) muc.forEach(function (aid) { html += alwBtn(aid); });
+    }
+    if (rest.length) {
+      html += groupToggle(rest, alwOpen2, "toggleAlwOpen2", "weitere ALW");
+      if (alwOpen2) rest.forEach(function (aid) { html += alwBtn(aid); });
     }
   }
   /* Optionen */
@@ -925,7 +967,7 @@ function viewForm() {
     html += '<div class="card"><div class="qlabel">🚉 Fahrt ' + (s.i + 1) + ' – Wo hast du begonnen?</div>';
     if (auto) html += '<div class="muted" style="font-size:13px;margin-bottom:8px">📍 Start automatisch übernommen: <b>' + esc(HBF[f0.start]) + "</b></div>";
     var lz = letztesZiel();
-    if (lz && !auto) html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + lz + '\')">📍 ' + esc(HBF[lz]) + " <span class='muted'>(letztes Ziel)</span></button>";
+    if (lz && !auto && s.i > 0) html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + lz + '\')">📍 ' + esc(HBF[lz]) + " <span class='muted'>(letztes Ziel)</span></button>";
     ["muenchen_hbf", "muenchen_ost"].forEach(function (h) {
       html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
     });
@@ -943,20 +985,28 @@ function viewForm() {
     var fg = fahrtOf(s.i);
     html += '<div class="card"><div class="qlabel">🎯 Fahrt ' + (s.i + 1) + " – Wohin ging es?</div>" +
       '<div class="muted" style="font-size:13px;margin-bottom:8px">Von: <b>' + esc(HBF[fg.start]) + "</b></div>";
-    var targets = ["stuttgart", "nuernberg", "wuerzburg", "hannover", "kassel", "fulda", "erfurt", "leipzig", "augsburg", "mannheim", "laim_rbf", "pasing_bbf"];
+    /* Feste Reihenfolge, immer gleich – München & Frankfurt als Gruppen (Jürgen 01.11.2026) */
+    var targets = ["stuttgart", "nuernberg", "wuerzburg"];
     html += '<div class="chips wrap">' + targets.map(function (t) {
       return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
     }).join("");
-    html += '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;render()">Frankfurt ▸</button>';
-    if (fg.start !== "muenchen_hbf") html += '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'muenchen_hbf\')">München Hbf</button>';
-    if (fg.start !== "muenchen_ost") html += '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'muenchen_ost\')">München Ost</button>';
-    html += "</div>";
+    html += '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;state.muenchenGroup=false;render()">Frankfurt ▸</button>';
     if (state.zielGroup) {
       html += '<div class="chips wrap" style="margin-top:8px">' + ["ff_hbf", "ff_ffs", "ff_flh"].map(function (t) {
         return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
       }).join("") + "</div>";
     }
-    html += "</div>";
+    var targets2 = ["hannover", "kassel", "fulda", "erfurt", "leipzig", "augsburg", "mannheim"];
+    html += targets2.map(function (t) {
+      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+    }).join("");
+    html += '<button type="button" class="chip' + (state.muenchenGroup ? " on" : "") + '" onclick="state.muenchenGroup=!state.muenchenGroup;state.zielGroup=false;render()">München ▸</button>';
+    if (state.muenchenGroup) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + ["muenchen_hbf", "muenchen_ost", "laim_rbf", "pasing_bbf"].filter(function (t) { return t !== fg.start; }).map(function (t) {
+        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+      }).join("") + "</div>";
+    }
+    html += "</div></div>";
   } else if (s.k === "weg") {
     var f1 = fahrtOf(s.i);
     html += '<div class="card"><div class="qlabel">🛤️ Fahrt ' + (s.i + 1) + ": " + esc(HBF[f1.start]) + " → " + esc(HBF[f1.ziel]) + "</div>";
