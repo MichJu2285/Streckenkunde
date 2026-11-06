@@ -248,19 +248,19 @@ var ALW = {
   "ful_wolfgang":   { n: "via Wolfgang (ohne Hanau)", v: "Würzburg Hbf", vr: "Fulda", sub: ["M300/1"], rep: ["M361", "M25/3", "M28", "M23/3", "M23/4"] },
   "bebra":          { n: "via Bebra (umgeht Kassel)", v: "Fulda", vr: "Hannover Hbf", sub: ["M300/3", "N300/4"], rep: ["M23/5", "M23/6", "N300/4"] },
   /* München-Knoten: ALW auf der 1/1 (M5, M5 via 46, M16) */
-  "m5":             { n: "via Kanal/Pasing Nord auf die 1/1 (35 → 37)", v: "München Hbf", vr: "Pasing Nord", sub: ["S1/1"], rep: ["S35/1", "S37", "S1/1"] },
-  "m5_46":          { n: "via Kanal/Pasing Nord auf die 1/1 (46 → 37)", v: "München Hbf", vr: "Pasing Nord", sub: ["S1/1"], rep: ["S46", "S37", "S1/1"] },
-  "m16":            { n: "via Gl. Garmisch nach Pasing (63/1 & 30/1)", v: "München Hbf", vr: "München-Pasing", sub: ["S1/1"], rep: ["S63", "S1/1"] },
+  "m5":             { n: "Str. Ingolstadt", v: "München Hbf", vr: "Pasing Nord", sub: ["S1/1"], rep: ["S35/1", "S37", "S1/1"] },
+  "m5_46":          { n: "Str. Landshut", v: "München Hbf", vr: "Pasing Nord", sub: ["S1/1"], rep: ["S46", "S37", "S1/1"] },
+  "m16":            { n: "Str. Garmisch", v: "München Hbf", vr: "München-Pasing", sub: ["S1/1"], rep: ["S63", "S1/1"] },
   /* München-Knoten: ALW auf der 35 (vier Nordring-ALW) */
-  "nr1":            { n: "via Nordring im Uhrzeigersinn (107 → 110 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S107", "S110", "S112", "S35/1"] },
-  "nr2":            { n: "via Nordring im Uhrzeigersinn, 46 direkt (46 → 110 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S46", "S110", "S112", "S35/1"] },
-  "nr3":            { n: "via Nordring im Uhrzeigersinn, via Kanal (35 → 46 → 110 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S35/1", "S46", "S110", "S112", "S35/1"] },
-  "nr4":            { n: "via Nordring gegen den Uhrzeigersinn (50/1 → 57/84 → 4 → 112)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S50/1", "S57/84", "S4", "S112", "S35/1"] },
+  "nr1":            { n: "über MH Nord und Laim", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S107", "S110", "S112", "S35/1"] },
+  "nr2":            { n: "über MH Nord und Str. Landshut", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S46", "S110", "S112", "S35/1"] },
+  "nr3":            { n: "über MH Nord und Str. Ingolstadt", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S35/1", "S46", "S110", "S112", "S35/1"] },
+  "nr4":            { n: "über MH Nord und Ostbahnhof (Nordring)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S50/1", "S57/84", "S4", "S112", "S35/1"] },
   /* München-Pasing Bbf */
-  "mpb_augsburg":   { n: "via Augsburg-Linie (1+30 → Weiche → 1037)", v: "München Hbf", vr: "München-Pasing Bbf", sub: ["S107", "S91"], rep: ["S1/1"] },
+  "mpb_augsburg":   { n: "über Str. Au/Li-Do", v: "München Hbf", vr: "München-Pasing Bbf", sub: ["S107", "S91"], rep: ["S1/1"] },
   /* München Ost: Alternativen auf dem Weg Laim → Pasing */
-  "o_fhb":          { n: "via Friedenheimer Brücke/31", v: "München Süd", vr: "München-Pasing", sub: ["S51", "S91"], rep: ["S51", "S31"] },
-  "o_landsberger":  { n: "via Landsberger Straße auf die 1+30", v: "München Süd", vr: "München-Pasing", sub: ["S51", "S91"], rep: ["S51", "S31"] }
+  "o_fhb":          { n: "über Str. Südl. Verbindungsgleis", v: "München Süd", vr: "München-Pasing", sub: ["S51", "S91"], rep: ["S51", "S31"] },
+  "o_landsberger":  { n: "über Abzw. Landsberger Str.", v: "München Süd", vr: "München-Pasing", sub: ["S51", "S91"], rep: ["S51", "S31"] }
 };
 
 /* ---------- Optionen (kein kompletter Laufweg – nur zusätzlich anwählbar) ---------- */
