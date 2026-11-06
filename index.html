@@ -1100,7 +1100,7 @@ function viewForm() {
     if (lz && !auto && s.i > 0) html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + lz + '\')">📍 ' + esc(HBF[lz]) + " <span class='muted'>(letztes Ziel)</span></button>";
     /* München als EINEN aufklappbaren Auswahlpunkt (Jürgen 06.11.2026) – wie bei der
        Ziel-Auswahl: antippen zeigt die vier Münchner Bahnhöfe (Hbf, Ost, Laim Rbf, Pasing Bbf). */
-    html += '<button type="button" class="opt' + (state.startMuenchen ? " on" : "") + '" onclick="state.startMuenchen=!state.startMuenchen;state.anderer=false;render()">München ▸ <span class="muted" style="font-size:13px">Hbf · Ost · Laim Rbf · Pasing Bbf</span></button>';
+    html += '<button type="button" class="opt' + (state.startMuenchen ? " on" : "") + '" onclick="state.startMuenchen=!state.startMuenchen;state.anderer=false;render()">München ▸</button>';
     if (state.startMuenchen) {
       html += '<div class="chips wrap" style="margin-top:8px">' + MUC_HOFE.map(function (h) {
         return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
