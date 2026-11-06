@@ -1097,3 +1097,335 @@ function viewForm() {
     if (auto) html += '<div class="muted" style="font-size:13px;margin-bottom:8px">📍 Start automatisch übernommen: <b>' + esc(HBF[f0.start]) + "</b></div>";
     var lz = letztesZiel();
     if (lz && !auto && s.i > 0) html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + lz + '\')">📍 ' + esc(HBF[lz]) + " <span class='muted'>(letztes Ziel)</span></button>";
+    /* München als EINEN aufklappbaren Auswahlpunkt (Jürgen 06.11.2026) – wie bei der
+       Ziel-Auswahl: antippen zeigt die vier Münchner Bahnhöfe (Hbf, Ost, Laim Rbf, Pasing Bbf). */
+    html += '<button type="button" class="opt' + (state.startMuenchen ? " on" : "") + '" onclick="state.startMuenchen=!state.startMuenchen;state.anderer=false;render()">München ▸ <span class="muted" style="font-size:13px">Hbf · Ost · Laim Rbf · Pasing Bbf</span></button>';
+    if (state.startMuenchen) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + MUC_HOFE.map(function (h) {
+        return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+      }).join("") + "</div>";
+    }
+    html += '<button type="button" class="opt" onclick="state.anderer=!state.anderer;state.startMuenchen=false;render()">🚉 Anderer Hbf…</button>';
+    if (state.anderer) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + Object.keys(HBF).filter(function (h) { return MUC_HOFE.indexOf(h) < 0; }).map(function (h) {
+        return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+      }).join("") + "</div>";
+    }
+    html += "</div>";
+    if (auto) {
+      html += '<button class="btn-main" onclick="pushStep({k:\'ziel\',i:' + s.i + '})">Weiter mit ' + esc(HBF[f0.start]) + "</button>";
+    }
+  } else if (s.k === "ziel") {
+    var fg = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🎯 Fahrt ' + (s.i + 1) + " – Wohin ging es?</div>" +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Von: <b>' + esc(HBF[fg.start]) + "</b></div>";
+    /* Feste Reihenfolge, immer gleich – München & Frankfurt als Gruppen (Jürgen 01.11.2026) */
+    var targets = ["stuttgart", "nuernberg", "wuerzburg"];
+    html += '<div class="chips wrap">' + targets.map(function (t) {
+      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+    }).join("");
+    html += '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;state.muenchenGroup=false;render()">Frankfurt ▸</button>';
+    if (state.zielGroup) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + ["ff_hbf", "ff_ffs", "ff_flh"].map(function (t) {
+        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+      }).join("") + "</div>";
+    }
+    var targets2 = ["hannover", "kassel", "fulda", "erfurt", "leipzig", "augsburg", "mannheim"];
+    html += targets2.map(function (t) {
+      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+    }).join("");
+    html += '<button type="button" class="chip' + (state.muenchenGroup ? " on" : "") + '" onclick="state.muenchenGroup=!state.muenchenGroup;state.zielGroup=false;render()">München ▸</button>';
+    if (state.muenchenGroup) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + ["muenchen_hbf", "muenchen_ost", "laim_rbf", "pasing_bbf"].filter(function (t) { return t !== fg.start; }).map(function (t) {
+        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+      }).join("") + "</div>";
+    }
+    /* Drehfahrt: Start = Ziel, nur für München Hbf / Laim Rbf (Jürgen 01.11.2026) */
+    if (DREHFAHRTEN[fg.start]) {
+      html += '<button type="button" class="opt" style="margin-top:10px" onclick="pickZiel(' + s.i + ',\'' + fg.start + '\')">🔄 Drehfahrt – Fahrzeug wurde in ' + esc(HBF[fg.start]) + " gedreht</button>";
+    }
+    html += "</div></div>";
+  } else if (s.k === "weg") {
+    var f1 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🛤️ Fahrt ' + (s.i + 1) + ": " + esc(HBF[f1.start]) + " → " + esc(HBF[f1.ziel]) + "</div>";
+    html += '<div class="muted" style="font-size:13px">Regelweg ist vorausgewählt. ALW kannst du jetzt <b>mehrfach</b> antippen – einer pro Störung.</div></div>';
+    html += wegStepHTML(f1, s.i, false);
+  } else if (s.k === "dreh") {
+    /* Drehfahrten-Auswahl: Rundfahrt Start = Ziel, ohne Retour (Jürgen 01.11.2026) */
+    var fd = fahrtOf(s.i);
+    var dlist = DREHFAHRTEN[fd.start] || [];
+    html += '<div class="card"><div class="qlabel">🔄 Drehfahrt: ' + esc(HBF[fd.start]) + " → " + esc(HBF[fd.ziel]) + "</div>" +
+      '<div class="muted" style="font-size:13px">Das Fahrzeug wurde gedreht – welche Runde wurde gefahren?</div></div>';
+    dlist.forEach(function (d) {
+      var on = fd.drehId === d.id || (!fd.drehId && d.d);
+      html += '<button type="button" class="opt route' + (on ? " on" : "") + '" onclick="setDreh(' + s.i + ',\'' + d.id + '\')">' +
+        '<div class="rt-name">' + (on ? "✓ " : "") + esc(d.n) + " <span class='muted' style='font-size:12px'>(in beide Richtungen befahrbar)</span></div>" +
+        '<div class="muted" style="font-size:12px;margin:2px 0 4px">' + esc(d.txt) + "</div>" +
+        chainChips(d.secs) + "</button>";
+    });
+    html += '<button class="btn-main" onclick="pushStep({k:\'mehr\',i:' + s.i + '})">Weiter</button>';
+  } else if (s.k === "ret") {
+    var f2 = fahrtOf(s.i);
+    if (f2.ziel === "muenchen_hbf" || f2.ziel === "muenchen_ost") {
+      /* endet in München → Retour entfällt */
+      f2.retour = null;
+      return { html: html, skip: { k: "mehr", i: s.i } };
+    }
+    html += '<div class="card"><div class="qlabel">↩️ Und retour?</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Die Rückfahrt bekommt ihren eigenen Fahrweg – eine Umleitung kann auch nur retour gelten.</div>' +
+      '<button type="button" class="opt" onclick="startRetour(' + s.i + ')">Ja, retour nach München</button>' +
+      '<button type="button" class="opt" onclick="keineRetour(' + s.i + ')">Nein, ohne Retour</button></div>';
+  } else if (s.k === "rziel") {
+    var f3 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🏠 Rückziel?</div>';
+    ["muenchen_hbf", "muenchen_ost"].forEach(function (h) {
+      html += '<button type="button" class="opt" onclick="pickRuckziel(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+    });
+    if (f3.start !== "muenchen_hbf" && f3.start !== "muenchen_ost") {
+      html += '<button type="button" class="opt" onclick="pickRuckziel(' + s.i + ',\'' + f3.start + '\')">Zurück nach ' + esc(HBF[f3.start]) + "</button>";
+    }
+    html += "</div>";
+  } else if (s.k === "rweg") {
+    var f4 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🛤️ Retour: ' + esc(HBF[f4.ziel]) + " → " + esc(HBF[f4.retour.ziel]) + "</div>";
+    html += '<div class="muted" style="font-size:13px">ALW gelten automatisch retour gespiegelt – die Abweichungsbahnhöfe passen sich an.</div></div>';
+    html += wegStepHTML(f4, s.i, true);
+  } else if (s.k === "mehr") {
+    html += '<div class="card"><div class="qlabel">🔁 Gab es heute noch eine weitere Fahrt?</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Der Startbahnhof der nächsten Fahrt wird automatisch übernommen.</div>' +
+      '<button type="button" class="opt" onclick="weitereFahrt(' + s.i + ')">Ja, weitere Fahrt</button>' +
+      '<button type="button" class="opt" onclick="keineWeitere(' + s.i + ')">Nein, das war alles</button></div>';
+  } else if (s.k === "note") {
+    var cnt = state.w.fahrten.length;
+    html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
+      '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
+    html += '<div class="muted" style="font-size:13px;margin:0 2px 14px">📅 Eintrag für <b>' + fmtDate(state.w.date) + '</b> – <button type="button" class="chip small" onclick="toggleDatumEdit()">ändern</button>';
+    if (state.dateEdit) {
+      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDateLive(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a;margin-top:8px">';
+    }
+    html += "</div>";
+    html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
+  }
+  html += "</div>";
+  return html;
+}
+
+/* ---------- Auswertung ---------- */
+function collectDriven() {
+  var driven = {}; /* secId -> [dates] */
+  state.entries.forEach(function (e) {
+    (e.fahrten || []).forEach(function (f) {
+      (f.chain || []).forEach(function (s) { (driven[s] = driven[s] || []).push(e.date); });
+      if (f.retour) (f.retour.chain || []).forEach(function (s) { (driven[s] = driven[s] || []).push(e.date); });
+    });
+  });
+  return driven;
+}
+function lastOf(dates) {
+  return dates && dates.length ? dates.slice().sort().pop() : null;
+}
+function viewStats() {
+  var driven = collectDriven();
+  var today = todayISO();
+  var html = '<div class="content">';
+  /* Fristen-Alarm */
+  var rows = [];
+  Object.keys(SECTIONS).forEach(function (sid) {
+    var lf = lastOf(driven[sid]) || seedFromFrist(SECTIONS[sid].f);
+    if (!lf) return;
+    var frist = new Date(lf);
+    frist.setFullYear(frist.getFullYear() + 1);
+    rows.push({ sid: sid, lf: lf, frist: frist.toISOString().slice(0, 10), a: ampelOf(lf, today) });
+  });
+  rows.sort(function (a, b) { return a.frist < b.frist ? -1 : 1; });
+  html += '<div class="card"><div class="qlabel">⏰ Nächste Fristen (12-Monats-Regel)</div>';
+  rows.slice(0, 6).forEach(function (r2) {
+    html += '<div class="dist-lbl" style="margin-bottom:5px"><span>' + ampelHTML(r2.a) + " " + esc(SECTIONS[r2.sid].n) + "</span>" +
+      '<span class="muted">Frist ' + fmtDate(r2.frist) + "</span></div>";
+  });
+  html += '<div class="muted" style="font-size:12px;margin-top:6px">Rot = über 12 Monate ohne Fahrt → mit dem Dienstplaner sprechen. Gelb = in ~3 Monaten fällig.</div></div>';
+  /* Abschnitte nach Regionalbereich */
+  var year = state.jahr;
+  ["S", "M", "N", "SO"].forEach(function (rb) {
+    html += '<div class="section-t">' + ({ S: "Süd", M: "Mitte", N: "Nord", SO: "Südost" })[rb] + "</div>";
+    RB[rb].forEach(function (sid) {
+      var sec = SECTIONS[sid];
+      var lf = lastOf(driven[sid]) || seedFromFrist(sec.f);
+      var a = lf ? ampelOf(lf, today) : "none";
+      var months = "";
+      for (var m = 0; m < 12; m++) {
+        var hit = (driven[sid] || []).some(function (d) {
+          return +d.slice(0, 4) === year && +d.slice(5, 7) === m + 1;
+        });
+        months += '<span class="mo' + (hit ? " hit" : "") + '">' + ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m] + "</span>";
+      }
+      html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
+        '<span>' + ampelHTML(a) + " <b>" + esc(sec.n) + "</b> <span class='muted' style='font-size:12px'>" + esc(sec.v) + " → " + esc(sec.b) + "</span></span>" +
+        '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nie gefahren") + "</span></div>" +
+        '<div class="months">' + months + "</div></div>";
+    });
+  });
+  /* Baureihen */
+  html += '<div class="section-t">Baureihen</div>';
+  var brDriven = {};
+  state.entries.forEach(function (e) {
+    (e.baureihen || []).forEach(function (b) { (brDriven[b] = brDriven[b] || []).push(e.date); });
+  });
+  BAUREIHEN.forEach(function (b) {
+    var lf = lastOf(brDriven[b]);
+    var a = lf ? ampelOf(lf, today) : "none";
+    var months = "";
+    for (var m = 0; m < 12; m++) {
+      var hit = (brDriven[b] || []).some(function (d) {
+        return +d.slice(0, 4) === year && +d.slice(5, 7) === m + 1;
+      });
+      months += '<span class="mo' + (hit ? " hit" : "") + '">' + ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m] + "</span>";
+    }
+    html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
+      '<span>' + ampelHTML(a) + " <b>" + esc(b) + "</b></span>" +
+      '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
+      '<div class="months">' + months + "</div></div>";
+  });
+  /* Sicherung */
+  html += backupCard();
+  html += "</div>";
+  return html;
+}
+
+/* ---------- Verlauf ---------- */
+function viewLog() {
+  if (!state.entries.length) {
+    return '<div class="center"><div class="big-emoji">🗂️</div><h2 style="margin:0 0 6px;font-size:20px">Noch nichts drin</h2>' +
+      '<p class="muted">Deine eingetragenen Fahrten landen hier.</p></div>';
+  }
+  var html = '<div class="content">';
+  state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
+    html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px">' +
+      '<span style="font-weight:600;color:#0f172a">📆 ' + fmtDate(e.date) + "</span>" +
+      '<span class="tag">' + esc(brGruppenText(e.baureihen)) + "</span></div>";
+    if (!(e.fahrten || []).length) {
+      html += '<div class="muted" style="font-size:12px;margin-top:2px">ohne Fahrt – nur Baureihen eingetragen (z. B. Fahrzeug bereitgestellt)</div>';
+    }
+    (e.fahrten || []).forEach(function (f, fi) {
+      html += '<div class="trip"><div class="rt-name" style="margin-top:' + (fi ? 10 : 4) + 'px">' +
+        "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
+      if (f.dreh && f.drehName) {
+        html += '<div class="muted" style="font-size:12px;margin-top:2px">🔄 ' + esc(f.drehName) + "</div>";
+      }
+      if (f.chain && f.chain.length) html += chainChips(f.chain);
+      else html += '<div class="warn" style="font-size:12px">ohne Fahrweg gespeichert</div>';
+      (f.alwLabels || []).forEach(function (l) {
+        html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+      });
+      if (f.retour) {
+        html += '<div class="rt-name" style="margin-top:8px">↩️ Retour → ' + esc(HBF[f.retour.ziel]) + "</div>";
+        if (f.retour.chain) html += chainChips(f.retour.chain);
+        (f.retour.alwLabels || []).forEach(function (l) {
+          html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+        });
+      }
+      html += "</div>";
+    });
+    if (e.note) html += '<div class="note">„' + esc(e.note) + "“</div>";
+    if (state.confirmId === e.id) {
+      html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</button>' +
+        '<button type="button" class="btn-sm btn-grey" onclick="state.confirmId=null;render()">Abbrechen</button></div>';
+    } else {
+      html += '<button type="button" class="del" onclick="state.confirmId=\'' + e.id + '\';render()">Eintrag löschen</button>';
+    }
+    html += "</div>";
+  });
+  return html + "</div>";
+}
+
+/* ---------- Backup ---------- */
+function backupCard() {
+  return '<div class="card"><div class="qlabel">💾 Sicherung</div>' +
+    '<p class="muted" style="margin:0 0 10px;font-size:13px">Deine Einträge liegen nur auf diesem Gerät. Kopiere den Block als Backup – oder füge ein altes Backup ein und tippe auf „Laden“.</p>' +
+    '<textarea rows="4" id="backupArea" style="font-size:11px;font-family:ui-monospace,Menlo,monospace" oninput="state.backupText=this.value"></textarea>' +
+    '<div class="flexrow"><button type="button" class="btn-sm btn-grey" onclick="copyBackup()">Kopieren</button>' +
+    '<button type="button" class="btn-sm btn-red" onclick="restoreBackup()">Laden</button></div>' +
+    '<div id="backupMsg" style="text-align:center;font-size:14px;color:#475569;margin-top:8px"></div></div>';
+}
+function backupMsg(text) {
+  var el = document.getElementById("backupMsg");
+  if (el) el.textContent = text;
+  setTimeout(function () { if (el) el.textContent = ""; }, 2600);
+}
+function copyBackup() {
+  var text = (state.backupText || "").trim() || JSON.stringify(state.entries);
+  var done = function () { backupMsg("Kopiert! ✅"); };
+  var fail = function () { backupMsg("Bitte Text manuell markieren und kopieren."); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+  else fail();
+}
+function restoreBackup() {
+  var text = (state.backupText || "").trim();
+  try {
+    var parsed = JSON.parse(text);
+    if (!Array.isArray(parsed)) throw new Error("kein Array");
+    var byId = {};
+    state.entries.concat(parsed).forEach(function (e) { if (e && e.id) byId[e.id] = e; });
+    state.entries = Object.keys(byId).map(function (k) { return byId[k]; })
+      .sort(function (a, b) { return (a.date || "") < (b.date || "") ? -1 : 1; });
+    persist();
+    render();
+    backupMsg("Daten geladen! ✅");
+  } catch (err) { backupMsg("Das ist kein gültiger Daten-Block. ❌"); }
+}
+
+/* ---------- Aktionen / Persistenz ---------- */
+function persist() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries)); } catch (e) {}
+}
+function go(tab) { state.tab = tab; render(); window.scrollTo(0, 0); }
+
+function render() {
+  var wrap = document.getElementById("wrap");
+  if (state.tab === "form" && !state.w && !state.saved) startWizard();
+  /* Auto-Skip: Fahrt endet in München → Retour entfällt */
+  if (state.tab === "form" && state.w && state.w.steps.length) {
+    var cs = curStep();
+    if (cs.k === "ret") {
+      var f = fahrtOf(cs.i);
+      if (f.ziel === "muenchen_hbf" || f.ziel === "muenchen_ost") {
+        f.retour = null;
+        state.w.steps.push({ k: "mehr", i: cs.i });
+      }
+    }
+  }
+  var body = state.tab === "form" ? viewForm() : state.tab === "stats" ? viewStats() : viewLog();
+  if (typeof body === "object" && body.skip) { state.w.steps.push(body.skip); return render(); }
+  var tabs = [
+    { id: "form", ico: "📝", label: "Eintragen" },
+    { id: "stats", ico: "📊", label: "Auswertung" },
+    { id: "log", ico: "🗂️", label: "Verlauf" }
+  ];
+  var tabbar = '<div class="tabbar">' + tabs.map(function (t) {
+    return '<button type="button" class="tab' + (state.tab === t.id ? " on" : "") + '" onclick="go(\'' + t.id + '\')">' +
+      '<span class="ico">' + t.ico + "</span>" + t.label + "</button>";
+  }).join("") + "</div>";
+  var stepsH = "";
+  if (state.tab === "form" && state.w && !state.saved && state.w.fahrten.length) {
+    stepsH = '<div class="crumbs">' + state.w.fahrten.length + ". Fahrt" + "</div>";
+  }
+  wrap.innerHTML =
+    '<header><div class="logo">🚆</div><div><h1>Streckenkunde</h1><div class="sub">Dein digitales Streckenkunde-Heft</div></div></header>' +
+    body + tabbar;
+  if (state.tab === "stats") {
+    var ba = document.getElementById("backupArea");
+    if (ba && !state.backupText) ba.value = JSON.stringify(state.entries);
+  }
+  if (state.tab === "form" && state.w && !state.saved) {
+    var na = document.getElementById("noteArea");
+    if (na) na.value = state.w.note || "";
+    var da = document.getElementById("dateArea");
+    if (da) da.value = state.w.date;
+  }
+}
+
+render();
+
+</script>
+</body>
+</html>
