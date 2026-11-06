@@ -305,12 +305,12 @@ var ROUTES = [
   { id: "m_mpb", start: "muenchen_hbf", ziel: "pasing_bbf", n: "Regelweg (107 → 91 → 1037)", d: true, secs: ["S107", "S91", "S1037"], alws: ["mpb_augsburg"], opts: [] },
 
   /* ===== Start München Ost ===== */
-  { id: "o_st",  start: "muenchen_ost", ziel: "stuttgart", n: "via Laim → Augsburg–Ulm", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach", "o_fhb", "o_landsberger"], opts: [] },
-  { id: "o_nn",  start: "muenchen_ost", ziel: "nuernberg", n: "via Laim → Augsburg", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S18"], alws: ["o_fhb", "o_landsberger"], opts: ["nn_rbf"] },
-  { id: "o_wue", start: "muenchen_ost", ziel: "wuerzburg", n: "via Laim → Augsburg/Treuchtlingen", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S18", "S35/3"], alws: ["o_fhb", "o_landsberger"], opts: [] },
-  { id: "o_aug", start: "muenchen_ost", ziel: "augsburg", n: "via Laim (oft gefahren)", d: true, secs: ["S50/1", "S51", "S91", "S1/1"], alws: ["o_fhb", "o_landsberger"], opts: [] },
+  { id: "o_st",  start: "muenchen_ost", ziel: "stuttgart", n: "via Laim → Augsburg–Ulm", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach", "o_landsberger", "o_fhb"], opts: [] },
+  { id: "o_nn",  start: "muenchen_ost", ziel: "nuernberg", n: "via Laim → Augsburg", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S18"], alws: ["o_landsberger", "o_fhb"], opts: ["nn_rbf"] },
+  { id: "o_wue", start: "muenchen_ost", ziel: "wuerzburg", n: "via Laim → Augsburg/Treuchtlingen", d: true, secs: ["S50/1", "S51", "S91", "S1/1", "S18", "S35/3"], alws: ["o_landsberger", "o_fhb"], opts: [] },
+  { id: "o_aug", start: "muenchen_ost", ziel: "augsburg", n: "via Laim (oft gefahren)", d: true, secs: ["S50/1", "S51", "S91", "S1/1"], alws: ["o_landsberger", "o_fhb"], opts: [] },
   { id: "o_mlr", start: "muenchen_ost", ziel: "laim_rbf", n: "via München Süd → 51", d: true, secs: ["S50/1", "S51"], alws: [], opts: [] },
-  { id: "o_mpb", start: "muenchen_ost", ziel: "pasing_bbf", n: "via Laim → 91 → 1037", d: true, secs: ["S50/1", "S51", "S91", "S1037"], alws: ["o_fhb", "o_landsberger"], opts: [] },
+  { id: "o_mpb", start: "muenchen_ost", ziel: "pasing_bbf", n: "via Laim → 91 → 1037", d: true, secs: ["S50/1", "S51", "S91", "S1037"], alws: ["o_landsberger", "o_fhb"], opts: [] },
 
   /* ===== Start Stuttgart (Fahrtenkette) ===== */
   { id: "st_mah", start: "stuttgart", ziel: "mannheim", n: "Regelweg via Stuttgart Nordbahnhof", d: true, secs: ["S310/1", "S310/2"], alws: [], opts: [] },
