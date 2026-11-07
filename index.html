@@ -1470,6 +1470,14 @@ function restoreBackup() {
 function persist() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries)); } catch (e) {}
 }
+/* Eintrag aus dem Verlauf löschen (Jürgen 09.11.2026: „Ja, löschen“-Button tat nichts –
+   die aufgerufene Funktion existierte nicht). */
+function deleteEntry(id) {
+  state.entries = state.entries.filter(function (e) { return e.id !== id; });
+  state.confirmId = null;
+  persist();
+  render();
+}
 function go(tab) { state.tab = tab; render(); window.scrollTo(0, 0); }
 
 function render() {
