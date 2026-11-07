@@ -649,7 +649,7 @@ function composeLeg(route, alwIds, optIds) {
     appliedIds: plan.applied.map(function (m) { return m.r.id; }),
     alwLabels: (alwIds || []).map(function (id) {
       var a = ALW[id];
-      return "Ab " + (mir ? a.vr : a.v) + " " + a.n;
+      return a.n;
     })
   };
 }
@@ -1051,7 +1051,6 @@ function wegStepHTML(f, i, isRet) {
   var exclSel = alwSel.filter(function (aid) { return ALW[aid] && ALW[aid].excl; })[0] || null;
   function alwBtn(aid) {
     var a = ALW[aid];
-    var ab = isRet ? a.vr : a.v;
     var on = alwSel.indexOf(aid) >= 0;
     var conf = leg.warnings.filter(function (wx) { return wx.id === aid; })[0];
     var nm = leg.warnings.filter(function (wx) { return wx.withId === aid; })[0];
@@ -1067,15 +1066,15 @@ function wegStepHTML(f, i, isRet) {
       var pc = probe.conflicts.filter(function (c) { return c.id === aid; })[0];
       if (pc) { dis = true; disTxt = "Überschneidet sich mit einer gewählten ALW – nur eine der beiden wirkt"; }
       else if (probe.noMatch.indexOf(aid) >= 0) { dis = true; disTxt = "passt nicht zum gewählten Fahrweg"; }
-      else if (exclSel && aid !== exclSel) { dis = true; disTxt = "durch „Ab " + esc(isRet ? ALW[exclSel].vr : ALW[exclSel].v) + " " + esc(ALW[exclSel].n) + "“ ausgeschlossen"; }
+      else if (exclSel && aid !== exclSel) { dis = true; disTxt = "durch „" + esc(ALW[exclSel].n) + "“ ausgeschlossen"; }
     }
     var h = '<button type="button" class="opt alw' + (on ? " on" : "") + (dis ? " dis" : "") + '" ' + (dis ? "disabled " : "") +
       'onclick="toggleAlw(' + i + ",'" + aid + "'," + (isRet ? "true" : "false") + ')">' +
-      '<div class="rt-name">' + (on ? "☑ " : "☐ ") + "Ab " + esc(ab) + " " + esc(a.n) +
+      '<div class="rt-name">' + (on ? "☑ " : "☐ ") + esc(a.n) +
       (a.excl ? " <span class='muted' style='font-size:13px'>(schließt andere ALW aus)</span>" : "") + "</div>" +
       (d.entf.length || d.dazu.length ? '<div class="delta">' + deltaChips(d) + "</div>" : '<div class="muted" style="font-size:12px">ergänzt den Regelweg</div>') +
       (dis ? '<div class="muted" style="font-size:12px">' + disTxt + "</div>" : "") +
-      (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „Ab " + esc(isRet ? ALW[conf.withId].vr : ALW[conf.withId].v) + " " + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
+      (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „" + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
       (nm ? '<div class="warn">⚠️ Dieser ALW verdrängt eine andere Auswahl</div>' : "") +
       "</button>";
     return h;
@@ -1118,7 +1117,7 @@ function wegStepHTML(f, i, isRet) {
   html += '<div class="section-t">Deine Fahrt</div><div class="card">' + chainChips(leg.chain);
   leg.warnings.forEach(function (wx) {
     if (!ALW[wx.id]) return;
-    html += '<div class="warn">⚠️ „Ab ' + esc(isRet ? ALW[wx.id].vr : ALW[wx.id].v) + " " + esc(ALW[wx.id].n) + "“ überschneidet sich mit einer anderen Auswahl – wirkt hier nicht</div>";
+    html += '<div class="warn">⚠️ „' + esc(ALW[wx.id].n) + "“ überschneidet sich mit einer anderen Auswahl – wirkt hier nicht</div>";
   });
   html += "</div>";
   var next = isRet ? "mehr" : "ret";
