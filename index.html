@@ -686,6 +686,12 @@ function fmtDate(iso) {
 }
 /* ============ Streckenkunde v2 – App-Oberfläche ============ */
 
+/* Wunschreihenfolge der Bahnhöfe (Jürgen 08.11.2026) – überall gleich:
+   Zielauswahl UND „Anderer Hbf…“. München ▸ zuerst, Frankfurt ▸ nach Würzburg. */
+var ZIEL_BAHNHOF = ["augsburg", "stuttgart", "mannheim", "nuernberg", "wuerzburg"]; /* vor Frankfurt ▸ */
+var ZIEL_BAHNHOF2 = ["fulda", "kassel", "hannover", "erfurt", "leipzig"];           /* nach Frankfurt ▸ */
+var FF_GRUPPE = ["ff_hbf", "ff_ffs", "ff_flh"];
+
 var state = {
   tab: "form",
   entries: loadEntries(),
@@ -696,6 +702,7 @@ var state = {
   zielGroup: false,  /* Frankfurt-Gruppe aufgeklappt */
   muenchenGroup: false, /* München-Gruppe aufgeklappt */
   startMuenchen: false, /* München-Gruppe im Start-Schritt aufgeklappt */
+  andererFf: false, /* Frankfurt-Gruppe in „Anderer Hbf…“ aufgeklappt */
   dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
   dateEdit: false,   /* Notiz-Schritt: Datum-Änderung offen */
   jahr: new Date().getFullYear()
@@ -774,6 +781,7 @@ function startWizard() {
   state.zielGroup = false;
   state.muenchenGroup = false;
   state.startMuenchen = false;
+  state.andererFf = false;
   state.dateCustom = false;
   state.dateEdit = false;
 }
@@ -858,6 +866,7 @@ function pickStart(i, h) {
   state.zielGroup = false;
   state.muenchenGroup = false;
   state.startMuenchen = false;
+  state.andererFf = false;
   state.anderer = false;
   pushStep({ k: "ziel", i: i });
 }
@@ -1173,9 +1182,20 @@ function viewForm() {
         return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
       }).join("") + "</div>";
     }
-    html += '<button type="button" class="opt" onclick="state.anderer=!state.anderer;state.startMuenchen=false;render()">🚉 Anderer Hbf…</button>';
+    html += '<button type="button" class="opt" onclick="state.anderer=!state.anderer;state.startMuenchen=false;state.andererFf=false;render()">🚉 Anderer Hbf…</button>';
     if (state.anderer) {
-      html += '<div class="chips wrap" style="margin-top:8px">' + Object.keys(HBF).filter(function (h) { return MUC_HOFE.indexOf(h) < 0; }).map(function (h) {
+      /* Gleiche Wunschreihenfolge wie in der Zielauswahl (Jürgen 08.11.2026),
+         Frankfurt als aufklappbare Gruppe ▸ – München bleibt eigener Punkt darüber. */
+      html += '<div class="chips wrap" style="margin-top:8px">' + ZIEL_BAHNHOF.map(function (h) {
+        return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+      }).join("") +
+        '<button type="button" class="chip' + (state.andererFf ? " on" : "") + '" onclick="state.andererFf=!state.andererFf;render()">Frankfurt ▸</button></div>';
+      if (state.andererFf) {
+        html += '<div class="chips wrap" style="margin-top:8px">' + FF_GRUPPE.map(function (h) {
+          return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+        }).join("") + "</div>";
+      }
+      html += '<div class="chips wrap" style="margin-top:8px">' + ZIEL_BAHNHOF2.map(function (h) {
         return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
       }).join("") + "</div>";
     }
@@ -1187,27 +1207,26 @@ function viewForm() {
     var fg = fahrtOf(s.i);
     html += '<div class="card"><div class="qlabel">🎯 Fahrt ' + (s.i + 1) + " – Wohin ging es?</div>" +
       '<div class="muted" style="font-size:13px;margin-bottom:8px">Von: <b>' + esc(HBF[fg.start]) + "</b></div>";
-    /* Feste Reihenfolge, immer gleich – München & Frankfurt als Gruppen (Jürgen 01.11.2026) */
-    var targets = ["stuttgart", "nuernberg", "wuerzburg"];
-    html += '<div class="chips wrap">' + targets.map(function (t) {
-      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
-    }).join("");
-    html += '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;state.muenchenGroup=false;render()">Frankfurt ▸</button>';
-    if (state.zielGroup) {
-      html += '<div class="chips wrap" style="margin-top:8px">' + ["ff_hbf", "ff_ffs", "ff_flh"].map(function (t) {
-        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
-      }).join("") + "</div>";
-    }
-    var targets2 = ["hannover", "kassel", "fulda", "erfurt", "leipzig", "augsburg", "mannheim"];
-    html += targets2.map(function (t) {
-      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
-    }).join("");
+    /* Wunschreihenfolge (Jürgen 08.11.2026): München ▸ zuerst, dann Augsburg, Stuttgart,
+       Mannheim, Nürnberg, Würzburg, Frankfurt ▸, Fulda, Kassel, Hannover, Erfurt, Leipzig. */
     html += '<button type="button" class="chip' + (state.muenchenGroup ? " on" : "") + '" onclick="state.muenchenGroup=!state.muenchenGroup;state.zielGroup=false;render()">München ▸</button>';
     if (state.muenchenGroup) {
       html += '<div class="chips wrap" style="margin-top:8px">' + ["muenchen_hbf", "muenchen_ost", "laim_rbf", "pasing_bbf"].filter(function (t) { return t !== fg.start; }).map(function (t) {
         return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
       }).join("") + "</div>";
     }
+    html += '<div class="chips wrap">' + ZIEL_BAHNHOF.map(function (t) {
+      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+    }).join("") +
+      '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;state.muenchenGroup=false;render()">Frankfurt ▸</button></div>';
+    if (state.zielGroup) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + FF_GRUPPE.map(function (t) {
+        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+      }).join("") + "</div>";
+    }
+    html += '<div class="chips wrap">' + ZIEL_BAHNHOF2.map(function (t) {
+      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+    }).join("") + "</div>";
     /* Drehfahrt: Start = Ziel, nur für München Hbf / Laim Rbf (Jürgen 01.11.2026) */
     if (DREHFAHRTEN[fg.start]) {
       html += '<button type="button" class="opt" style="margin-top:10px" onclick="pickZiel(' + s.i + ',\'' + fg.start + '\')">🔄 Drehfahrt – Fahrzeug wurde in ' + esc(HBF[fg.start]) + " gedreht</button>";
