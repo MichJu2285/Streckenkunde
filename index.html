@@ -326,7 +326,60 @@ var ROUTES = [
   /* ===== Start Fulda (Fahrtenkette / Pausenbahnhof) ===== */
   { id: "ful_ff",  start: "fulda", ziel: "ff_hbf", n: "Regelweg über die Altstrecke", d: true, secs: ["M300/2", "M23/4", "M23/3", "M23/2", "M23/1"], alws: ["ff_ostbahn"], opts: ["ff_niederrad"] },
   { id: "ful_ffs", start: "fulda", ziel: "ff_ffs", n: "Regelweg (endet im FFS)", d: true, secs: ["M300/2", "M23/4", "M23/3", "M23/2"], alws: ["ff_ostbahn"], opts: [] },
-  { id: "ful_flh", start: "fulda", ziel: "ff_flh", n: "via FFS → 12 → Flughafen", d: true, secs: ["M300/2", "M23/4", "M23/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_ostbahn"], opts: [] }
+  { id: "ful_flh", start: "fulda", ziel: "ff_flh", n: "via FFS → 12 → Flughafen", d: true, secs: ["M300/2", "M23/4", "M23/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_ostbahn"], opts: [] },
+
+  /* ===== Fahrtenketten: Fernziel ↔ Fernziel (07.11.2026) =====
+     Komponiert aus den bestätigten Bausteinen der Fahrweg-Bibliothek – Grundregel
+     beide Richtungen gilt weiter: jede hier definierte Kette wird für die Gegenrichtung
+     automatisch gespiegelt (routesForWithFallback in app.js). */
+  /* Augsburg */
+  { id: "aug_st",  start: "augsburg", ziel: "stuttgart", n: "Regelweg via Ulm", d: true, secs: ["S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"], opts: [] },
+  { id: "aug_nn",  start: "augsburg", ziel: "nuernberg", n: "Regelweg (die 18)", d: true, secs: ["S18"], alws: [], opts: [] },
+  { id: "aug_wue", start: "augsburg", ziel: "wuerzburg", n: "via Treuchtlingen (18 → 35/3)", d: true, secs: ["S18", "S35/3"], alws: [], opts: [] },
+  /* Nürnberg */
+  { id: "nn_st1",  start: "nuernberg", ziel: "stuttgart", n: "Regelweg via Augsburg–Ulm", d: true, secs: ["S18", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"], opts: [] },
+  { id: "nn_st2",  start: "nuernberg", ziel: "stuttgart", n: "Regelweg via Ansbach–Aalen", d: false, secs: ["S15/1", "S15/2", "S15/3"], alws: [], opts: [] },
+  { id: "nn_wue",  start: "nuernberg", ziel: "wuerzburg", n: "Regelweg (die 24)", d: true, secs: ["S24"], alws: ["wue_ansbach"], opts: [] },
+  { id: "nn_ff",   start: "nuernberg", ziel: "ff_hbf", n: "Regelweg via Würzburg–Aschaffenburg", d: true, secs: ["S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"], opts: ["ff_niederrad"] },
+  { id: "nn_ffs",  start: "nuernberg", ziel: "ff_ffs", n: "Regelweg via Würzburg–Aschaffenburg (endet im FFS)", d: true, secs: ["S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["wue_ansbach", "ff_gemuenden", "ff_ostbahn", "ff_schluechtern"], opts: [] },
+  { id: "nn_flh",  start: "nuernberg", ziel: "ff_flh", n: "Regelweg via FFS → 12 → Flughafen", d: true, secs: ["S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"], opts: [] },
+  { id: "nn_ful",  start: "nuernberg", ziel: "fulda", n: "Regelweg via Würzburg", d: true, secs: ["S24", "M300/1", "M300/2"], alws: ["wue_ansbach", "ful_gemuenden", "ff_flieden", "ful_altbau", "ful_wolfgang"], opts: ["opt_25a"] },
+  { id: "nn_kas",  start: "nuernberg", ziel: "kassel", n: "Regelweg via Würzburg–Fulda", d: true, secs: ["S24", "M300/1", "M300/2", "M300/3"], alws: ["wue_ansbach", "ff_flieden"], opts: [] },
+  { id: "nn_han",  start: "nuernberg", ziel: "hannover", n: "Regelweg via Kassel", d: true, secs: ["S24", "M300/1", "M300/2", "M300/3", "N300/4"], alws: ["wue_ansbach", "ff_flieden", "bebra"], opts: [] },
+  { id: "nn_erf",  start: "nuernberg", ziel: "erfurt", n: "Regelweg via VDE 8 (48 → 500)", d: true, secs: ["S48", "S500"], alws: [], opts: ["opt_coburg"] },
+  { id: "nn_lep",  start: "nuernberg", ziel: "leipzig", n: "Regelweg via VDE 8", d: true, secs: ["S48", "S500", "SO400", "SO500"], alws: [], opts: ["opt_coburg"] },
+  { id: "nn_mah",  start: "nuernberg", ziel: "mannheim", n: "via Stuttgart", d: true, secs: ["S18", "S1/2", "S1/3", "S153", "S310/1", "S310/2"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"], opts: [] },
+  /* Würzburg */
+  { id: "wue_ff",  start: "wuerzburg", ziel: "ff_hbf", n: "Regelweg via Aschaffenburg", d: true, secs: ["M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"], opts: ["ff_niederrad"] },
+  { id: "wue_ffs", start: "wuerzburg", ziel: "ff_ffs", n: "Regelweg (endet im FFS)", d: true, secs: ["M300/1", "M361", "M25/3", "M23/2"], alws: ["ff_gemuenden", "ff_ostbahn", "ff_schluechtern"], opts: [] },
+  { id: "wue_flh", start: "wuerzburg", ziel: "ff_flh", n: "via FFS → 12 → Flughafen", d: true, secs: ["M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"], opts: [] },
+  { id: "wue_ful", start: "wuerzburg", ziel: "fulda", n: "Regelweg (SFS)", d: true, secs: ["M300/1", "M300/2"], alws: ["ful_gemuenden", "ff_flieden", "ful_altbau", "ful_wolfgang"], opts: ["opt_25a"] },
+  { id: "wue_kas", start: "wuerzburg", ziel: "kassel", n: "Regelweg via Fulda", d: true, secs: ["M300/1", "M300/2", "M300/3"], alws: ["ff_flieden"], opts: [] },
+  { id: "wue_han", start: "wuerzburg", ziel: "hannover", n: "Regelweg via Kassel", d: true, secs: ["M300/1", "M300/2", "M300/3", "N300/4"], alws: ["ff_flieden", "bebra"], opts: [] },
+  { id: "wue_st1", start: "wuerzburg", ziel: "stuttgart", n: "Regelweg via Ansbach–Aalen", d: true, secs: ["S24", "S15/1", "S15/2", "S15/3"], alws: [], opts: [] },
+  { id: "wue_st2", start: "wuerzburg", ziel: "stuttgart", n: "via Nürnberg–Augsburg", d: false, secs: ["S24", "S18", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"], opts: [] },
+  { id: "wue_aug", start: "wuerzburg", ziel: "augsburg", n: "via Treuchtlingen (35/3 → 18)", d: true, secs: ["S35/3", "S18"], alws: [], opts: [] },
+  /* Frankfurt intern */
+  { id: "ffh_ffs", start: "ff_hbf", ziel: "ff_ffs", n: "Regelweg (23/1)", d: true, secs: ["M23/1"], alws: [], opts: [] },
+  { id: "ffh_flh", start: "ff_hbf", ziel: "ff_flh", n: "Sammelstück Hbf → Flughafen", d: true, secs: ["MFF_FLF"], alws: [], opts: [] },
+  { id: "ffs_flh", start: "ff_ffs", ziel: "ff_flh", n: "via 12 → Flughafen", d: true, secs: ["M12", "MFF_FLF"], alws: [], opts: [] },
+  /* Kassel / Hannover / Fulda / Erfurt / Leipzig */
+  { id: "kas_ff",  start: "kassel", ziel: "ff_hbf", n: "via Fulda (Altstrecke)", d: true, secs: ["M300/3", "M300/2", "M23/4", "M23/3", "M23/2", "M23/1"], alws: ["ff_ostbahn"], opts: ["ff_niederrad"] },
+  { id: "kas_ffs", start: "kassel", ziel: "ff_ffs", n: "via Fulda (Altstrecke, endet im FFS)", d: true, secs: ["M300/3", "M300/2", "M23/4", "M23/3", "M23/2"], alws: ["ff_ostbahn"], opts: [] },
+  { id: "kas_flh", start: "kassel", ziel: "ff_flh", n: "via Fulda → FFS → 12 → Flughafen", d: true, secs: ["M300/3", "M300/2", "M23/4", "M23/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_ostbahn"], opts: [] },
+  { id: "kas_han", start: "kassel", ziel: "hannover", n: "Regelweg (die 300/4)", d: true, secs: ["N300/4"], alws: [], opts: [] },
+  { id: "han_ff",  start: "hannover", ziel: "ff_hbf", n: "via Kassel–Fulda (Altstrecke)", d: true, secs: ["N300/4", "M300/3", "M300/2", "M23/4", "M23/3", "M23/2", "M23/1"], alws: ["ff_ostbahn"], opts: ["ff_niederrad"] },
+  { id: "han_ffs", start: "hannover", ziel: "ff_ffs", n: "via Kassel–Fulda (endet im FFS)", d: true, secs: ["N300/4", "M300/3", "M300/2", "M23/4", "M23/3", "M23/2"], alws: ["ff_ostbahn"], opts: [] },
+  { id: "han_flh", start: "hannover", ziel: "ff_flh", n: "via Kassel–Fulda → 12 → Flughafen", d: true, secs: ["N300/4", "M300/3", "M300/2", "M23/4", "M23/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_ostbahn"], opts: [] },
+  { id: "ful_kas", start: "fulda", ziel: "kassel", n: "Regelweg (die 300/3)", d: true, secs: ["M300/3"], alws: [], opts: [] },
+  { id: "ful_han", start: "fulda", ziel: "hannover", n: "via Kassel", d: true, secs: ["M300/3", "N300/4"], alws: ["bebra"], opts: [] },
+  { id: "erf_lep", start: "erfurt", ziel: "leipzig", n: "Regelweg (400 → 500 via Flughafen)", d: true, secs: ["SO400", "SO500"], alws: [], opts: [] },
+  { id: "erf_ff",  start: "erfurt", ziel: "ff_hbf", n: "via Nürnberg–Würzburg", d: true, secs: ["S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"], opts: ["ff_niederrad"] },
+  { id: "erf_ffs", start: "erfurt", ziel: "ff_ffs", n: "via Nürnberg–Würzburg (endet im FFS)", d: true, secs: ["S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["wue_ansbach", "ff_gemuenden", "ff_ostbahn", "ff_schluechtern"], opts: [] },
+  { id: "erf_flh", start: "erfurt", ziel: "ff_flh", n: "via Nürnberg–Würzburg → 12 → Flughafen", d: true, secs: ["S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"], opts: [] },
+  { id: "lep_ff",  start: "leipzig", ziel: "ff_hbf", n: "via Erfurt–Nürnberg–Würzburg", d: true, secs: ["SO500", "SO400", "S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"], opts: ["ff_niederrad"] },
+  { id: "lep_ffs", start: "leipzig", ziel: "ff_ffs", n: "via Erfurt–Nürnberg–Würzburg (endet im FFS)", d: true, secs: ["SO500", "SO400", "S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["wue_ansbach", "ff_gemuenden", "ff_ostbahn", "ff_schluechtern"], opts: [] },
+  { id: "lep_flh", start: "leipzig", ziel: "ff_flh", n: "via Erfurt–Nürnberg–Würzburg → 12 → Flughafen", d: true, secs: ["SO500", "SO400", "S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"], opts: [] }
 ];
 
 /* ===== Generierte Routen: München Ost auf die 35/1 (drei Ost-Exits) =====
@@ -471,6 +524,9 @@ function retourRoutes(von, ruckziel) {
     if (firstOst.length) firstOst[0].d = true;
     else if (out.length) out[out.length - 1].d = true;
   }
+  /* Fallback (07.11.2026): Fernziel-Retours ohne eigene Spiegel-Logik –
+     gleiche Auflösung wie im Hinfahrt-Schritt (direkt, gespiegelt, München-Beine). */
+  if (!out.length) out = routesForWithFallback(von, ruckziel);
   if (out.length && !out.some(function (r) { return r.d; })) out[0].d = true;
   return out;
 }
@@ -684,12 +740,23 @@ function ampelHTML(a) {
   return '<span class="ampel" style="background:' + c + '"></span>';
 }
 
-/* Routen für Start → Ziel, mit Spiegelungs-Fallback (Grundregel: beide Richtungen). */
+/* Routen für Start → Ziel, mit Spiegelungs-Fallback (Grundregel: beide Richtungen).
+   Fernziel → Laim Rbf / Pasing Bbf: gespiegelte Hbf-Route + Anschließbein (07.11.2026). */
 function routesForWithFallback(start, ziel) {
   var direct = routesFor(start, ziel);
   if (direct.length) return direct;
   var back = routesFor(ziel, start);
-  if (back.length) return back.map(function (r) { return mirrorRoute(r, start); });
+  if (back.length) return back.map(function (r) { return mirrorRoute(r, ziel); });
+  var tails = { laim_rbf: ["S107"], pasing_bbf: ["S107", "S91", "S1037"] };
+  if (tails[ziel]) {
+    var mh = routesFor("muenchen_hbf", start);
+    if (mh.length) return mh.map(function (r) {
+      var m = mirrorRoute(r, ziel);
+      m.secs = m.secs.concat(tails[ziel]);
+      m.n = r.n + (ziel === "laim_rbf" ? " – weiter über die 107 nach Laim" : " – weiter über 107 → 91 → 1037 nach Pasing");
+      return m;
+    });
+  }
   return [];
 }
 
