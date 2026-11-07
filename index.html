@@ -257,6 +257,9 @@ var ALW = {
   "nr2":            { n: "über MH Nord und Str. Landshut", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S46", "S110", "S112", "S35/1"] },
   "nr3":            { n: "über MH Nord und Str. Ingolstadt", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S35/1", "S46", "S110", "S112", "S35/1"] },
   "nr4":            { n: "über MH Nord und Ostbahnhof (Nordring)", v: "München Hbf", vr: "Karlsfeld", sub: ["S35/1"], rep: ["S50/1", "S57/84", "S4", "S112", "S35/1"] },
+  /* Str. Landshut bis Obermenzing (Jürgen 09.11.2026): Ausfahrt über die 46 (eigene
+     Bahnsteige am Hbf), kurz bis München-Obermenzing, dort Wechsel auf die Süd 35/1. */
+  "ls_om":          { n: "via Str. Landshut (bis Obermenzing)", v: "München Hbf", vr: "Obermenzing", sub: ["S35/1"], rep: ["S46", "S35/1"] },
   /* München-Pasing Bbf */
   "mpb_augsburg":   { n: "über Str. Au/Li-Do", v: "München Hbf", vr: "München-Pasing Bbf", sub: ["S107", "S91"], rep: ["S1/1"] },
   /* München Ost: Alternativen auf dem Weg Laim → Pasing */
@@ -281,6 +284,7 @@ var OPT = {
 
 var SUED_WUE = ["wue_ansbach", "wue_altmuehltal", "wue_fuerth"];   /* alle Ziele über Würzburg (RW über NN) */
 var NORDRING = ["nr1", "nr2", "nr3", "nr4"];                        /* alle Ziele über die Süd 35 */
+var LANDSHUT = ["ls_om"];                                         /* Str. Landshut bis Obermenzing – ebenfalls alle Ziele über die Süd 35 (Jürgen 09.11.2026) */
 var AUF_11 = ["m5", "m5_46", "m16"];                               /* alle Ziele über die Süd 1/1 */
 /* München-Knoten-ALW (in der App als eigene Gruppe vor allen anderen ALW) */
 var MUC_ALW = { m5: 1, m5_46: 1, m16: 1, nr1: 1, nr2: 1, nr3: 1, nr4: 1, mpb_augsburg: 1, o_fhb: 1, o_landsberger: 1 };
@@ -288,18 +292,18 @@ var MUC_ALW = { m5: 1, m5_46: 1, m16: 1, nr1: 1, nr2: 1, nr3: 1, nr4: 1, mpb_aug
 var ROUTES = [
   /* ===== Start München Hbf ===== */
   { id: "m_st",  start: "muenchen_hbf", ziel: "stuttgart", n: "Regelweg via Augsburg–Ulm", nr: "Regelweg via Ulm–Augsburg", d: true,  secs: ["S1/1", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"].concat(AUF_11), opts: [] },
-  { id: "m_nn1", start: "muenchen_hbf", ziel: "nuernberg", n: "Regelweg 1 via Ingolstadt", d: true,  secs: ["S35/1", "S350"], alws: ["nn_altmuehltal"].concat(NORDRING), opts: [] },
+  { id: "m_nn1", start: "muenchen_hbf", ziel: "nuernberg", n: "Regelweg 1 via Ingolstadt", d: true,  secs: ["S35/1", "S350"], alws: ["nn_altmuehltal"].concat(NORDRING).concat(LANDSHUT), opts: [] },
   { id: "m_nn2", start: "muenchen_hbf", ziel: "nuernberg", n: "Regelweg 2 via Augsburg", d: false, secs: ["S1/1", "S18"], alws: AUF_11.slice(), opts: ["nn_rbf"] },
-  { id: "m_wue1", start: "muenchen_hbf", ziel: "wuerzburg", n: "Regelweg 1 via Nürnberg", d: true,  secs: ["S35/1", "S350", "S24"], alws: SUED_WUE.concat(NORDRING), opts: [] },
+  { id: "m_wue1", start: "muenchen_hbf", ziel: "wuerzburg", n: "Regelweg 1 via Nürnberg", d: true,  secs: ["S35/1", "S350", "S24"], alws: SUED_WUE.concat(NORDRING).concat(LANDSHUT), opts: [] },
   { id: "m_wue2", start: "muenchen_hbf", ziel: "wuerzburg", n: "Regelweg 2 via Augsburg/Treuchtlingen", nr: "Regelweg 2 via Treuchtlingen/Augsburg", d: false, secs: ["S1/1", "S18", "S35/3"], alws: AUF_11.slice(), opts: [] },
-  { id: "m_ff",  start: "muenchen_hbf", ziel: "ff_hbf", n: "Regelweg via Würzburg–Aschaffenburg", nr: "Regelweg via Aschaffenburg–Würzburg", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING), opts: ["ff_niederrad", "opt_25a"] },
-  { id: "m_ffs", start: "muenchen_hbf", ziel: "ff_ffs", n: "Regelweg via Würzburg–Aschaffenburg", nr: "Regelweg via Aschaffenburg–Würzburg", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["ff_gemuenden", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING), opts: ["opt_25a"] },
-  { id: "m_flh", start: "muenchen_hbf", ziel: "ff_flh", n: "Regelweg via FFS → 12 → Flughafen", nr: "Regelweg via Flughafen → 12 → FFS", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING), opts: ["opt_25a"] },
-  { id: "m_kas", start: "muenchen_hbf", ziel: "kassel", n: "Regelweg via Fulda", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2", "M300/3"], alws: ["ff_flieden"].concat(SUED_WUE).concat(NORDRING), opts: [] },
-  { id: "m_han", start: "muenchen_hbf", ziel: "hannover", n: "Regelweg via Kassel", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2", "M300/3", "N300/4"], alws: ["ff_flieden", "bebra"].concat(SUED_WUE).concat(NORDRING), opts: [] },
-  { id: "m_ful", start: "muenchen_hbf", ziel: "fulda", n: "Regelweg über die SFS", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2"], alws: ["ful_gemuenden", "ff_flieden", "ful_altbau", "ful_wolfgang"].concat(SUED_WUE).concat(NORDRING), opts: ["opt_25a"] },
-  { id: "m_erf", start: "muenchen_hbf", ziel: "erfurt", n: "Regelweg via VDE 8", d: true, secs: ["S35/1", "S350", "S48", "S500"], alws: ["wue_fuerth"].concat(NORDRING), opts: ["opt_coburg"] },
-  { id: "m_lep", start: "muenchen_hbf", ziel: "leipzig", n: "Regelweg via VDE 8", d: true, secs: ["S35/1", "S350", "S48", "S500", "SO400", "SO500"], alws: ["wue_fuerth"].concat(NORDRING), opts: ["opt_coburg"] },
+  { id: "m_ff",  start: "muenchen_hbf", ziel: "ff_hbf", n: "Regelweg via Würzburg–Aschaffenburg", nr: "Regelweg via Aschaffenburg–Würzburg", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING).concat(LANDSHUT), opts: ["ff_niederrad", "opt_25a"] },
+  { id: "m_ffs", start: "muenchen_hbf", ziel: "ff_ffs", n: "Regelweg via Würzburg–Aschaffenburg", nr: "Regelweg via Aschaffenburg–Würzburg", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["ff_gemuenden", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING).concat(LANDSHUT), opts: ["opt_25a"] },
+  { id: "m_flh", start: "muenchen_hbf", ziel: "ff_flh", n: "Regelweg via FFS → 12 → Flughafen", nr: "Regelweg via Flughafen → 12 → FFS", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"].concat(SUED_WUE).concat(NORDRING).concat(LANDSHUT), opts: ["opt_25a"] },
+  { id: "m_kas", start: "muenchen_hbf", ziel: "kassel", n: "Regelweg via Fulda", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2", "M300/3"], alws: ["ff_flieden"].concat(SUED_WUE).concat(NORDRING).concat(LANDSHUT), opts: [] },
+  { id: "m_han", start: "muenchen_hbf", ziel: "hannover", n: "Regelweg via Kassel", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2", "M300/3", "N300/4"], alws: ["ff_flieden", "bebra"].concat(SUED_WUE).concat(NORDRING).concat(LANDSHUT), opts: [] },
+  { id: "m_ful", start: "muenchen_hbf", ziel: "fulda", n: "Regelweg über die SFS", d: true, secs: ["S35/1", "S350", "S24", "M300/1", "M300/2"], alws: ["ful_gemuenden", "ff_flieden", "ful_altbau", "ful_wolfgang"].concat(SUED_WUE).concat(NORDRING).concat(LANDSHUT), opts: ["opt_25a"] },
+  { id: "m_erf", start: "muenchen_hbf", ziel: "erfurt", n: "Regelweg via VDE 8", d: true, secs: ["S35/1", "S350", "S48", "S500"], alws: ["wue_fuerth"].concat(NORDRING).concat(LANDSHUT), opts: ["opt_coburg"] },
+  { id: "m_lep", start: "muenchen_hbf", ziel: "leipzig", n: "Regelweg via VDE 8", d: true, secs: ["S35/1", "S350", "S48", "S500", "SO400", "SO500"], alws: ["wue_fuerth"].concat(NORDRING).concat(LANDSHUT), opts: ["opt_coburg"] },
   { id: "m_aug", start: "muenchen_hbf", ziel: "augsburg", n: "Regelweg", d: true, secs: ["S1/1"], alws: AUF_11.slice(), opts: [] },
   { id: "m_mos", start: "muenchen_hbf", ziel: "muenchen_ost", n: "Regelweg via München Süd", d: true, secs: ["S50/1"], alws: [], opts: [] },
   { id: "m_mlr", start: "muenchen_hbf", ziel: "laim_rbf", n: "Regelweg (die 107)", d: true, secs: ["S107"], alws: [], opts: [] },
