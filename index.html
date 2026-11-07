@@ -215,6 +215,7 @@ var HBF = {
   "fulda": "Fulda",
   "erfurt": "Erfurt Hbf",
   "leipzig": "Leipzig Hbf",
+  "berlin": "Berlin Hbf",
   "augsburg": "Augsburg Hbf",
   "mannheim": "Mannheim Hbf",
   "laim_rbf": "München-Laim Rbf",
@@ -691,6 +692,10 @@ function fmtDate(iso) {
 var ZIEL_BAHNHOF = ["augsburg", "stuttgart", "mannheim", "nuernberg", "wuerzburg"]; /* vor Frankfurt ▸ */
 var ZIEL_BAHNHOF2 = ["fulda", "kassel", "hannover", "erfurt", "leipzig"];           /* nach Frankfurt ▸ */
 var FF_GRUPPE = ["ff_hbf", "ff_ffs", "ff_flh"];
+/* Berlin – Platzhalter Nr. 13 (Jürgen 08.11.2026): ausgegraut, nicht anklickbar,
+   für die Zukunft. Wenn Berlin als Ziel dazukommt: Chip hier entfernen und
+   "berlin" in ZIEL_BAHNHOF2 bzw. mit eigenen Routen aufnehmen. */
+var BERLIN_CHIP = '<button type="button" class="chip" disabled style="opacity:.45;cursor:default">Berlin</button>';
 
 var state = {
   tab: "form",
@@ -1197,7 +1202,7 @@ function viewForm() {
       }
       html += '<div class="chips wrap" style="margin-top:8px">' + ZIEL_BAHNHOF2.map(function (h) {
         return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
-      }).join("") + "</div>";
+      }).join("") + BERLIN_CHIP + "</div>";
     }
     html += "</div>";
     if (auto) {
@@ -1226,7 +1231,7 @@ function viewForm() {
     }
     html += '<div class="chips wrap">' + ZIEL_BAHNHOF2.map(function (t) {
       return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
-    }).join("") + "</div>";
+    }).join("") + BERLIN_CHIP + "</div>";
     /* Drehfahrt: Start = Ziel, nur für München Hbf / Laim Rbf (Jürgen 01.11.2026) */
     if (DREHFAHRTEN[fg.start]) {
       html += '<button type="button" class="opt" style="margin-top:10px" onclick="pickZiel(' + s.i + ',\'' + fg.start + '\')">🔄 Drehfahrt – Fahrzeug wurde in ' + esc(HBF[fg.start]) + " gedreht</button>";
