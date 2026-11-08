@@ -68,6 +68,7 @@
   .months { display: flex; gap: 3px; margin-top: 4px; }
   .mo { flex: 1; text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; background: #f1f5f9; border-radius: 6px; padding: 4px 0; }
   .mo.hit { background: #10B981; color: #fff; }
+  .mo b.mo-day { display: block; font-size: 14px; font-weight: 800; margin-top: 1px; }
   .card.sec { padding: 10px 14px; margin-bottom: 6px; }
   .trip { margin-top: 4px; }
   input[type="date"] { font-family: inherit; }
@@ -1364,16 +1365,20 @@ function viewStats() {
     '</div><div class="muted" style="font-size:12px;margin-top:6px">Angezeigt: ' +
     (blk.h2 ? "Jul – Dez " : "Jan – Jun ") + year +
     (aktH2 === (blk.h2 ? "H2" : "H1") ? " (aktuelles Halbjahr)" : "") +
-    '. Nach Ablauf abgeben wie beim Zettel.</div></div>';
+    '. Nach Ablauf abgeben wie beim Zettel. Zahl = Tag deiner letzten Fahrt im Monat, X = keine Fahrt.</div></div>';
   /* Monats-Chips nur für den gewählten Halbjahr-Block */
+  /* Monats-Chips (Jürgen 09.11.2026): Statt grün-Anhäkchen zeigt jeder Monat den
+     TAG der letzten Fahrt in diesem Monat; ohne Fahrt ein X. */
   function monthsHTML(dates) {
     var out = "";
     for (var m = 0; m < 6; m++) {
       var mo = blk.start + m;
-      var hit = dates.some(function (d) {
-        return +d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1;
+      var last = "";
+      dates.forEach(function (d) {
+        if (+d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1 && d > last) last = d;
       });
-      out += '<span class="mo' + (hit ? " hit" : "") + '">' + blk.labels[m] + "</span>";
+      out += '<span class="mo' + (last ? " hit" : "") + '">' + blk.labels[m] +
+        '<b class="mo-day">' + (last ? String(+last.slice(8, 10)) : "X") + "</b></span>";
     }
     return '<div class="months">' + out + "</div>";
   }
