@@ -933,6 +933,71 @@ function toggleAlwOpen(i, isRet) {
 }
 function toggleAlwOpen2(i, isRet) {
   var f = fahrtOf(i);
+  if (isRet && f.retour) f.retour.alwOpen2 = !f.retour.alwOpen2;
+  else f.alwOpen2 = !f.alwOpen2;
+  render();
+}
+function startRetour(i) {
+  var f = fahrtOf(i);
+  f.retour = { ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false };
+  pushStep({ k: "rziel", i: i });
+}
+function keineRetour(i) {
+  var f = fahrtOf(i);
+  f.retour = null;
+  pushStep({ k: "mehr", i: i });
+}
+function pickRuckziel(i, h) {
+  var f = fahrtOf(i);
+  f.retour.ziel = h;
+  f.retour.routeId = null; f.retour.alws = []; f.retour.opts = [];
+  pushStep({ k: "rweg", i: i });
+}
+function setRetourRoute(i, rid) {
+  var f = fahrtOf(i);
+  f.retour.routeId = rid;
+  f.retour.alws = []; f.retour.opts = [];
+  render();
+}
+function weitereFahrt(i) {
+  var letzte = fahrtOf(i);
+  var nf = fahrtOf(i + 1);
+  nf.start = letzte.ziel;
+  pushStep({ k: "start", i: i + 1 });
+}
+function keineWeitere(i) { pushStep({ k: "note" }); }
+function setNote(v) { state.w.note = v; }
+function setDate(v) { state.w.date = v; }
+function pickHeute() {
+  state.w.date = todayISO();
+  state.dateCustom = false;
+  pushStep({ k: "br" });
+}
+function pickDatum(v) {
+  if (!v) return;
+  state.w.date = v;
+  state.dateCustom = false;
+  pushStep({ k: "br" });
+}
+function toggleDatumCustom() { state.dateCustom = !state.dateCustom; render(); }
+function toggleDatumEdit() { state.dateEdit = !state.dateEdit; render(); }
+function setDateLive(v) { if (v) { state.w.date = v; render(); } }
+
+function submitEntry() {
+  var w = state.w;
+  if (!w.baureihen.length || !w.fahrten.length) return;
+  var fahrten = w.fahrten.map(function (f) {
+    var out = { start: f.start, ziel: f.ziel, routeId: f.routeId, alws: f.alws.slice(), opts: f.opts.slice(), chain: [] };
+    /* Drehfahrt: Rundfahrt aus der Drehfahrten-Bibliothek, ohne Retour (Jürgen 01.11.2026) */
+    if (f.start === f.ziel && DREHFAHRTEN[f.start]) {
+      var dlist = DREHFAHRTEN[f.start];
+      var dw = dlist.filter(function (x) { return x.id === f.drehId; })[0] ||
+               dlist.filter(function (x) { return x.d; })[0] || dlist[0];
+      out.routeId = dw.id;
+      out.dreh = 1;
+      out.drehName = dw.n;
+      out.chain = dw.secs.slice();
+      return out;
     }
     var rs = routesForWithFallback(f.start, f.ziel);
     var r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
