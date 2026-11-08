@@ -715,8 +715,20 @@ var state = {
   andererFf: false, /* Frankfurt-Gruppe in „Anderer Hbf…“ aufgeklappt */
   dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
   dateEdit: false,   /* Notiz-Schritt: Datum-Änderung offen */
-  jahr: new Date().getFullYear()
+  jahr: new Date().getFullYear(),
+  block: null /* Halbjahr-Block der Auswertung: null = automatisch (aktuelles Halbjahr), "H1" = Jan–Jun, "H2" = Jul–Dez (Jürgen 08.11.2026) */
 };
+
+/* Aktueller Halbjahr-Block (Jürgen 08.11.2026: Der Zettel bildet immer nur ein Halbjahr ab –
+   Jan–Jun oder Jul–Dez – und wird nach Ablauf abgegeben; die Auswertung zeigt standardmäßig
+   das aktuelle Halbjahr, umschaltbar per Button). */
+function blockInfo() {
+  var h2 = state.block ? state.block === "H2" : new Date().getMonth() >= 6;
+  return h2
+    ? { h2: true, start: 6, labels: ["Jul", "Aug", "Sep", "Okt", "Nov", "Dez"] }
+    : { h2: false, start: 0, labels: ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun"] };
+}
+function setBlock(b) { state.block = b; render(); }
 
 /* Die vier Münchner Bahnhöfe – als Gruppe im Start- und Ziel-Schritt (Jürgen 06.11.2026) */
 var MUC_HOFE = ["muenchen_hbf", "muenchen_ost", "laim_rbf", "pasing_bbf"];
@@ -921,71 +933,6 @@ function toggleAlwOpen(i, isRet) {
 }
 function toggleAlwOpen2(i, isRet) {
   var f = fahrtOf(i);
-  if (isRet && f.retour) f.retour.alwOpen2 = !f.retour.alwOpen2;
-  else f.alwOpen2 = !f.alwOpen2;
-  render();
-}
-function startRetour(i) {
-  var f = fahrtOf(i);
-  f.retour = { ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false };
-  pushStep({ k: "rziel", i: i });
-}
-function keineRetour(i) {
-  var f = fahrtOf(i);
-  f.retour = null;
-  pushStep({ k: "mehr", i: i });
-}
-function pickRuckziel(i, h) {
-  var f = fahrtOf(i);
-  f.retour.ziel = h;
-  f.retour.routeId = null; f.retour.alws = []; f.retour.opts = [];
-  pushStep({ k: "rweg", i: i });
-}
-function setRetourRoute(i, rid) {
-  var f = fahrtOf(i);
-  f.retour.routeId = rid;
-  f.retour.alws = []; f.retour.opts = [];
-  render();
-}
-function weitereFahrt(i) {
-  var letzte = fahrtOf(i);
-  var nf = fahrtOf(i + 1);
-  nf.start = letzte.ziel;
-  pushStep({ k: "start", i: i + 1 });
-}
-function keineWeitere(i) { pushStep({ k: "note" }); }
-function setNote(v) { state.w.note = v; }
-function setDate(v) { state.w.date = v; }
-function pickHeute() {
-  state.w.date = todayISO();
-  state.dateCustom = false;
-  pushStep({ k: "br" });
-}
-function pickDatum(v) {
-  if (!v) return;
-  state.w.date = v;
-  state.dateCustom = false;
-  pushStep({ k: "br" });
-}
-function toggleDatumCustom() { state.dateCustom = !state.dateCustom; render(); }
-function toggleDatumEdit() { state.dateEdit = !state.dateEdit; render(); }
-function setDateLive(v) { if (v) { state.w.date = v; render(); } }
-
-function submitEntry() {
-  var w = state.w;
-  if (!w.baureihen.length || !w.fahrten.length) return;
-  var fahrten = w.fahrten.map(function (f) {
-    var out = { start: f.start, ziel: f.ziel, routeId: f.routeId, alws: f.alws.slice(), opts: f.opts.slice(), chain: [] };
-    /* Drehfahrt: Rundfahrt aus der Drehfahrten-Bibliothek, ohne Retour (Jürgen 01.11.2026) */
-    if (f.start === f.ziel && DREHFAHRTEN[f.start]) {
-      var dlist = DREHFAHRTEN[f.start];
-      var dw = dlist.filter(function (x) { return x.id === f.drehId; })[0] ||
-               dlist.filter(function (x) { return x.d; })[0] || dlist[0];
-      out.routeId = dw.id;
-      out.dreh = 1;
-      out.drehName = dw.n;
-      out.chain = dw.secs.slice();
-      return out;
     }
     var rs = routesForWithFallback(f.start, f.ziel);
     var r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
@@ -1342,23 +1289,39 @@ function viewStats() {
   html += '<div class="muted" style="font-size:12px;margin-top:6px">Rot = über 12 Monate ohne Fahrt → mit dem Dienstplaner sprechen. Gelb = in ~3 Monaten fällig.</div></div>';
   /* Abschnitte nach Regionalbereich */
   var year = state.jahr;
+  var blk = blockInfo();
+  var heuteH2 = new Date().getMonth() >= 6;
+  var aktH2 = heuteH2 ? "H2" : "H1";
+  html += '<div class="card"><div class="qlabel">📅 Halbjahr (wie auf dem Zettel)</div>' +
+    '<div class="chips wrap" style="padding:0">' +
+    '<button class="chip' + (blk.h2 ? "" : " on") + '" onclick="setBlock(\'H1\')">Jan – Jun</button>' +
+    '<button class="chip' + (blk.h2 ? " on" : "") + '" onclick="setBlock(\'H2\')">Jul – Dez</button>' +
+    '</div><div class="muted" style="font-size:12px;margin-top:6px">Angezeigt: ' +
+    (blk.h2 ? "Jul – Dez " : "Jan – Jun ") + year +
+    (aktH2 === (blk.h2 ? "H2" : "H1") ? " (aktuelles Halbjahr)" : "") +
+    '. Nach Ablauf abgeben wie beim Zettel.</div></div>';
+  /* Monats-Chips nur für den gewählten Halbjahr-Block */
+  function monthsHTML(dates) {
+    var out = "";
+    for (var m = 0; m < 6; m++) {
+      var mo = blk.start + m;
+      var hit = dates.some(function (d) {
+        return +d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1;
+      });
+      out += '<span class="mo' + (hit ? " hit" : "") + '">' + blk.labels[m] + "</span>";
+    }
+    return '<div class="months">' + out + "</div>";
+  }
   ["S", "M", "N", "SO"].forEach(function (rb) {
     html += '<div class="section-t">' + ({ S: "Süd", M: "Mitte", N: "Nord", SO: "Südost" })[rb] + "</div>";
     RB[rb].forEach(function (sid) {
       var sec = SECTIONS[sid];
       var lf = lastOf(driven[sid]) || seedFromFrist(sec.f);
       var a = lf ? ampelOf(lf, today) : "none";
-      var months = "";
-      for (var m = 0; m < 12; m++) {
-        var hit = (driven[sid] || []).some(function (d) {
-          return +d.slice(0, 4) === year && +d.slice(5, 7) === m + 1;
-        });
-        months += '<span class="mo' + (hit ? " hit" : "") + '">' + ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m] + "</span>";
-      }
       html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
         '<span>' + ampelHTML(a) + " <b>" + esc(sec.n) + "</b> <span class='muted' style='font-size:12px'>" + esc(sec.v) + " → " + esc(sec.b) + "</span></span>" +
         '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nie gefahren") + "</span></div>" +
-        '<div class="months">' + months + "</div></div>";
+        monthsHTML(driven[sid] || []) + "</div>";
     });
   });
   /* Baureihen */
@@ -1370,17 +1333,10 @@ function viewStats() {
   BAUREIHEN.forEach(function (b) {
     var lf = lastOf(brDriven[b]);
     var a = lf ? ampelOf(lf, today) : "none";
-    var months = "";
-    for (var m = 0; m < 12; m++) {
-      var hit = (brDriven[b] || []).some(function (d) {
-        return +d.slice(0, 4) === year && +d.slice(5, 7) === m + 1;
-      });
-      months += '<span class="mo' + (hit ? " hit" : "") + '">' + ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m] + "</span>";
-    }
     html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
       '<span>' + ampelHTML(a) + " <b>" + esc(b) + "</b></span>" +
       '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
-      '<div class="months">' + months + "</div></div>";
+      monthsHTML(brDriven[b] || []) + "</div>";
   });
   /* Sicherung */
   html += backupCard();
