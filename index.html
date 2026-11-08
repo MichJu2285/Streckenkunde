@@ -288,7 +288,7 @@ var NORDRING = ["nr1", "nr2", "nr3", "nr4"];                        /* alle Ziel
 var LANDSHUT = ["ls_om"];                                         /* Str. Landshut bis Obermenzing – ebenfalls alle Ziele über die Süd 35 (Jürgen 09.11.2026) */
 var AUF_11 = ["m5", "m5_46", "m16"];                               /* alle Ziele über die Süd 1/1 */
 /* München-Knoten-ALW (in der App als eigene Gruppe vor allen anderen ALW) */
-var MUC_ALW = { m5: 1, m5_46: 1, m16: 1, nr1: 1, nr2: 1, nr3: 1, nr4: 1, mpb_augsburg: 1, o_fhb: 1, o_landsberger: 1 };
+var MUC_ALW = { ls_om: 1, m5: 1, m5_46: 1, m16: 1, nr1: 1, nr2: 1, nr3: 1, nr4: 1, mpb_augsburg: 1, o_fhb: 1, o_landsberger: 1 };
 
 var ROUTES = [
   /* ===== Start München Hbf ===== */
@@ -1063,6 +1063,8 @@ function wegStepHTML(f, i, isRet) {
   /* ALW – einklappbar, MEHRFACHAUSWAHL; München-Knoten als eigene Gruppe zuerst */
   var avail = r.alws.filter(function (aid) { return !!ALW[aid]; });
   var muc = avail.filter(function (aid) { return !!MUC_ALW[aid]; });
+  /* via Str. Landshut an ERSTER Stelle der München-ALW (Jürgen 09.11.2026) */
+  muc.sort(function (a, b) { return (b === "ls_om") - (a === "ls_om"); });
   var rest = avail.filter(function (aid) { return !MUC_ALW[aid]; });
   var mir = !!r.mirrored;
   var exclSel = alwSel.filter(function (aid) { return ALW[aid] && ALW[aid].excl; })[0] || null;
