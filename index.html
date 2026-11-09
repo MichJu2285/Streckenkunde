@@ -1155,13 +1155,26 @@ function wegStepHTML(f, i, isRet) {
   if (!avail.length) {
     html += '<div class="muted" style="margin:0 16px 8px;font-size:14px">Keine ALW verfügbar</div>';
   } else {
-    if (muc.length) {
-      html += groupToggle(muc, alwOpen, "toggleAlwOpen", "München-ALW");
-      if (alwOpen) muc.forEach(function (aid) { html += alwBtn(aid); });
+    /* Gruppen-Reihenfolge nach Fahrtrichtung (Jürgen 09.11.2026):
+       Start in München → München-ALW zuerst; Start anderswo (z. B. Stuttgart → München)
+       → die anderen ALW zuerst, München-Gruppe danach. */
+    var startNow = isRet ? f.ziel : f.start;
+    var mucStart = MUC_HOFE.indexOf(startNow) >= 0;
+    var gFirst = mucStart ? muc : rest;
+    var gFirstFn = mucStart ? "toggleAlwOpen" : "toggleAlwOpen2";
+    var gFirstOpen = mucStart ? alwOpen : alwOpen2;
+    var gFirstLbl = mucStart ? "München-ALW" : "weitere ALW";
+    var gSecond = mucStart ? rest : muc;
+    var gSecondFn = mucStart ? "toggleAlwOpen2" : "toggleAlwOpen";
+    var gSecondOpen = mucStart ? alwOpen2 : alwOpen;
+    var gSecondLbl = mucStart ? "weitere ALW" : "München-ALW";
+    if (gFirst.length) {
+      html += groupToggle(gFirst, gFirstOpen, gFirstFn, gFirstLbl);
+      if (gFirstOpen) gFirst.forEach(function (aid) { html += alwBtn(aid); });
     }
-    if (rest.length) {
-      html += groupToggle(rest, alwOpen2, "toggleAlwOpen2", "weitere ALW");
-      if (alwOpen2) rest.forEach(function (aid) { html += alwBtn(aid); });
+    if (gSecond.length) {
+      html += groupToggle(gSecond, gSecondOpen, gSecondFn, gSecondLbl);
+      if (gSecondOpen) gSecond.forEach(function (aid) { html += alwBtn(aid); });
     }
   }
   /* Optionen */
