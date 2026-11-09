@@ -379,13 +379,9 @@ var ROUTES = [
   { id: "han_flh", start: "hannover", ziel: "ff_flh", n: "via Kassel–Fulda → 12 → Flughafen", nr: "via Flughafen → 12 → Fulda–Kassel", d: true, secs: ["N300/4", "M300/3", "M300/2", "M23/4", "M23/3", "M23/2", "M12", "MFF_FLF"], alws: ["ff_ostbahn"], opts: [] },
   { id: "ful_kas", start: "fulda", ziel: "kassel", n: "Regelweg (die 300/3)", d: true, secs: ["M300/3"], alws: [], opts: [] },
   { id: "ful_han", start: "fulda", ziel: "hannover", n: "via Kassel", d: true, secs: ["M300/3", "N300/4"], alws: ["bebra"], opts: [] },
-  { id: "erf_lep", start: "erfurt", ziel: "leipzig", n: "Regelweg (400 → 500 via Flughafen)", nr: "Regelweg (500 → 400 via Flughafen)", d: true, secs: ["SO400", "SO500"], alws: [], opts: [] },
-  { id: "erf_ff",  start: "erfurt", ziel: "ff_hbf", n: "via Nürnberg–Würzburg", nr: "via Würzburg–Nürnberg", d: true, secs: ["S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"], opts: ["ff_niederrad"] },
-  { id: "erf_ffs", start: "erfurt", ziel: "ff_ffs", n: "via Nürnberg–Würzburg (endet im FFS)", nr: "via Würzburg–Nürnberg (beginnt im FFS)", d: true, secs: ["S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["wue_ansbach", "ff_gemuenden", "ff_ostbahn", "ff_schluechtern"], opts: [] },
-  { id: "erf_flh", start: "erfurt", ziel: "ff_flh", n: "via Nürnberg–Würzburg → 12 → Flughafen", nr: "via Flughafen → 12 → Würzburg–Nürnberg", d: true, secs: ["S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"], opts: [] },
-  { id: "lep_ff",  start: "leipzig", ziel: "ff_hbf", n: "via Erfurt–Nürnberg–Würzburg", nr: "via Würzburg–Nürnberg–Erfurt", d: true, secs: ["SO500", "SO400", "S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"], opts: ["ff_niederrad"] },
-  { id: "lep_ffs", start: "leipzig", ziel: "ff_ffs", n: "via Erfurt–Nürnberg–Würzburg (endet im FFS)", nr: "via Würzburg–Nürnberg–Erfurt (beginnt im FFS)", d: true, secs: ["SO500", "SO400", "S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["wue_ansbach", "ff_gemuenden", "ff_ostbahn", "ff_schluechtern"], opts: [] },
-  { id: "lep_flh", start: "leipzig", ziel: "ff_flh", n: "via Erfurt–Nürnberg–Würzburg → 12 → Flughafen", nr: "via Flughafen → 12 → Würzburg–Nürnberg–Erfurt", d: true, secs: ["SO500", "SO400", "S500", "S48", "S24", "M300/1", "M361", "M25/3", "M23/2", "M12", "MFF_FLF"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt_flh", "ff_ostbahn", "ff_schluechtern"], opts: [] }
+  { id: "erf_lep", start: "erfurt", ziel: "leipzig", n: "Regelweg (400 → 500 via Flughafen)", nr: "Regelweg (500 → 400 via Flughafen)", d: true, secs: ["SO400", "SO500"], alws: [], opts: [] }
+  /* Erfurt/Leipzig → Frankfurt am 09.11.2026 gestrichen (Jürgen): Es gibt zwar zwei mögliche Wege,
+     aber beide sind praktisch nicht fahrbar (Arbeitszeit) – Jürgen hat dort keine Streckenkunde. */
 ];
 
 /* ===== Generierte Routen: München Ost auf die 35/1 (drei Ost-Exits) =====
