@@ -473,7 +473,9 @@ var DREHFAHRTEN = {
    praktisch nicht gefahren werden. In der Zielauswahl ausgegraut + nicht antippbar
    (wie bei den ALW-Konflikten). Gilt automatisch in BEIDE Richtungen.
    Einträge: [startId, zielId] */
-var BLOCKED = [];
+var BLOCKED = [
+  ["nuernberg", "mannheim"]  /* NN↔Mannheim – Jürgen 09.11.2026: fliegt raus (wird nicht gefahren) */
+];
 /* ============ Streckenkunde v2 – Engine ============ */
 /* Kernidee: Jeder ALW ist ein Muster→Ersetzung-Baustein (sub → rep), der an einer
    bestimmten Stelle der Kette andockt. MEHRERE ALW pro Fahrt sind möglich, solange
