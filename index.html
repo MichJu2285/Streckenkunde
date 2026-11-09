@@ -1006,6 +1006,19 @@ function pickDatum(v) {
   pushStep({ k: "br" });
 }
 function toggleDatumCustom() { state.dateCustom = !state.dateCustom; render(); }
+/* „Anderer Tag…" öffnet den Kalender DIREKT (Jürgen 09.11.2026) – kein Zwischenschritt.
+   showPicker() läuft noch innerhalb des Tap-Gesten-Kontexts, dadurch öffnet iOS/Safari
+   den Datum-Picker sofort; ältere Browser fallen auf focus() zurück. */
+function andererTag() {
+  if (state.dateCustom) { state.dateCustom = false; render(); return; }
+  state.dateCustom = true;
+  render();
+  var el = document.getElementById("dateArea");
+  if (el) {
+    try { if (el.showPicker) { el.showPicker(); return; } } catch (e) {}
+    try { el.focus(); } catch (e) {}
+  }
+}
 function toggleDatumEdit() { state.dateEdit = !state.dateEdit; render(); }
 function setDateLive(v) { if (v) { state.w.date = v; render(); } }
 
@@ -1228,7 +1241,7 @@ function viewForm() {
     html += '<div class="welcome">Servus Jürgen! 👋<span class="w1">Schön, dich zu sehen.</span><span class="w2">Pack ma’s!</span></div>';
     html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
       '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
-      '<button type="button" class="opt" onclick="toggleDatumCustom()">📆 Anderer Tag…</button>';
+      '<button type="button" class="opt" onclick="andererTag()">📆 Anderer Tag…</button>';
     if (state.dateCustom) {
       html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="pickDatum(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a;margin-top:8px">' +
         '<div class="muted" style="font-size:13px;margin-top:6px">Tag wählen – danach geht es automatisch weiter.</div>';
