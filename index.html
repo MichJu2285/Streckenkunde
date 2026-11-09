@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-09c: Anderer Tag ohne label (iOS Doppel-Tap-Fix), Cache-Buster -->
+<!-- v2 build 2026-11-09d: Anderer Tag als SICHTBARES Date-Input (iOS verwirft Picker bei unsichtbarem Input), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1225,8 +1225,9 @@ function viewForm() {
     html += '<div class="welcome">Servus Jürgen! 👋<span class="w1">Schön, dich zu sehen.</span><span class="w2">Pack ma’s!</span></div>';
     html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
       '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
-      '<div class="opt" style="position:relative;overflow:hidden;cursor:pointer">📆 Anderer Tag…' +
-        '<input type="date" onchange="if(this.value)pickDatum(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px"></div>';
+      '<div style="position:relative;margin-bottom:8px">' +
+        '<input type="date" value="' + state.w.date + '" onchange="if(this.value)pickDatum(this.value)" style="display:block;width:100%;height:50px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;font-size:18px;font-family:inherit;color:transparent;-webkit-text-fill-color:transparent">' +
+        '<span style="position:absolute;inset:0;display:flex;align-items:center;padding:12px 14px;font-size:18px;color:#334155;pointer-events:none">📆 Anderer Tag…</span></div>';
     html += "</div>";
   } else if (s.k === "br") {
     html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div>';
