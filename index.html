@@ -1125,8 +1125,8 @@ function wegStepHTML(f, i, isRet) {
     }
     var dis = false, disTxt = "";
     if (!on) {
-      if (exclSel && aid !== exclSel) { dis = true; disTxt = "durch „" + esc(ALW[exclSel].n) + "“ ausgeschlossen"; }
-      else if (exclBy(aid)) { dis = true; disTxt = "durch „" + esc(ALW[exclBy(aid)].n) + "“ ausgeschlossen"; }
+      if (exclSel && aid !== exclSel) { dis = true; }
+      else if (exclBy(aid)) { dis = true; }
       else {
         var probe = planAlws(r.secs, alwSel.concat([aid]), mir);
         var pc = probe.conflicts.filter(function (c) { return c.id === aid; })[0];
@@ -1139,7 +1139,7 @@ function wegStepHTML(f, i, isRet) {
       '<div class="rt-name">' + (on ? "☑ " : "☐ ") + esc(a.n) +
       (a.excl ? " <span class='muted' style='font-size:13px'>(schließt andere ALW aus)</span>" : "") + "</div>" +
       (d.entf.length || d.dazu.length ? '<div class="delta">' + deltaChips(d) + "</div>" : '<div class="muted" style="font-size:12px">ergänzt den Regelweg</div>') +
-      (dis ? '<div class="muted" style="font-size:12px">' + disTxt + "</div>" : "") +
+      (dis && disTxt ? '<div class="muted" style="font-size:12px">' + disTxt + "</div>" : "") +
       (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „" + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
       (nm ? '<div class="warn">⚠️ Dieser ALW verdrängt eine andere Auswahl</div>' : "") +
       "</button>";
