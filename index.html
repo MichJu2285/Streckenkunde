@@ -734,6 +734,7 @@ var state = {
   w: null,          /* Wizard-Zustand */
   saved: false,
   confirmId: null,
+  editId: null,
   backupText: "",
   zielGroup: false,  /* Frankfurt-Gruppe aufgeklappt */
   muenchenGroup: false, /* München-Gruppe aufgeklappt */
@@ -1497,6 +1498,33 @@ function viewLog() {
   }
   var html = '<div class="content">';
   state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
+    /* Bearbeiten-Modus (Jürgen 09.11.2026): Datum, Baureihen-Gruppen, Fahrten löschen, Notiz */
+    if (state.editId === e.id) {
+      html += '<div class="card"><div class="dist-lbl" style="margin-bottom:8px">' +
+        '<span style="font-weight:600;color:#0f172a">✏️ Eintrag bearbeiten</span></div>';
+      html += '<div class="qlabel" style="margin-bottom:6px;font-size:15px">📆 Datum</div>' +
+        '<input type="date" value="' + esc(e.date) + '" onchange="editDate(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a">';
+      html += '<div class="qlabel" style="margin:12px 0 6px;font-size:15px">🚆 Baureihen</div><div class="chips wrap">' +
+        BR_GROUPS.map(function (grp, gi) {
+          var all = grp.every(function (b) { return (e.baureihen || []).indexOf(b) >= 0; });
+          return '<button type="button" class="chip' + (all ? " on" : "") + '" onclick="editToggleBr(' + gi + ')">' + esc(BR_LABELS[gi]) + "</button>";
+        }).join("") + "</div>";
+      html += '<div class="qlabel" style="margin:12px 0 6px;font-size:15px">🚆 Fahrten</div>';
+      if (!(e.fahrten || []).length) {
+        html += '<div class="muted" style="font-size:12px;margin-bottom:4px">ohne Fahrt – nur Baureihen eingetragen</div>';
+      } else {
+        (e.fahrten || []).forEach(function (f, fi) {
+          html += '<div class="flexrow" style="margin-top:4px;align-items:center">' +
+            '<span style="flex:1;font-size:15px">🚆 ' + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</span>" +
+            '<button type="button" class="btn-sm btn-grey" style="flex:none;padding:6px 12px" onclick="editDelFahrt(' + fi + ')">🗑️</button></div>';
+        });
+      }
+      html += '<div class="qlabel" style="margin:12px 0 6px;font-size:15px">📝 Notiz</div>' +
+        '<textarea rows="3" oninput="editNote(this.value)">' + esc(e.note || "") + "</textarea>";
+      html += '<button type="button" class="btn-main" style="margin-top:10px" onclick="editDone()">Fertig ✅</button>';
+      html += "</div>";
+      return;
+    }
     html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px">' +
       '<span style="font-weight:600;color:#0f172a">📆 ' + fmtDate(e.date) + "</span>" +
       '<span class="tag">' + esc(brGruppenText(e.baureihen)) + "</span></div>";
@@ -1528,7 +1556,8 @@ function viewLog() {
       html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</button>' +
         '<button type="button" class="btn-sm btn-grey" onclick="state.confirmId=null;render()">Abbrechen</button></div>';
     } else {
-      html += '<button type="button" class="del" onclick="state.confirmId=\'' + e.id + '\';render()">Eintrag löschen</button>';
+      html += '<button type="button" class="del" onclick="state.editId=\'' + e.id + '\';render()">✏️ Bearbeiten</button>';
+      html += '<button type="button" class="del" style="margin-left:12px" onclick="state.confirmId=\'' + e.id + '\';render()">Eintrag löschen</button>';
     }
     html += "</div>";
   });
@@ -1580,6 +1609,41 @@ function persist() {
 function deleteEntry(id) {
   state.entries = state.entries.filter(function (e) { return e.id !== id; });
   state.confirmId = null;
+  persist();
+  render();
+}
+/* ---------- Eintrag bearbeiten (Jürgen 09.11.2026) ---------- */
+function entryById(id) {
+  return state.entries.filter(function (e) { return e.id === id; })[0] || null;
+}
+function editDate(v) {
+  if (!v) return;
+  var e = entryById(state.editId);
+  if (e) { e.date = v; persist(); render(); }
+}
+/* Baureihen-Gruppe im Eintrag an/aus – gleiche Logik wie im Eintragen-Schritt */
+function editToggleBr(gi) {
+  var e = entryById(state.editId);
+  if (!e) return;
+  e.baureihen = e.baureihen || [];
+  var grp = BR_GROUPS[gi];
+  var all = grp.every(function (b) { return e.baureihen.indexOf(b) >= 0; });
+  if (all) e.baureihen = e.baureihen.filter(function (b) { return grp.indexOf(b) < 0; });
+  else grp.forEach(function (b) { if (e.baureihen.indexOf(b) < 0) e.baureihen.push(b); });
+  persist();
+  render();
+}
+function editDelFahrt(fi) {
+  var e = entryById(state.editId);
+  if (e && e.fahrten) { e.fahrten.splice(fi, 1); persist(); render(); }
+}
+/* Notiz ohne render() sichern – sonst verliert das Feld den Fokus bei jedem Buchstaben */
+function editNote(v) {
+  var e = entryById(state.editId);
+  if (e) { e.note = v; persist(); }
+}
+function editDone() {
+  state.editId = null;
   persist();
   render();
 }
