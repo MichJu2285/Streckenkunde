@@ -1137,8 +1137,7 @@ function wegStepHTML(f, i, isRet) {
     var h = '<button type="button" class="opt alw' + (on ? " on" : "") + (dis ? " dis" : "") + '" ' + (dis ? "disabled " : "") +
       'onclick="toggleAlw(' + i + ",'" + aid + "'," + (isRet ? "true" : "false") + ')">' +
       '<div class="rt-name">' + (on ? "☑ " : "☐ ") + esc(a.n) +
-      (a.excl ? " <span class='muted' style='font-size:13px'>(schließt andere ALW aus)</span>" : "") +
-      (a.exclIds ? " <span class='muted' style='font-size:13px'>(schließt " + a.exclIds.map(function (x) { return ALW[x] ? ALW[x].n : x; }).join(" / ") + " aus)</span>" : "") + "</div>" +
+      (a.excl ? " <span class='muted' style='font-size:13px'>(schließt andere ALW aus)</span>" : "") + "</div>" +
       (d.entf.length || d.dazu.length ? '<div class="delta">' + deltaChips(d) + "</div>" : '<div class="muted" style="font-size:12px">ergänzt den Regelweg</div>') +
       (dis ? '<div class="muted" style="font-size:12px">' + disTxt + "</div>" : "") +
       (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „" + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
