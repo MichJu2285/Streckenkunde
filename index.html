@@ -468,6 +468,12 @@ var DREHFAHRTEN = {
       txt: "108 nach München-Obermenzing → auf die 35/1 → bei Allach auf die 111 nach München Nord → 110 zurück nach Laim" }
   ]
 };
+
+/* Gesperrte Hbf-Kombinationen (Jürgen 09.11.2026): Start-Ziel-Paare, die von ihm
+   praktisch nicht gefahren werden. In der Zielauswahl ausgegraut + nicht antippbar
+   (wie bei den ALW-Konflikten). Gilt automatisch in BEIDE Richtungen.
+   Einträge: [startId, zielId] */
+var BLOCKED = [];
 /* ============ Streckenkunde v2 – Engine ============ */
 /* Kernidee: Jeder ALW ist ein Muster→Ersetzung-Baustein (sub → rep), der an einer
    bestimmten Stelle der Kette andockt. MEHRERE ALW pro Fahrt sind möglich, solange
@@ -702,6 +708,23 @@ var FF_GRUPPE = ["ff_hbf", "ff_ffs", "ff_flh"];
    für die Zukunft. Wenn Berlin als Ziel dazukommt: Chip hier entfernen und
    "berlin" in ZIEL_BAHNHOF2 bzw. mit eigenen Routen aufnehmen. */
 var BERLIN_CHIP = '<button type="button" class="chip" disabled style="opacity:.45;cursor:default">Berlin</button>';
+
+/* Gesperrte Hbf-Kombinationen (Jürgen 09.11.2026): ausgegraut, nicht antippbar –
+   wie bei den ALW-Konflikten. BLOCKED (data.js) gilt automatisch in beide Richtungen. */
+function isBlocked(start, ziel) {
+  return BLOCKED.some(function (p) {
+    return (p[0] === start && p[1] === ziel) || (p[0] === ziel && p[1] === start);
+  });
+}
+function zielChip(i, start, t) {
+  var b = isBlocked(start, t);
+  var h = '<button type="button" class="chip"';
+  if (b) h += ' disabled style="opacity:.45;cursor:default"';
+  else h += ' onclick="pickZiel(' + i + ",'" + t + '\')"';
+  h += '>' + esc(HBF[t]);
+  if (b) h += " <span class='muted' style='font-size:12px'>(nicht fahrbar)</span>";
+  return h + "</button>";
+}
 
 var state = {
   tab: "form",
@@ -1236,20 +1259,20 @@ function viewForm() {
     html += '<button type="button" class="chip' + (state.muenchenGroup ? " on" : "") + '" onclick="state.muenchenGroup=!state.muenchenGroup;state.zielGroup=false;render()">München ▸</button>';
     if (state.muenchenGroup) {
       html += '<div class="chips wrap" style="margin-top:8px">' + ["muenchen_hbf", "muenchen_ost", "laim_rbf", "pasing_bbf"].filter(function (t) { return t !== fg.start; }).map(function (t) {
-        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+        return zielChip(s.i, fg.start, t);
       }).join("") + "</div>";
     }
     html += '<div class="chips wrap">' + ZIEL_BAHNHOF.map(function (t) {
-      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+      return zielChip(s.i, fg.start, t);
     }).join("") +
       '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;state.muenchenGroup=false;render()">Frankfurt ▸</button></div>';
     if (state.zielGroup) {
       html += '<div class="chips wrap" style="margin-top:8px">' + FF_GRUPPE.map(function (t) {
-        return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+        return zielChip(s.i, fg.start, t);
       }).join("") + "</div>";
     }
     html += '<div class="chips wrap">' + ZIEL_BAHNHOF2.map(function (t) {
-      return '<button type="button" class="chip" onclick="pickZiel(' + s.i + ',\'' + t + '\')">' + esc(HBF[t]) + "</button>";
+      return zielChip(s.i, fg.start, t);
     }).join("") + BERLIN_CHIP + "</div>";
     /* Drehfahrt: Start = Ziel, nur für München Hbf / Laim Rbf (Jürgen 01.11.2026) */
     if (DREHFAHRTEN[fg.start]) {
@@ -1259,6 +1282,9 @@ function viewForm() {
   } else if (s.k === "weg") {
     var f1 = fahrtOf(s.i);
     html += '<div class="card"><div class="qlabel">🛤️ Fahrt ' + (s.i + 1) + ": " + esc(HBF[f1.start]) + " → " + esc(HBF[f1.ziel]) + "</div>";
+    if (isBlocked(f1.start, f1.ziel)) {
+      html += '<div class="muted" style="font-size:13px;margin-top:6px">⚠️ Diese Verbindung ist bei dir gesperrt (wird praktisch nicht gefahren) – normalerweise wählst du sie nicht. Bitte prüfen!</div>';
+    }
     html += '<div class="muted" style="font-size:13px">Regelweg ist vorausgewählt. ALW kannst du jetzt <b>mehrfach</b> antippen – einer pro Störung.</div></div>';
     html += wegStepHTML(f1, s.i, false);
   } else if (s.k === "dreh") {
