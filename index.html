@@ -1454,19 +1454,21 @@ function viewStats() {
         monthsHTML(driven[sid] || []) + "</div>";
     });
   });
-  /* Baureihen */
+  /* Baureihen – zusammengefasst in Gruppen wie in der Baureihen-Frage / auf dem Zettel (Jürgen 09.11.2026) */
   html += '<div class="section-t">Baureihen</div>';
   var brDriven = {};
   state.entries.forEach(function (e) {
     (e.baureihen || []).forEach(function (b) { (brDriven[b] = brDriven[b] || []).push(e.date); });
   });
-  BAUREIHEN.forEach(function (b) {
-    var lf = lastOf(brDriven[b]);
+  BR_GROUPS.forEach(function (grp, gi) {
+    var dates = [];
+    grp.forEach(function (b) { (brDriven[b] || []).forEach(function (d) { dates.push(d); }); });
+    var lf = lastOf(dates);
     var a = lf ? ampelOf(lf, today) : "none";
     html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
-      '<span>' + ampelHTML(a) + " <b>" + esc(b) + "</b></span>" +
+      '<span>' + ampelHTML(a) + " <b>" + esc(BR_LABELS[gi]) + "</b></span>" +
       '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
-      monthsHTML(brDriven[b] || []) + "</div>";
+      monthsHTML(dates) + "</div>";
   });
   /* Sicherung */
   html += backupCard();
