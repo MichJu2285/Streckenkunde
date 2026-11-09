@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-09b: Bearbeiten nur Datum + Baureihen, Abbrechen-Button (Cache-Buster) -->
+<!-- v2 build 2026-11-09c: Anderer Tag ohne label (iOS Doppel-Tap-Fix), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1225,8 +1225,8 @@ function viewForm() {
     html += '<div class="welcome">Servus Jürgen! 👋<span class="w1">Schön, dich zu sehen.</span><span class="w2">Pack ma’s!</span></div>';
     html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
       '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
-      '<label class="opt" style="position:relative;overflow:hidden;display:block;cursor:pointer">📆 Anderer Tag…' +
-        '<input type="date" onchange="if(this.value)pickDatum(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>';
+      '<div class="opt" style="position:relative;overflow:hidden;cursor:pointer">📆 Anderer Tag…' +
+        '<input type="date" onchange="if(this.value)pickDatum(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px"></div>';
     html += "</div>";
   } else if (s.k === "br") {
     html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div>';
