@@ -343,8 +343,8 @@ var ROUTES = [
   { id: "aug_nn",  start: "augsburg", ziel: "nuernberg", n: "Regelweg (die 18)", d: true, secs: ["S18"], alws: [], opts: [] },
   { id: "aug_wue", start: "augsburg", ziel: "wuerzburg", n: "via Treuchtlingen (18 → 35/3)", nr: "via Treuchtlingen (35/3 → 18)", d: true, secs: ["S18", "S35/3"], alws: [], opts: [] },
   /* Nürnberg */
-  { id: "nn_st1",  start: "nuernberg", ziel: "stuttgart", n: "Regelweg via Augsburg–Ulm", nr: "Regelweg via Ulm–Augsburg", d: true, secs: ["S18", "S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"], opts: [] },
-  { id: "nn_st2",  start: "nuernberg", ziel: "stuttgart", n: "Regelweg via Ansbach–Aalen", nr: "Regelweg via Aalen–Ansbach", d: false, secs: ["S15/1", "S15/2", "S15/3"], alws: [], opts: [] },
+  /* Nürnberg↔Stuttgart: via Augsburg–Ulm gestrichen (Jürgen 09.11.2026 – nicht real), nur via Ansbach–Aalen */
+  { id: "nn_st2",  start: "nuernberg", ziel: "stuttgart", n: "Regelweg via Ansbach–Aalen", nr: "Regelweg via Aalen–Ansbach", d: true, secs: ["S15/1", "S15/2", "S15/3"], alws: [], opts: [] },
   { id: "nn_wue",  start: "nuernberg", ziel: "wuerzburg", n: "Regelweg (die 24)", d: true, secs: ["S24"], alws: ["wue_ansbach"], opts: [] },
   { id: "nn_ff",   start: "nuernberg", ziel: "ff_hbf", n: "Regelweg via Würzburg–Aschaffenburg", nr: "Regelweg via Aschaffenburg–Würzburg", d: true, secs: ["S24", "M300/1", "M361", "M25/3", "M23/2", "M23/1"], alws: ["wue_ansbach", "ff_gemuenden", "ff_darmstadt", "ff_ostbahn", "ff_schluechtern"], opts: ["ff_niederrad"] },
   { id: "nn_ffs",  start: "nuernberg", ziel: "ff_ffs", n: "Regelweg via Würzburg–Aschaffenburg (endet im FFS)", nr: "Regelweg via Aschaffenburg–Würzburg (beginnt im FFS)", d: true, secs: ["S24", "M300/1", "M361", "M25/3", "M23/2"], alws: ["wue_ansbach", "ff_gemuenden", "ff_ostbahn", "ff_schluechtern"], opts: [] },
