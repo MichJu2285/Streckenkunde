@@ -524,19 +524,14 @@ function mirrorRoute(route, ruckziel, appendLeg) {
 }
 
 /* Retour-Routen von "von" nach "ruckziel": Spiegelung aller Hinfahrt-Routen
-   ruckziel -> von. Für Rückziel München Ost zusätzlich die via-Hbf-Variante
-   (gespiegelte Hbf-Route + 50/1-Bein, kein Durchschleifen). */
+   ruckziel -> von. Keine via-Hbf-Variante mehr für Rückziel München Ost
+   (Jürgen 09.11.2026: macht in der Praxis keinen Sinn – Abstieg am Hbf oder
+   eigene Fahrt). */
 function retourRoutes(von, ruckziel) {
   var out = [];
   var direct = ROUTES.filter(function (r) { return r.start === ruckziel && r.ziel === von; });
   direct.forEach(function (r) { out.push(mirrorRoute(r, ruckziel)); });
   if (ruckziel === "muenchen_ost") {
-    var viaHbf = ROUTES.filter(function (r) { return r.start === "muenchen_hbf" && r.ziel === von; });
-    viaHbf.forEach(function (r) {
-      var m = mirrorRoute(r, ruckziel, "S50/1");
-      m.n = "via Hbf (50/1-Bein)";
-      out.push(m);
-    });
     /* Standard-Rückroute ab Ost = gespiegelte Ost-Route (via Laim etc.) */
     var ostStd = out.filter(function (r) { return r.id.indexOf("_r") === 0 || r.id.indexOf("o") === 0; });
     ostStd.forEach(function (r) { r.d = false; });
