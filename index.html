@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-10a: Erfurt/Leipzig-Sperren (nur München/NN/Augsburg + Erfurt↔Leipzig frei), Augsburg↔Erfurt/Leipzig-Routen neu, Cache-Buster -->
+<!-- v2 build 2026-11-10b: Augsburg-Erfurt/Leipzig nur via Fürth (ohne ALW Richtungswechsel NN), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -342,8 +342,8 @@ var ROUTES = [
   { id: "aug_st",  start: "augsburg", ziel: "stuttgart", n: "Regelweg via Ulm", d: true, secs: ["S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"], opts: [] },
   { id: "aug_nn",  start: "augsburg", ziel: "nuernberg", n: "Regelweg (die 18)", d: true, secs: ["S18"], alws: [], opts: [] },
   { id: "aug_wue", start: "augsburg", ziel: "wuerzburg", n: "via Treuchtlingen (18 → 35/3)", nr: "via Treuchtlingen (35/3 → 18)", d: true, secs: ["S18", "S35/3"], alws: [], opts: [] },
-  { id: "aug_erf", start: "augsburg", ziel: "erfurt", n: "Regelweg via Nürnberg (18 → 48 → 500)", nr: "Regelweg via Nürnberg (500 → 48 → 18)", d: true, secs: ["S18", "S48", "S500"], alws: [], opts: ["opt_coburg"] }, /* NEU 10.11.2026: Augsburg ab Erfurt/Leipzig erreichbar (Jürgen) */
-  { id: "aug_lep", start: "augsburg", ziel: "leipzig", n: "Regelweg via Nürnberg (18 → VDE 8)", nr: "Regelweg via Nürnberg (VDE 8 → 18)", d: true, secs: ["S18", "S48", "S500", "SO400", "SO500"], alws: [], opts: ["opt_coburg"] }, /* NEU 10.11.2026 */
+  { id: "aug_erf", start: "augsburg", ziel: "erfurt", n: "Regelweg via Fürth (18 → 21 → 48 → 500)", nr: "Regelweg via Fürth (500 → 48 → 21 → 18)", d: true, secs: ["S18", "S21", "S48", "S500"], alws: [], opts: ["opt_coburg"] }, /* NEU 10.11.2026 (Jürgen): Direkter Weg nach Augsburg NUR via Fürth-Baustein – ohne ALW müsste man in Nürnberg die Richtung ändern (wird nicht angeboten, Muster M8). */
+  { id: "aug_lep", start: "augsburg", ziel: "leipzig", n: "Regelweg via Fürth (18 → 21 → VDE 8)", nr: "Regelweg via Fürth (VDE 8 → 21 → 18)", d: true, secs: ["S18", "S21", "S48", "S500", "SO400", "SO500"], alws: [], opts: ["opt_coburg"] }, /* NEU 10.11.2026, dito */
   /* Nürnberg */
   /* Nürnberg↔Stuttgart: via Augsburg–Ulm gestrichen (Jürgen 09.11.2026 – nicht real), nur via Ansbach–Aalen */
   { id: "nn_st2",  start: "nuernberg", ziel: "stuttgart", n: "Regelweg via Ansbach–Aalen", nr: "Regelweg via Aalen–Ansbach", d: true, secs: ["S15/1", "S15/2", "S15/3"], alws: [], opts: [] },
