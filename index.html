@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-09d: Anderer Tag als SICHTBARES Date-Input (iOS verwirft Picker bei unsichtbarem Input), Cache-Buster -->
+<!-- v2 build 2026-11-10a: Erfurt/Leipzig-Sperren (nur München/NN/Augsburg + Erfurt↔Leipzig frei), Augsburg↔Erfurt/Leipzig-Routen neu, Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -342,6 +342,8 @@ var ROUTES = [
   { id: "aug_st",  start: "augsburg", ziel: "stuttgart", n: "Regelweg via Ulm", d: true, secs: ["S1/2", "S1/3", "S153"], alws: ["st_wendlingen", "st_donauwoerth", "st_noerdlingen", "st_ansbach"], opts: [] },
   { id: "aug_nn",  start: "augsburg", ziel: "nuernberg", n: "Regelweg (die 18)", d: true, secs: ["S18"], alws: [], opts: [] },
   { id: "aug_wue", start: "augsburg", ziel: "wuerzburg", n: "via Treuchtlingen (18 → 35/3)", nr: "via Treuchtlingen (35/3 → 18)", d: true, secs: ["S18", "S35/3"], alws: [], opts: [] },
+  { id: "aug_erf", start: "augsburg", ziel: "erfurt", n: "Regelweg via Nürnberg (18 → 48 → 500)", nr: "Regelweg via Nürnberg (500 → 48 → 18)", d: true, secs: ["S18", "S48", "S500"], alws: [], opts: ["opt_coburg"] }, /* NEU 10.11.2026: Augsburg ab Erfurt/Leipzig erreichbar (Jürgen) */
+  { id: "aug_lep", start: "augsburg", ziel: "leipzig", n: "Regelweg via Nürnberg (18 → VDE 8)", nr: "Regelweg via Nürnberg (VDE 8 → 18)", d: true, secs: ["S18", "S48", "S500", "SO400", "SO500"], alws: [], opts: ["opt_coburg"] }, /* NEU 10.11.2026 */
   /* Nürnberg */
   /* Nürnberg↔Stuttgart: via Augsburg–Ulm gestrichen (Jürgen 09.11.2026 – nicht real), nur via Ansbach–Aalen */
   { id: "nn_st2",  start: "nuernberg", ziel: "stuttgart", n: "Regelweg via Ansbach–Aalen", nr: "Regelweg via Aalen–Ansbach", d: true, secs: ["S15/1", "S15/2", "S15/3"], alws: [], opts: [] },
@@ -479,7 +481,29 @@ var BLOCKED = [
   ["wuerzburg", "stuttgart"], /* WÜ↔Stuttgart – Jürgen 09.11.2026: fliegt raus (wird nicht gefahren) */
   ["hannover", "ff_hbf"],     /* Hannover↔Frankfurt – Jürgen 09.11.2026: wird in der Praxis nicht gefahren */
   ["hannover", "ff_ffs"],     /* dito FFS */
-  ["hannover", "ff_flh"]      /* dito Flughafen */
+  ["hannover", "ff_flh"],     /* dito Flughafen */
+  /* Erfurt/Leipzig (Jürgen 10.11.2026): Von dort aus derzeit nur alle Münchner
+     Bahnhöfe, Nürnberg und Augsburg erreichbar (plus Erfurt↔Leipzig untereinander,
+     Jürgen bestätigt frei) – alle übrigen Ziele gesperrt, beide Richtungen.
+     Routen bleiben intern erhalten (rückholbar). */
+  ["erfurt", "stuttgart"],    /* Erfurt↔Stuttgart – Jürgen 10.11.2026: derzeit nicht erreichbar */
+  ["erfurt", "mannheim"],     /* dito */
+  ["erfurt", "wuerzburg"],
+  ["erfurt", "ff_hbf"],
+  ["erfurt", "ff_ffs"],
+  ["erfurt", "ff_flh"],
+  ["erfurt", "fulda"],
+  ["erfurt", "kassel"],
+  ["erfurt", "hannover"],
+  ["leipzig", "stuttgart"],   /* Leipzig dito – Jürgen 10.11.2026 */
+  ["leipzig", "mannheim"],
+  ["leipzig", "wuerzburg"],
+  ["leipzig", "ff_hbf"],
+  ["leipzig", "ff_ffs"],
+  ["leipzig", "ff_flh"],
+  ["leipzig", "fulda"],
+  ["leipzig", "kassel"],
+  ["leipzig", "hannover"]
 ];
 /* ============ Streckenkunde v2 – Engine ============ */
 /* Kernidee: Jeder ALW ist ein Muster→Ersetzung-Baustein (sub → rep), der an einer
