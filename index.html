@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-11e: Felder (Opt-Zeilen/Chips/Textarea) durchscheinend (--feld-alpha .6), Cache-Buster -->
+<!-- v2 build 2026-11-11f: Felder 85 % Deckkraft (--feld-alpha .85), Zurück-Button, Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -12,7 +12,7 @@
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%23ffffff"/><rect x="4" y="4" width="92" height="92" rx="18" fill="none" stroke="%23EC0016" stroke-width="8"/><text x="50" y="56" font-size="44" font-weight="bold" font-family="Arial,Helvetica,sans-serif" text-anchor="middle" fill="%23EC0016">SK</text></svg>'>
 <link rel="apple-touch-icon" href="icon.png">
 <style>
-  :root { --red: #EC0016; --bg-photo: 1; --bg-overlay: .25; --card-alpha: .93; --feld-alpha: .6; }
+  :root { --red: #EC0016; --bg-photo: 1; --bg-overlay: .25; --card-alpha: .93; --feld-alpha: .85; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f8fafc; color: #0f172a; }
   /* Hintergrund-Foto (Jürgen 10.11.2026): Datei background.jpg im Repo (lädt Jürgen direkt
@@ -1264,7 +1264,7 @@ function viewForm() {
   var s = curStep();
   var html = '<div class="content">';
   if (w.steps.length > 1) {
-    html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Antwort korrigieren</button>';
+    html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Zurück</button>';
   }
   if (s.k === "datum") {
     html += '<div class="welcome">Servus Jürgen! 👋<span class="w1">Schön, dich zu sehen.</span><span class="w2">Pack ma’s!</span></div>';
