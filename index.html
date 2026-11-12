@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-11g: Section-Labels lesbar (Milchglas-Chip, dunkel, fett), Cache-Buster -->
+<!-- v2 build 2026-11-11h: Section-Labels in tiefem Tannengrün (statt Schwarz, Jürgen-Wunsch), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -80,9 +80,10 @@
   .note { font-size: 15px; color: #64748b; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; font-style: italic; }
   .del { background: none; border: none; color: #94a3b8; font-size: 13px; margin-top: 6px; padding: 0; font-family: inherit; cursor: pointer; }
   /* Section-Labels (Regelweg / ALW / Deine Fahrt …) – Jürgen 11.11.2026: auf dem Hintergrund-Foto
-     schwer lesbar. Fix: dunkler + fetter (18/800 statt 16/600/#64748b) + eigener Milchglas-Chip
-     wie bei den Karten, damit das Foto nie mehr durch den Text scheint. */
-  .section-t { display: inline-block; font-size: 18px; font-weight: 800; color: #0f172a; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(10px) saturate(1.05); backdrop-filter: blur(10px) saturate(1.05); padding: 6px 14px; border-radius: 12px; box-shadow: 0 1px 2px rgba(15,23,42,.08); margin: 14px 16px 10px; }
+     schwer lesbar → Milchglas-Chip + fett. U59 (Jürgen 12.11.2026): Schwarz war „sehr hart" –
+     Farbe jetzt tiefes Tannengrün #1b4332, passt zum grünlichen Gleisfoto und bleibt
+     hoch-lesbar (Kontrast auf Weiß ~9,5:1). */
+  .section-t { display: inline-block; font-size: 18px; font-weight: 800; color: #1b4332; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(10px) saturate(1.05); backdrop-filter: blur(10px) saturate(1.05); padding: 6px 14px; border-radius: 12px; box-shadow: 0 1px 2px rgba(15,23,42,.08); margin: 14px 16px 10px; }
   .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 6; background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #e2e8f0; display: flex; max-width: 480px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom); }
   .tab { flex: 1; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #94a3b8; background: none; border: none; cursor: pointer; font-family: inherit; }
   .tab.on { color: var(--red); }
