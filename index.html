@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-12k: Section-Labels 16px/halbfett 600 (statt 18px/400), Cache-Buster -->
+<!-- v2 build 2026-11-14a: Auswertung in Zettel-Reihenfolge (Mitte→Nord→Süd→Südost, Zettel-Ordnung je Bereich, Extras am Bereichs-Ende), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -189,13 +189,23 @@ var SECTIONS = {
   "SO500":      { n: "Südost 500 (via Flughafen)", v: "Vieselbach", b: "Leipzig Hbf", f: "2027-02-17" }
 };
 
-/* ---------- Regionalbereiche (für die Auswertung) ---------- */
+/* ---------- Regionalbereiche (für die Auswertung) ----------
+   Jürgen 14.11.2026 (Fotos IMG_3187/3188): Auswertung in GENAUER Zettel-Reihenfolge,
+   damit das Übertragen auf den Papier-Zettel leichter fällt. Zettel-Struktur:
+   Frankfurt/Mitte (28 zuerst, dann 11/1, 12, … 9 & 11/2) → Nord (300/4) →
+   Süd (1/1 … 91 & 1037, 91) → Südost (400, 500); die Mitte-Liste lief über den
+   Seitenwechsel hinweg durch (Seite 1 endet mit Süd 310/1, Seite 2 beginnt mit 310/2).
+   Abschnitte, die NICHT auf dem Zettel stehen (12-Monats-Logik), stehen am Ende
+   des jeweiligen Bereichs (Jürgens Wahl 14.11.2026) – Liste in RB_EXTRA. */
 var RB = {
-  "S": ["S1/1","S1/2","S1/3","S153","S6","S32","S310/1","S310/2","S35/1","S35/2","S35/3","S350","S37","S4","S46","S47/2","S48","S500","S501","S50","S50/1","S51","S57/84","S63","S91","S1037","S107","S108","S110","S111","S112","S15/1","S15/2","S15/3","S16","S18","S18a","S21","S23","S231","S24","S31"],
-  "M": ["M300/1","M300/2","M300/3","M361","M25/1","M25/2","M25a","M25/3","M35","M21/2","M21/3","M23/1","M23/2","M23/3","M23/4","M23/5","M23/6","M28","M32","M33","M360","M15/1","M12","M11/1","M9&11/2","M15","M372","MFF_FLF"],
+  "M": ["MFF_FLF","M28","M11/1","M12","M15/1","M21/2","M21/3","M23/1","M23/2","M23/4","M23/5","M23/6","M25/1","M25/3","M25a","M300/1","M300/2","M300/3","M35","M361","M372","M9&11/2","M15","M23/3","M25/2","M32","M33","M360"],
   "N": ["N300/4"],
+  "S": ["S1/1","S1/2","S1/3","S107","S110","S111","S112","S15/1","S15/2","S15/3","S153","S16","S18","S18a","S21","S23","S231","S24","S31","S310/1","S310/2","S32","S35/1","S35/2","S35/3","S350","S37","S4","S46","S47/2","S48","S50/1","S500","S51","S57/84","S6","S63","S1037","S91","S108","S50","S501"],
   "SO": ["SO400","SO500"]
 };
+/* Nicht auf dem Papier-Zettel (verfallene/ungeführte Abschnitte, 12-Monats-Logik) –
+   nur für die Trennlinie in der Auswertung. Zettel-Position der übrigen: siehe Fotos. */
+var RB_EXTRA = { "M": ["M15","M23/3","M25/2","M32","M33","M360"], "S": ["S108","S50","S501"] };
 
 /* ---------- Baureihen (fahrberechtigt, vom Papierzettel) ---------- */
 var BAUREIHEN = ["101", "1116", "401", "402", "403", "406", "411", "415", "412", "412.7", "S286", "S287", "S296.1", "S296.3", "S8091.7", "S8091.9"];
@@ -1486,9 +1496,14 @@ function viewStats() {
     }
     return '<div class="months">' + out + "</div>";
   }
-  ["S", "M", "N", "SO"].forEach(function (rb) {
+  /* Jürgen 14.11.2026: Bereichs-Reihenfolge wie auf dem Zettel – Mitte, Nord, Süd, Südost. */
+  ["M", "N", "S", "SO"].forEach(function (rb) {
     html += '<div class="section-t">' + ({ S: "Süd", M: "Mitte", N: "Nord", SO: "Südost" })[rb] + "</div>";
-    RB[rb].forEach(function (sid) {
+    RB[rb].forEach(function (sid, ri) {
+      var extra = RB_EXTRA[rb] || [];
+      if (extra.length && ri === RB[rb].length - extra.length) {
+        html += '<div class="muted" style="text-align:center;font-size:11px;margin:0 16px 6px">— nicht auf dem Zettel —</div>';
+      }
       var sec = SECTIONS[sid];
       var lf = lastOf(driven[sid]) || seedFromFrist(sec.f);
       var a = lf ? ampelOf(lf, today) : "none";
