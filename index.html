@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-14a: Auswertung in Zettel-Reihenfolge (Mitte→Nord→Süd→Südost, Zettel-Ordnung je Bereich, Extras am Bereichs-Ende), Cache-Buster -->
+<!-- v2 build 2026-11-14b: Kdg-Frist zählt als Fahrt (Frist − 12 Monate) – auch in den Monats-Chips der Auswertung, Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1447,6 +1447,16 @@ function collectDriven() {
 function lastOf(dates) {
   return dates && dates.length ? dates.slice().sort().pop() : null;
 }
+/* Jürgen 14.11.2026: Die Kdg-bis-Frist zählt als Fahrt – Frist − 12 Monate ist die
+   letzte Fahrt laut Zettel/DB-System (z. B. Frist Juli 2027 = gefahren Juli 2026).
+   Fließt in "letzte Fahrt", Ampel, Fristen-Karte UND die Monats-Chips ein –
+   Strecken ohne App-Eintrag zeigen sonst lauter X, obwohl laut Zettel gefahren. */
+function lfMitFrist(dates, frist) {
+  var l = lastOf(dates);
+  var s = seedFromFrist(frist);
+  if (l && s) return l > s ? l : s;
+  return l || s || null;
+}
 function viewStats() {
   var driven = collectDriven();
   var today = todayISO();
@@ -1454,7 +1464,7 @@ function viewStats() {
   /* Fristen-Alarm */
   var rows = [];
   Object.keys(SECTIONS).forEach(function (sid) {
-    var lf = lastOf(driven[sid]) || seedFromFrist(SECTIONS[sid].f);
+    var lf = lfMitFrist(driven[sid], SECTIONS[sid].f);
     if (!lf) return;
     var frist = new Date(lf);
     frist.setFullYear(frist.getFullYear() + 1);
@@ -1505,12 +1515,17 @@ function viewStats() {
         html += '<div class="muted" style="text-align:center;font-size:11px;margin:0 16px 6px">— nicht auf dem Zettel —</div>';
       }
       var sec = SECTIONS[sid];
-      var lf = lastOf(driven[sid]) || seedFromFrist(sec.f);
+      var lf = lfMitFrist(driven[sid], sec.f);
+      /* Frist-Rückrechnung (Jürgen 14.11.2026) auch in den Monats-Chips:
+         Frist − 12 Monate zählt als Fahrtermin, sofern nicht schon echt erfasst. */
+      var mDates = driven[sid] || [];
+      var sSeed = seedFromFrist(sec.f);
+      if (sSeed && mDates.indexOf(sSeed) < 0) mDates = mDates.concat([sSeed]);
       var a = lf ? ampelOf(lf, today) : "none";
       html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
         '<span>' + ampelHTML(a) + " <b>" + esc(sec.n) + "</b> <span class='muted' style='font-size:12px'>" + esc(sec.v) + " → " + esc(sec.b) + "</span></span>" +
         '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nie gefahren") + "</span></div>" +
-        monthsHTML(driven[sid] || []) + "</div>";
+        monthsHTML(mDates) + "</div>";
     });
   });
   /* Baureihen – zusammengefasst in Gruppen wie in der Baureihen-Frage / auf dem Zettel (Jürgen 09.11.2026) */
