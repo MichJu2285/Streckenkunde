@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15b: Excel-Export-Button (3 Blätter) + Backup-Panel (Sichern/Laden als Datei) statt Text-Sicherung, Cache-Buster -->
+<!-- v2 build 2026-11-15c: Export/Backup-Buttons im Petrolton abgestimmt (statt stechendem Rot), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -60,6 +60,11 @@
   .btn-sm { flex: 1; border: none; border-radius: 12px; padding: 10px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
   .btn-grey { background: #f1f5f9; color: #334155; }
   .btn-red { background: var(--red); color: #fff; }
+  /* Petrol-Familie für Export/Backup (Jürgen 15.11.2026: Rot zu stechend, alle 4 Felder abgestimmt im Petrolton der Labels #0f4c4c) */
+  .btn-petrol { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: #0f4c4c; color: #fff; border: none; border-radius: 16px; padding: 15px; font-size: 18px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-petrol-ghost { display: block; width: calc(100% - 32px); margin: 0 16px 10px; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #0f4c4c; border: 1.5px solid #0f4c4c; border-radius: 16px; padding: 13px; font-size: 18px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-petrol-soft { background: rgba(15,76,76,.12); color: #0f4c4c; }
+  .btn-petrol-solid { background: #0f4c4c; color: #fff; }
   textarea { width: 100%; background: rgba(248,250,252,var(--feld-alpha)); border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-size: 18px; font-family: inherit; color: #0f172a; }
   textarea:focus { outline: none; border-color: var(--red); }
   .hint { margin: 0 16px 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 12px; font-size: 15px; }
@@ -1644,14 +1649,14 @@ function viewLog() {
 
 /* ---------- Export & Backup (Jürgen 15.11.2026: Excel-Button + Backup-Panel statt Text-Sicherung) ---------- */
 function exportCard() {
-  var html = '<button type="button" class="btn-main" onclick="exportExcel()">📊 Excel-Liste erstellen</button>' +
-    '<button type="button" class="btn-ghost" style="margin-bottom:0" onclick="toggleBackupPanel()">💾 Backup</button>';
+  var html = '<button type="button" class="btn-petrol" onclick="exportExcel()">📊 Excel-Liste erstellen</button>' +
+    '<button type="button" class="btn-petrol-ghost" onclick="toggleBackupPanel()">💾 Backup</button>';
   if (state.backupOpen) {
     html += '<div class="card" style="margin-top:10px">' +
       '<div class="muted" style="font-size:13px;margin:0 0 4px">Deine Einträge liegen nur auf diesem Gerät. „Sichern“ erstellt eine Backup-Datei – „Laden“ stellt sie wieder her.</div>' +
       '<div class="flexrow">' +
-      '<button type="button" class="btn-sm btn-grey" onclick="saveBackup()">⬇️ Sichern (Speichern)</button>' +
-      '<button type="button" class="btn-sm btn-red" onclick="backupPickFile()">📂 Laden…</button>' +
+      '<button type="button" class="btn-sm btn-petrol-soft" onclick="saveBackup()">⬇️ Sichern (Speichern)</button>' +
+      '<button type="button" class="btn-sm btn-petrol-solid" onclick="backupPickFile()">📂 Laden…</button>' +
       '</div>' +
       '<input type="file" id="backupFile" accept=".json,application/json" style="display:none" onchange="loadBackupFile(this)">' +
       '</div>';
