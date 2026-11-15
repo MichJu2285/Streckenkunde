@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15j: Jahres-Umschalter in der Auswertung (ein Jahr zurück, Strecken-Chips + Excel folgen), Cache-Buster -->
+<!-- v2 build 2026-11-15k: Jahr-Zeile über den Halbjahr-Buttons, aktuelles Jahr rot hinterlegt (Jürgen-Wunsch IMG_3293), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1501,12 +1501,12 @@ function viewStats() {
   var curJahr = new Date().getFullYear();
   html += '<div class="card"><div class="qlabel">📅 Halbjahr (wie auf dem Zettel)</div>' +
     '<div class="chips wrap" style="padding:0">' +
+    '<button class="chip"' + (year < curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(-1)">◀ ' + (year - 1) + '</button>' +
+    '<span class="chip small" style="background:var(--red);border-color:var(--red);color:#fff">' + year + '</span>' +
+    '<button class="chip"' + (year >= curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(1)">' + (year + 1) + ' ▶</button>' +
+    '</div><div class="chips wrap" style="padding:0;margin-top:8px">' +
     '<button class="chip' + (blk.h2 ? "" : " on") + '" onclick="setBlock(\'H1\')">Jan – Jun</button>' +
     '<button class="chip' + (blk.h2 ? " on" : "") + '" onclick="setBlock(\'H2\')">Jul – Dez</button>' +
-    '</div><div class="chips wrap" style="padding:0;margin-top:8px">' +
-    '<button class="chip"' + (year < curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(-1)">◀ ' + (year - 1) + '</button>' +
-    '<span class="chip small">' + year + '</span>' +
-    '<button class="chip"' + (year >= curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(1)">' + (year + 1) + ' ▶</button>' +
     '</div><div class="muted" style="font-size:12px;margin-top:6px">Angezeigt: ' +
     (blk.h2 ? "Jul – Dez " : "Jan – Jun ") + year +
     (year === curJahr && aktH2 === (blk.h2 ? "H2" : "H1") ? " (aktuelles Halbjahr)" : "") +
