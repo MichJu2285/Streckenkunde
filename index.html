@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15e: Excel-Button Milchglas-Basis unter der Petrol-Tint (lesbar auf dem Foto), Cache-Buster -->
+<!-- v2 build 2026-11-15f: Monats-Chips + Ampel-Grün auf Limettengrün #9AE65C (Chips mit dunkler Schrift, Jürgen-Wunsch IMG_3290), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -98,7 +98,7 @@
   .ampel { display: inline-block; width: 10px; height: 10px; border-radius: 99px; margin-right: 6px; }
   .months { display: flex; gap: 3px; margin-top: 4px; }
   .mo { flex: 1; text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; background: #f1f5f9; border-radius: 6px; padding: 4px 0; }
-  .mo.hit { background: #10B981; color: #fff; }
+  .mo.hit { background: #9AE65C; color: #0f172a; }
   .mo b.mo-day { display: block; font-size: 14px; font-weight: 800; margin-top: 1px; }
   .card.sec { padding: 10px 14px; margin-bottom: 6px; }
   .trip { margin-top: 4px; }
@@ -857,7 +857,7 @@ function deltaChips(d) {
   return h;
 }
 function ampelHTML(a) {
-  var c = a === "gruen" ? "#10B981" : a === "gelb" ? "#F59E0B" : a === "rot" ? RED : "#94a3b8";
+  var c = a === "gruen" ? "#9AE65C" : a === "gelb" ? "#F59E0B" : a === "rot" ? RED : "#94a3b8";
   return '<span class="ampel" style="background:' + c + '"></span>';
 }
 
