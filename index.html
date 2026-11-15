@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15h: Monats-Chips Limette 50% (rgba(154,230,92,.5)), Ampel-Punkt solid #9AE65C, Cache-Buster -->
+<!-- v2 build 2026-11-15i: Freischwebende Texte auf Milchglas-Flächen (Eintrag-für-Zeile, Keine ALW verfügbar, Zettel-Trennlinie), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -90,6 +90,7 @@
      U62 (Jürgen 12.11.2026): Schrift jetzt 16px / halbfett 600 (statt 18px/400) –
      der Jürgen-Sweet-Spot zwischen normal und fett. */
   .section-t { display: inline-block; font-size: 16px; font-weight: 600; color: #0f4c4c; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(10px) saturate(1.05); backdrop-filter: blur(10px) saturate(1.05); padding: 6px 14px; border-radius: 12px; box-shadow: 0 1px 2px rgba(15,23,42,.08); margin: 14px 16px 10px; }
+  .sep-chip { display: inline-block; font-size: 11px; color: #64748b; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(10px) saturate(1.05); backdrop-filter: blur(10px) saturate(1.05); padding: 4px 12px; border-radius: 10px; box-shadow: 0 1px 2px rgba(15,23,42,.08); }
   .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 6; background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #e2e8f0; display: flex; max-width: 480px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom); }
   .tab { flex: 1; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #94a3b8; background: none; border: none; cursor: pointer; font-family: inherit; }
   .tab.on { color: var(--red); }
@@ -1210,7 +1211,7 @@ function wegStepHTML(f, i, isRet) {
   }
   html += '<div class="section-t">Alternative Laufwege (ALW)</div>';
   if (!avail.length) {
-    html += '<div class="muted" style="margin:0 16px 8px;font-size:14px">Keine ALW verfügbar</div>';
+    html += '<div class="card" style="padding:10px 14px;margin:0 16px 8px"><div class="muted" style="font-size:14px">Keine ALW verfügbar</div></div>';
   } else {
     /* Gruppen-Reihenfolge nach Fahrtrichtung (Jürgen 09.11.2026):
        Start in München → München-ALW zuerst; Start anderswo (z. B. Stuttgart → München)
@@ -1428,11 +1429,11 @@ function viewForm() {
     var cnt = state.w.fahrten.length;
     html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
       '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
-    html += '<div class="muted" style="font-size:13px;margin:0 2px 14px">📅 Eintrag für <b>' + fmtDate(state.w.date) + '</b> – <button type="button" class="chip small" onclick="toggleDatumEdit()">ändern</button>';
+    html += '<div class="card" style="margin:0 16px 12px"><div class="muted" style="font-size:13px">📅 Eintrag für <b>' + fmtDate(state.w.date) + '</b> – <button type="button" class="chip small" onclick="toggleDatumEdit()">ändern</button>';
     if (state.dateEdit) {
       html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDateLive(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a;margin-top:8px">';
     }
-    html += "</div>";
+    html += "</div></div>";
     html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
   }
   html += "</div>";
@@ -1518,7 +1519,7 @@ function viewStats() {
     RB[rb].forEach(function (sid, ri) {
       var extra = RB_EXTRA[rb] || [];
       if (extra.length && ri === RB[rb].length - extra.length) {
-        html += '<div class="muted" style="text-align:center;font-size:11px;margin:0 16px 6px">— nicht auf dem Zettel —</div>';
+        html += '<div style="text-align:center;margin:0 16px 6px"><span class="sep-chip">— nicht auf dem Zettel —</span></div>';
       }
       var sec = SECTIONS[sid];
       var lf = lfMitFrist(driven[sid], sec.f);
