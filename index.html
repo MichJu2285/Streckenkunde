@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-14b: Kdg-Frist zählt als Fahrt (Frist − 12 Monate) – auch in den Monats-Chips der Auswertung, Cache-Buster -->
+<!-- v2 build 2026-11-15a: Vollbild-Meldungen (Gespeichert!/Notiert!/Noch nichts drin) auf Milchglas-Fläche – lesbar auf dem Hintergrund-Foto, Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -65,6 +65,7 @@
   .hint { margin: 0 16px 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 12px; font-size: 15px; }
   .center { text-align: center; padding: 48px 20px; }
   .big-emoji { font-size: 54px; margin-bottom: 12px; }
+  .msg-card { margin: 0 16px 16px; padding: 22px 16px; border-radius: 16px; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(12px) saturate(1.05); backdrop-filter: blur(12px) saturate(1.05); box-shadow: 0 1px 2px rgba(15,23,42,.06); }
   .muted { color: #64748b; font-size: 16px; }
   .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; -webkit-overflow-scrolling: touch; }
   .chips.wrap { flex-wrap: wrap; overflow: visible; }
@@ -1259,19 +1260,19 @@ function wegStepHTML(f, i, isRet) {
 function viewForm() {
   var w = state.w;
   if (state.saved) {
-    return '<div class="center"><div class="big-emoji">✅</div>' +
+    return '<div class="center"><div class="msg-card"><div class="big-emoji">✅</div>' +
       '<h2 style="margin:0 0 6px;font-size:22px">Gespeichert!</h2>' +
-      '<p class="muted" style="margin:0 0 24px">Alle Fahrten sind eingetragen. Mach\'s gut, Jürgen! 👋</p>' +
+      '<p class="muted" style="margin:0 0 24px">Alle Fahrten sind eingetragen. Mach\'s gut, Jürgen! 👋</p></div>' +
       '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Neuer Eintrag</button>' +
       '<button class="btn-ghost" onclick="go(\'stats\')">Auswertung ansehen 📊</button></div>';
   }
   if (w.nichts) {
     var brOnly = w.nichtsBrs && w.nichtsBrs.length;
-    return '<div class="center"><div class="big-emoji">' + (brOnly ? "✅" : "👍") + '</div>' +
+    return '<div class="center"><div class="msg-card"><div class="big-emoji">' + (brOnly ? "✅" : "👍") + '</div>' +
       '<h2 style="margin:0 0 6px;font-size:22px">Notiert!</h2>' +
       '<p class="muted" style="margin:0 0 24px">' + (brOnly
         ? 'Gespeichert – <b>' + esc(brGruppenText(w.nichtsBrs)) + '</b> ohne Fahrt (z. B. Fahrzeug bereitgestellt). Mach\'s gut, Jürgen! 👋'
-        : 'Heute gibt es nichts einzutragen – es wurde kein Eintrag gespeichert.') + '</p>' +
+        : 'Heute gibt es nichts einzutragen – es wurde kein Eintrag gespeichert.') + '</p></div>' +
       '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Eintragen</button></div>';
   }
   if (!w) { startWizard(); }
@@ -1553,8 +1554,8 @@ function viewStats() {
 /* ---------- Verlauf ---------- */
 function viewLog() {
   if (!state.entries.length) {
-    return '<div class="center"><div class="big-emoji">🗂️</div><h2 style="margin:0 0 6px;font-size:20px">Noch nichts drin</h2>' +
-      '<p class="muted">Deine eingetragenen Fahrten landen hier.</p></div>';
+    return '<div class="center"><div class="msg-card"><div class="big-emoji">🗂️</div><h2 style="margin:0 0 6px;font-size:20px">Noch nichts drin</h2>' +
+      '<p class="muted">Deine eingetragenen Fahrten landen hier.</p></div></div>';
   }
   var html = '<div class="content">';
   state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
