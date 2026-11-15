@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15d: Excel-Button wie Sichern getönt, nur 'Sichern', Laden eine Spur heller (#146565), Cache-Buster -->
+<!-- v2 build 2026-11-15e: Excel-Button Milchglas-Basis unter der Petrol-Tint (lesbar auf dem Foto), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -61,7 +61,7 @@
   .btn-grey { background: #f1f5f9; color: #334155; }
   .btn-red { background: var(--red); color: #fff; }
   /* Petrol-Familie für Export/Backup (Jürgen 15.11.2026: Rot zu stechend, alle 4 Felder abgestimmt im Petrolton der Labels #0f4c4c) */
-  .btn-petrol { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: rgba(15,76,76,.12); color: #0f4c4c; border: none; border-radius: 16px; padding: 15px; font-size: 18px; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .btn-petrol { display: block; width: calc(100% - 32px); margin: 4px 16px 10px; background: linear-gradient(rgba(15,76,76,.12), rgba(15,76,76,.12)), rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(12px) saturate(1.05); backdrop-filter: blur(12px) saturate(1.05); color: #0f4c4c; border: none; border-radius: 16px; padding: 15px; font-size: 18px; font-weight: 600; font-family: inherit; cursor: pointer; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
   .btn-petrol-ghost { display: block; width: calc(100% - 32px); margin: 0 16px 10px; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #0f4c4c; border: 1.5px solid #0f4c4c; border-radius: 16px; padding: 13px; font-size: 18px; font-weight: 600; font-family: inherit; cursor: pointer; }
   .btn-petrol-soft { background: rgba(15,76,76,.12); color: #0f4c4c; }
   .btn-petrol-solid { background: #146565; color: #fff; }
