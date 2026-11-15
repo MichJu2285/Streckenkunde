@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15n: Gelbe Felder auf dem Foto mit Milchglas-Basis (opt.on mit feld-alpha, btn-main mit card-alpha), Cache-Buster -->
+<!-- v2 build 2026-11-15o: Zurück-Button als kompakter Milchglas-Pill links bündig mit Kartenrand statt dünn/kantenvollbreit (Jürgen-Wunsch IMG_3297), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -51,7 +51,7 @@
   .opt { display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: rgba(248,250,252,var(--feld-alpha)); color: #334155; font-size: 18px; margin-bottom: 8px; cursor: pointer; font-family: inherit; }
   .opt:last-child { margin-bottom: 0; }
   .opt.on { background: linear-gradient(rgba(255,196,0,.6), rgba(255,196,0,.6)), rgba(248,250,252,var(--feld-alpha)); border-color: var(--akzent); color: #0f172a; font-weight: 600; }
-  .opt.back { background: rgba(255,255,255,var(--feld-alpha)); color: #64748b; font-size: 15px; padding: 8px 14px; }
+  .opt.back { display: inline-block; width: auto; margin: 0 0 10px 16px; padding: 10px 16px; border-radius: 99px; font-size: 16px; font-weight: 600; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(12px) saturate(1.05); backdrop-filter: blur(12px) saturate(1.05); color: #475569; }
   .opt.toggle { background: rgba(255,255,255,var(--feld-alpha)); font-weight: 600; color: #475569; font-size: 16px; }
   .opt.dis { opacity: .5; cursor: default; }
   .opt.route .rt-name, .opt.alw .rt-name { font-weight: 600; margin-bottom: 6px; }
