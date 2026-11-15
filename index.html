@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15a: Vollbild-Meldungen (Gespeichert!/Notiert!/Noch nichts drin) auf Milchglas-Fläche – lesbar auf dem Hintergrund-Foto, Cache-Buster -->
+<!-- v2 build 2026-11-15b: Excel-Export-Button (3 Blätter) + Backup-Panel (Sichern/Laden als Datei) statt Text-Sicherung, Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -795,7 +795,7 @@ var state = {
   saved: false,
   confirmId: null,
   editId: null,
-  backupText: "",
+  backupOpen: false,
   zielGroup: false,  /* Frankfurt-Gruppe aufgeklappt */
   muenchenGroup: false, /* München-Gruppe aufgeklappt */
   startMuenchen: false, /* München-Gruppe im Start-Schritt aufgeklappt */
@@ -1545,8 +1545,8 @@ function viewStats() {
       '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
       monthsHTML(dates) + "</div>";
   });
-  /* Sicherung */
-  html += backupCard();
+  /* Export & Backup: Excel-Button + Backup-Panel (Jürgen 15.11.2026) */
+  html += exportCard();
   html += "</div>";
   return html;
 }
@@ -1642,40 +1642,266 @@ function viewLog() {
   return html + "</div>";
 }
 
-/* ---------- Backup ---------- */
-function backupCard() {
-  return '<div class="card"><div class="qlabel">💾 Sicherung</div>' +
-    '<p class="muted" style="margin:0 0 10px;font-size:13px">Deine Einträge liegen nur auf diesem Gerät. Kopiere den Block als Backup – oder füge ein altes Backup ein und tippe auf „Laden“.</p>' +
-    '<textarea rows="4" id="backupArea" style="font-size:11px;font-family:ui-monospace,Menlo,monospace" oninput="state.backupText=this.value"></textarea>' +
-    '<div class="flexrow"><button type="button" class="btn-sm btn-grey" onclick="copyBackup()">Kopieren</button>' +
-    '<button type="button" class="btn-sm btn-red" onclick="restoreBackup()">Laden</button></div>' +
-    '<div id="backupMsg" style="text-align:center;font-size:14px;color:#475569;margin-top:8px"></div></div>';
+/* ---------- Export & Backup (Jürgen 15.11.2026: Excel-Button + Backup-Panel statt Text-Sicherung) ---------- */
+function exportCard() {
+  var html = '<button type="button" class="btn-main" onclick="exportExcel()">📊 Excel-Liste erstellen</button>' +
+    '<button type="button" class="btn-ghost" style="margin-bottom:0" onclick="toggleBackupPanel()">💾 Backup</button>';
+  if (state.backupOpen) {
+    html += '<div class="card" style="margin-top:10px">' +
+      '<div class="muted" style="font-size:13px;margin:0 0 4px">Deine Einträge liegen nur auf diesem Gerät. „Sichern“ erstellt eine Backup-Datei – „Laden“ stellt sie wieder her.</div>' +
+      '<div class="flexrow">' +
+      '<button type="button" class="btn-sm btn-grey" onclick="saveBackup()">⬇️ Sichern (Speichern)</button>' +
+      '<button type="button" class="btn-sm btn-red" onclick="backupPickFile()">📂 Laden…</button>' +
+      '</div>' +
+      '<input type="file" id="backupFile" accept=".json,application/json" style="display:none" onchange="loadBackupFile(this)">' +
+      '</div>';
+  }
+  html += '<div id="backupMsg" style="text-align:center;font-size:14px;color:#475569;margin:8px 16px 0"></div>';
+  return html;
 }
+function toggleBackupPanel() { state.backupOpen = !state.backupOpen; render(); }
 function backupMsg(text) {
   var el = document.getElementById("backupMsg");
   if (el) el.textContent = text;
   setTimeout(function () { if (el) el.textContent = ""; }, 2600);
 }
-function copyBackup() {
-  var text = (state.backupText || "").trim() || JSON.stringify(state.entries);
-  var done = function () { backupMsg("Kopiert! ✅"); };
-  var fail = function () { backupMsg("Bitte Text manuell markieren und kopieren."); };
-  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
-  else fail();
+function backupPickFile() {
+  var el = document.getElementById("backupFile");
+  if (el) el.click();
 }
-function restoreBackup() {
-  var text = (state.backupText || "").trim();
+function downloadBlob(blob, name) {
+  var a = document.createElement("a");
+  var url = URL.createObjectURL(blob);
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { if (a.parentNode) document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+}
+function saveBackup() {
   try {
-    var parsed = JSON.parse(text);
-    if (!Array.isArray(parsed)) throw new Error("kein Array");
-    var byId = {};
-    state.entries.concat(parsed).forEach(function (e) { if (e && e.id) byId[e.id] = e; });
-    state.entries = Object.keys(byId).map(function (k) { return byId[k]; })
-      .sort(function (a, b) { return (a.date || "") < (b.date || "") ? -1 : 1; });
-    persist();
-    render();
-    backupMsg("Daten geladen! ✅");
-  } catch (err) { backupMsg("Das ist kein gültiger Daten-Block. ❌"); }
+    var data = { app: "streckenkunde", typ: "backup", erstellt: todayISO(), eintraege: state.entries };
+    var blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    downloadBlob(blob, "streckenkunde-backup-" + todayISO() + ".json");
+    backupMsg("Backup-Datei erstellt! ✅");
+  } catch (e) { backupMsg("Backup fehlgeschlagen ❌"); }
+}
+function loadBackupFile(input) {
+  var file = input.files && input.files[0];
+  try { input.value = ""; } catch (e) {}
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function () {
+    try {
+      var parsed = JSON.parse(reader.result);
+      var arr = Array.isArray(parsed) ? parsed :
+        (parsed && Array.isArray(parsed.eintraege || parsed.entries) ? (parsed.eintraege || parsed.entries) : null);
+      if (!arr) throw new Error("kein Format");
+      var byId = {};
+      state.entries.concat(arr).forEach(function (e) { if (e && e.id) byId[e.id] = e; });
+      state.entries = Object.keys(byId).map(function (k) { return byId[k]; })
+        .sort(function (a, b) { return (a.date || "") < (b.date || "") ? -1 : 1; });
+      persist(); render();
+      backupMsg("Daten geladen! ✅");
+    } catch (err) { backupMsg("Das ist kein gültiges Backup. ❌"); }
+  };
+  reader.readAsText(file);
+}
+function exportExcel() {
+  try {
+    var sheets = buildExportWorkbook();
+    var bytes = xlsxFromSheets(sheets);
+    var blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    downloadBlob(blob, "streckenkunde-liste-" + todayISO() + ".xlsx");
+    backupMsg("Excel-Liste erstellt! ✅");
+  } catch (e) { backupMsg("Export fehlgeschlagen ❌"); }
+}
+/* Arbeitsmappe: Blatt 1 Strecken (Zettel-Reihenfolge, ohne Kdg. bis/Ampel – Jürgen 15.11.2026),
+   Blatt 2 Baureihen (Gruppen mit Monaten), Blatt 3 Fahrten (Rohdaten). */
+function buildExportWorkbook() {
+  var driven = collectDriven();
+  var blk = blockInfo();
+  var year = state.jahr;
+  var labels = blk.labels;
+  var sheets = [];
+  /* Blatt 1: Strecken */
+  var bereiche = { S: "Süd", M: "Mitte", N: "Nord", SO: "Südost" };
+  var rows = [["Bereich", "Strecke", "Von", "Bis", "Letzte Fahrt"].concat(labels)];
+  ["M", "N", "S", "SO"].forEach(function (rb) {
+    var extra = RB_EXTRA[rb] || [];
+    RB[rb].forEach(function (sid, ri) {
+      var onZettel = extra.length ? ri < RB[rb].length - extra.length : true;
+      if (extra.length && ri === RB[rb].length - extra.length) {
+        rows.push(["", "— nicht auf dem Zettel —", "", "", "", "", "", "", "", "", ""]);
+      }
+      var sec = SECTIONS[sid];
+      var lf = lfMitFrist(driven[sid], sec.f);
+      var mDates = driven[sid] || [];
+      var sSeed = seedFromFrist(sec.f);
+      if (sSeed && mDates.indexOf(sSeed) < 0) mDates = mDates.concat([sSeed]);
+      var chips = labels.map(function (lab, m) {
+        var mo = blk.start + m, last = "";
+        mDates.forEach(function (d) {
+          if (+d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1 && d > last) last = d;
+        });
+        return last ? String(+last.slice(8, 10)) : "X";
+      });
+      rows.push([
+        onZettel ? bereiche[rb] : "",
+        sec.n + (onZettel ? "" : " *"),
+        sec.v || "", sec.b || "",
+        lf ? fmtDate(lf) : (onZettel ? "noch nie gefahren" : "")
+      ].concat(chips));
+    });
+  });
+  sheets.push({ name: "Strecken", rows: rows, widths: [8, 30, 26, 26, 16, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5] });
+  /* Blatt 2: Baureihen */
+  var brDriven = {};
+  state.entries.forEach(function (e) {
+    (e.baureihen || []).forEach(function (b) { (brDriven[b] = brDriven[b] || []).push(e.date); });
+  });
+  var rows2 = [["Baureihen", "Letzte Fahrt"].concat(labels)];
+  BR_GROUPS.forEach(function (grp, gi) {
+    var dates = [];
+    grp.forEach(function (b) { (brDriven[b] || []).forEach(function (d) { dates.push(d); }); });
+    var lf = lastOf(dates);
+    var chips = labels.map(function (lab, m) {
+      var mo = blk.start + m, last = "";
+      dates.forEach(function (d) {
+        if (+d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1 && d > last) last = d;
+      });
+      return last ? String(+last.slice(8, 10)) : "X";
+    });
+    rows2.push([BR_LABELS[gi], lf ? fmtDate(lf) : "noch nicht eingetragen"].concat(chips));
+  });
+  sheets.push({ name: "Baureihen", rows: rows2, widths: [26, 16, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5] });
+  /* Blatt 3: Fahrten (Rohdaten) */
+  var rows3 = [["Datum", "Baureihen", "Fahrt", "Fahrweg", "Retour", "Notiz"]];
+  state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
+    var brs = brGruppenText(e.baureihen || []);
+    if (!(e.fahrten || []).length) {
+      rows3.push([fmtDate(e.date), brs, "— ohne Fahrt (bereitgestellt)", "", "", e.note || ""]);
+      return;
+    }
+    (e.fahrten || []).forEach(function (f) {
+      var fahrt = (HBF[f.start] || f.start) + " → " + (HBF[f.ziel] || f.ziel) +
+        (f.dreh ? " (" + (f.drehName || "Drehfahrt") + ")" : "");
+      var weg = (f.chain || []).map(function (s) { return SECTIONS[s] ? SECTIONS[s].n : s; }).join(" · ");
+      var ret = "";
+      if (f.retour && f.retour.ziel) {
+        ret = "→ " + (HBF[f.retour.ziel] || f.retour.ziel) + " (" +
+          (f.retour.chain || []).map(function (s) { return SECTIONS[s] ? SECTIONS[s].n : s; }).join(" · ") + ")";
+      }
+      rows3.push([fmtDate(e.date), brs, fahrt, weg, ret, e.note || ""]);
+    });
+  });
+  sheets.push({ name: "Fahrten", rows: rows3, widths: [11, 22, 30, 60, 55, 26] });
+  return sheets;
+}
+/* ---------- Mini-XLSX-Writer (pure JS, keine externe Bibliothek): ZIP ohne Kompression + SpreadsheetML ---------- */
+var XLSX_CRC = (function () {
+  var t = [], c;
+  for (var n = 0; n < 256; n++) {
+    c = n;
+    for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function xlsxBytes(str) {
+  var s = unescape(encodeURIComponent(str)), out = [];
+  for (var i = 0; i < s.length; i++) out.push(s.charCodeAt(i) & 0xff);
+  return out;
+}
+function xlsxCrc(bytes) {
+  var c = 0xffffffff;
+  for (var i = 0; i < bytes.length; i++) c = XLSX_CRC[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+function xlsxXml(s) {
+  return String(s).replace(/[&<>"]/g, function (m) {
+    if (m === "&") return "&amp;";
+    if (m === "<") return "&lt;";
+    if (m === ">") return "&gt;";
+    return "&quot;";
+  });
+}
+function xlsxColRef(n) {
+  var s = "";
+  while (n > 0) { var r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); }
+  return s;
+}
+function xlsxSheetXml(sheet) {
+  var xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
+    '<cols>';
+  sheet.widths.forEach(function (w, i) {
+    xml += '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>';
+  });
+  xml += '</cols><sheetData>';
+  sheet.rows.forEach(function (row, ri) {
+    xml += '<row r="' + (ri + 1) + '">';
+    row.forEach(function (v, ci) {
+      if (v === "" || v === null || v === undefined) return;
+      xml += '<c r="' + xlsxColRef(ci + 1) + (ri + 1) + '"' + (ri === 0 ? ' s="1"' : '') +
+        ' t="inlineStr"><is><t xml:space="preserve">' + xlsxXml(v) + '</t></is></c>';
+    });
+    xml += '</row>';
+  });
+  xml += '</sheetData></worksheet>';
+  return xml;
+}
+function xlsxZip(files) {
+  var u16 = function (v) { return [v & 0xff, (v >>> 8) & 0xff]; };
+  var u32 = function (v) { return [v & 0xff, (v >>> 8) & 0xff, (v >>> 16) & 0xff, (v >>> 24) & 0xff]; };
+  var parts = [], central = [], offset = 0;
+  files.forEach(function (f) {
+    var name = xlsxBytes(f.name), data = f.data;
+    var crc = xlsxCrc(data);
+    var local = [].concat(u32(0x04034b50), u16(20), u16(0), u16(0), u16(0x6000), u16(0x5d6f),
+      u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+    parts.push(local, name, data);
+    central.push({ name: name, crc: crc, size: data.length, offset: offset });
+    offset += local.length + name.length + data.length;
+  });
+  var cd = [], cdSize = 0;
+  central.forEach(function (e) {
+    var c = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0), u16(0), u16(0x6000), u16(0x5d6f),
+      u32(e.crc), u32(e.size), u32(e.size), u16(e.name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(e.offset));
+    cd.push(c, e.name);
+    cdSize += c.length + e.name.length;
+  });
+  var eocd = [].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length),
+    u32(cdSize), u32(offset), u16(0));
+  var all = parts.concat(cd, [eocd]);
+  var total = 0;
+  all.forEach(function (p) { total += p.length; });
+  var out = new Uint8Array(total), pos = 0;
+  all.forEach(function (p) { for (var i = 0; i < p.length; i++) out[pos++] = p[i]; });
+  return out;
+}
+function xlsxFromSheets(sheets) {
+  var files = [];
+  var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+    '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>';
+  var wbSheets = '', wbRels = '';
+  sheets.forEach(function (s, i) {
+    ct += '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
+    wbSheets += '<sheet name="' + xlsxXml(s.name) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>';
+    wbRels += '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>';
+    files.push({ name: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: xlsxBytes(xlsxSheetXml(s)) });
+  });
+  ct += '</Types>';
+  files.unshift({ name: '[Content_Types].xml', data: xlsxBytes(ct) });
+  files.push({ name: '_rels/.rels', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>') });
+  files.push({ name: 'xl/workbook.xml', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' + wbSheets + '</sheets></workbook>') });
+  files.push({ name: 'xl/_rels/workbook.xml.rels', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + wbRels + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>') });
+  files.push({ name: 'xl/styles.xml', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><name val="Arial"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>') });
+  return xlsxZip(files);
 }
 
 /* ---------- Aktionen / Persistenz ---------- */
@@ -1755,10 +1981,6 @@ function render() {
   wrap.innerHTML =
     '<header><div class="logo">🚆</div><div><h1>Streckenkunde</h1><div class="sub">Dein digitales Streckenkunde-Heft</div></div></header>' +
     body + tabbar;
-  if (state.tab === "stats") {
-    var ba = document.getElementById("backupArea");
-    if (ba && !state.backupText) ba.value = JSON.stringify(state.entries);
-  }
   if (state.tab === "form" && state.w && !state.saved) {
     var na = document.getElementById("noteArea");
     if (na) na.value = state.w.note || "";
