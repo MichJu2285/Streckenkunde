@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15k: Jahr-Zeile über den Halbjahr-Buttons, aktuelles Jahr rot hinterlegt (Jürgen-Wunsch IMG_3293), Cache-Buster -->
+<!-- v2 build 2026-11-15l: Jahr-Feld gleiche Größe wie Pfeil-Buttons (chip statt chip small), Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1502,7 +1502,7 @@ function viewStats() {
   html += '<div class="card"><div class="qlabel">📅 Halbjahr (wie auf dem Zettel)</div>' +
     '<div class="chips wrap" style="padding:0">' +
     '<button class="chip"' + (year < curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(-1)">◀ ' + (year - 1) + '</button>' +
-    '<span class="chip small" style="background:var(--red);border-color:var(--red);color:#fff">' + year + '</span>' +
+    '<span class="chip" style="background:var(--red);border-color:var(--red);color:#fff;cursor:default">' + year + '</span>' +
     '<button class="chip"' + (year >= curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(1)">' + (year + 1) + ' ▶</button>' +
     '</div><div class="chips wrap" style="padding:0;margin-top:8px">' +
     '<button class="chip' + (blk.h2 ? "" : " on") + '" onclick="setBlock(\'H1\')">Jan – Jun</button>' +
