@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-15o: Zurück-Button als kompakter Milchglas-Pill links bündig mit Kartenrand statt dünn/kantenvollbreit (Jürgen-Wunsch IMG_3297), Cache-Buster -->
+<!-- v2 build 2026-11-16a: Funktionslosen Datum-Ändern-Chip im Notiz-Schritt entfernt (Jürgen IMG_3300) – Datum-Änderung läuft über Verlauf ✏️, Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -807,7 +807,6 @@ var state = {
   startMuenchen: false, /* München-Gruppe im Start-Schritt aufgeklappt */
   andererFf: false, /* Frankfurt-Gruppe in „Anderer Hbf…“ aufgeklappt */
   dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
-  dateEdit: false,   /* Notiz-Schritt: Datum-Änderung offen */
   jahr: new Date().getFullYear(),
   block: null /* Halbjahr-Block der Auswertung: null = automatisch (aktuelles Halbjahr), "H1" = Jan–Jun, "H2" = Jul–Dez (Jürgen 08.11.2026) */
 };
@@ -907,7 +906,6 @@ function startWizard() {
   state.startMuenchen = false;
   state.andererFf = false;
   state.dateCustom = false;
-  state.dateEdit = false;
 }
 function curStep() { return state.w.steps[state.w.steps.length - 1]; }
 function pushStep(s) { state.w.steps.push(s); render(); window.scrollTo(0, 0); }
@@ -1438,11 +1436,6 @@ function viewForm() {
     var cnt = state.w.fahrten.length;
     html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
       '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
-    html += '<div class="card" style="margin:0 16px 12px"><div class="muted" style="font-size:13px">📅 Eintrag für <b>' + fmtDate(state.w.date) + '</b> – <button type="button" class="chip small" onclick="toggleDatumEdit()">ändern</button>';
-    if (state.dateEdit) {
-      html += '<input type="date" id="dateArea" value="' + state.w.date + '" onchange="setDateLive(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a;margin-top:8px">';
-    }
-    html += "</div></div>";
     html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
   }
   html += "</div>";
@@ -2004,8 +1997,6 @@ function render() {
   if (state.tab === "form" && state.w && !state.saved) {
     var na = document.getElementById("noteArea");
     if (na) na.value = state.w.note || "";
-    var da = document.getElementById("dateArea");
-    if (da) da.value = state.w.date;
   }
 }
 
