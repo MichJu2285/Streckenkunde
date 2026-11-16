@@ -7,4 +7,10 @@ Privates Projekt – kein offizielles Angebot der Deutschen Bahn.
 
 ---
 
+## Bildnachweis
+
+- `background.jpg` (Sonnenuntergang über dem Meer): **eigenes Foto von MichJu2285** – alle Rechte vorbehalten. Verwendung nur in diesem Projekt.
+
+---
+
 © 2026 MichJu2285 – Alle Rechte vorbehalten.
