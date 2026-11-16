@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-16a: Funktionslosen Datum-Ändern-Chip im Notiz-Schritt entfernt (Jürgen IMG_3300) – Datum-Änderung läuft über Verlauf ✏️, Cache-Buster -->
+<!-- v2 build 2026-11-16b: Datums-Feld im Verlauf-Bearbeiten auf opt-Zeilen-Optik umgestellt (U55-Muster, Jürgen IMG_3301) – kein Inline-Stil mehr, Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1578,7 +1578,9 @@ function viewLog() {
       html += '<div class="card"><div class="dist-lbl" style="margin-bottom:8px">' +
         '<span style="font-weight:600;color:#0f172a">✏️ Eintrag bearbeiten</span></div>';
       html += '<div class="qlabel" style="margin-bottom:6px;font-size:15px">📆 Datum</div>' +
-        '<input type="date" value="' + esc(e.date) + '" onchange="editDate(this.value)" style="width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-size:18px;background:#f8fafc;color:#0f172a">';
+        '<div style="position:relative">' +
+        '<input type="date" value="' + esc(e.date) + '" onchange="editDate(this.value)" class="opt datumInput">' +
+        '<span style="position:absolute;top:0;left:0;padding:12px 14px;font-size:18px;color:#334155;pointer-events:none">📆 ' + fmtDate(e.date) + '</span></div>';
       html += '<div class="qlabel" style="margin:12px 0 6px;font-size:15px">🚆 Baureihen</div><div class="chips wrap">' +
         BR_GROUPS.map(function (grp, gi) {
           var all = grp.every(function (b) { return (e.baureihen || []).indexOf(b) >= 0; });
