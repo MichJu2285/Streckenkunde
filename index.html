@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-16j: Neuer Begrüßungstext – 4 Zeilen, Servus-Komma, 👋🏻, ned lang rumtun (Jürgen) – Cache-Buster -->
+<!-- v2 build 2026-11-16k: Auswertungs-Karten – letzte Fahrt/Frist unter dem Streckennamen auf eigener Zeile statt inline angeklebt (Jürgen IMG_3307) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1482,7 +1482,7 @@ function viewStats() {
   html += '<div class="card"><div class="qlabel">⏰ Nächste Fristen (12-Monats-Regel)</div>';
   rows.slice(0, 6).forEach(function (r2) {
     html += '<div class="dist-lbl" style="margin-bottom:5px"><span>' + ampelHTML(r2.a) + " " + esc(SECTIONS[r2.sid].n) + "</span>" +
-      '<span class="muted">Frist ' + fmtDate(r2.frist) + "</span></div>";
+      '<span class="muted" style="display:block;margin-top:2px">Frist ' + fmtDate(r2.frist) + "</span></div>";
   });
   html += '<div class="muted" style="font-size:12px;margin-top:6px">Rot = über 12 Monate ohne Fahrt → mit dem Dienstplaner sprechen. Gelb = in ~3 Monaten fällig.</div></div>';
   /* Abschnitte nach Regionalbereich */
@@ -1537,7 +1537,7 @@ function viewStats() {
       var a = lf ? ampelOf(lf, today) : "none";
       html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
         '<span>' + ampelHTML(a) + " <b>" + esc(sec.n) + "</b> <span class='muted' style='font-size:12px'>" + esc(sec.v) + " → " + esc(sec.b) + "</span></span>" +
-        '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nie gefahren") + "</span></div>" +
+        '<span class="muted" style="font-size:12px;display:block;margin-top:2px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nie gefahren") + "</span></div>" +
         monthsHTML(mDates) + "</div>";
     });
   });
@@ -1554,7 +1554,7 @@ function viewStats() {
     var a = lf ? ampelOf(lf, today) : "none";
     html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
       '<span>' + ampelHTML(a) + " <b>" + esc(BR_LABELS[gi]) + "</b></span>" +
-      '<span class="muted" style="font-size:12px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
+      '<span class="muted" style="font-size:12px;display:block;margin-top:2px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
       monthsHTML(dates) + "</div>";
   });
   /* Export & Backup: Excel-Button + Backup-Panel (Jürgen 15.11.2026) */
