@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-16i: Gelber Akzent-Streifen an der Begrüßungs-Karte entfernt (Jürgen IMG_3306) – Cache-Buster -->
+<!-- v2 build 2026-11-16j: Neuer Begrüßungstext – 4 Zeilen, Servus-Komma, 👋🏻, ned lang rumtun (Jürgen) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1274,7 +1274,7 @@ function viewForm() {
   if (state.saved) {
     return '<div class="center"><div class="msg-card"><div class="big-emoji">✅</div>' +
       '<h2 style="margin:0 0 6px;font-size:22px">Gespeichert!</h2>' +
-      '<p class="muted" style="margin:0 0 24px">Alle Fahrten sind eingetragen. Mach\'s gut, Jürgen! 👋</p></div>' +
+      '<p class="muted" style="margin:0 0 24px">Alle Fahrten sind eingetragen. Mach\'s gut, Jürgen! 👋🏻</p></div>' +
       '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Neuer Eintrag</button>' +
       '<button class="btn-ghost" onclick="go(\'stats\')">Auswertung ansehen 📊</button></div>';
   }
@@ -1283,7 +1283,7 @@ function viewForm() {
     return '<div class="center"><div class="msg-card"><div class="big-emoji">' + (brOnly ? "✅" : "👍") + '</div>' +
       '<h2 style="margin:0 0 6px;font-size:22px">Notiert!</h2>' +
       '<p class="muted" style="margin:0 0 24px">' + (brOnly
-        ? 'Gespeichert – <b>' + esc(brGruppenText(w.nichtsBrs)) + '</b> ohne Fahrt (z. B. Fahrzeug bereitgestellt). Mach\'s gut, Jürgen! 👋'
+        ? 'Gespeichert – <b>' + esc(brGruppenText(w.nichtsBrs)) + '</b> ohne Fahrt (z. B. Fahrzeug bereitgestellt). Mach\'s gut, Jürgen! 👋🏻'
         : 'Heute gibt es nichts einzutragen – es wurde kein Eintrag gespeichert.') + '</p></div>' +
       '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Eintragen</button></div>';
   }
@@ -1294,7 +1294,7 @@ function viewForm() {
     html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Zurück</button>';
   }
   if (s.k === "datum") {
-    html += '<div class="welcome">Servus Jürgen! 👋<span class="w1">Schön, dich zu sehen.</span><span class="w2">Pack ma’s!</span></div>';
+    html += '<div class="welcome">Servus, Jürgen! 👋🏻<span class="w1">Bereit für die nächste Runde Streckenkunde?</span><span class="w1">Mit ein paar Klicks ist alles erfasst. Also, ned lang rumtun …</span><span class="w2">Auf geht’s – pack ma’s!</span></div>';
     html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
       '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
       '<div style="position:relative">' +
