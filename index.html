@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-16b: Datums-Feld im Verlauf-Bearbeiten auf opt-Zeilen-Optik umgestellt (U55-Muster, Jürgen IMG_3301) – kein Inline-Stil mehr, Cache-Buster -->
+<!-- v2 build 2026-11-16c: Header-Logo – 🛤️ statt 🚆 auf Milchglas-Kachel statt Gelb-Akzent, mittig zum Titel (Jürgen IMG_3302) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -24,7 +24,7 @@
   body::after  { content: ""; position: fixed; inset: 0; z-index: -1; background: #f8fafc; opacity: calc(var(--bg-overlay) * var(--bg-photo)); }
   #wrap { max-width: 480px; margin: 0 auto; padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
   header { position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #f1f5f9; }
-  .logo { width: 40px; height: 40px; border-radius: 14px; background: var(--akzent); display: flex; align-items: center; justify-content: center; font-size: 21px; flex: none; }
+  .logo { width: 40px; height: 40px; border-radius: 14px; background: rgba(255,255,255,var(--card-alpha)); -webkit-backdrop-filter: blur(12px) saturate(1.05); backdrop-filter: blur(12px) saturate(1.05); box-shadow: 0 1px 2px rgba(15,23,42,.06); display: flex; align-items: center; justify-content: center; font-size: 26px; flex: none; }
   h1 { font-size: 19px; margin: 0; line-height: 1.2; }
   .sub { font-size: 13px; color: #64748b; line-height: 1.2; }
   .content { padding-top: 12px; }
@@ -1994,7 +1994,7 @@ function render() {
     stepsH = '<div class="crumbs">' + state.w.fahrten.length + ". Fahrt" + "</div>";
   }
   wrap.innerHTML =
-    '<header><div class="logo">🚆</div><div><h1>Streckenkunde</h1><div class="sub">Dein digitales Streckenkunde-Heft</div></div></header>' +
+    '<header><div class="logo">🛤️</div><div><h1>Streckenkunde</h1><div class="sub">Dein digitales Streckenkunde-Heft</div></div></header>' +
     body + tabbar;
   if (state.tab === "form" && state.w && !state.saved) {
     var na = document.getElementById("noteArea");
