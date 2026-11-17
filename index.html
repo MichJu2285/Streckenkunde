@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-17a: 153-Option umbenannt in „Über Obertürkheim → Bad Cannstatt (Via 153)“ (Jürgen) – Cache-Buster -->
+<!-- v2 build 2026-11-17b: Migration U93 – Süd 153 einmalig aus allen Alt-Einträgen entfernt (war bis U92 fix im Regelweg) + 153-Option (Obertürkheim → Bad Cannstatt) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -815,6 +815,33 @@ var state = {
   jahr: new Date().getFullYear(),
   block: null /* Halbjahr-Block der Auswertung: null = automatisch (aktuelles Halbjahr), "H1" = Jan–Jun, "H2" = Jul–Dez (Jürgen 08.11.2026) */
 };
+
+/* Migration U93 (Jürgen 17.11.2026): Bis Update 92 war die Süd 153 fix im Regelweg der
+   Stuttgart-Routen (m_st, o_st, aug_st, nn_mah, wue_st2) – jede Stuttgart-Fahrt speicherte
+   die 153 automatisch mit, obwohl Jürgen sie real schon lange nicht mehr befahren hat.
+   Einmalige Bereinigung: „S153“ aus allen gespeicherten Ketten entfernen (Fahrt + Retour).
+   Neue Einträge sind unberührt – die 153 kommt seither nur über die explizite Option
+   st_153 rein. Der localStorage-Flag verhindert ein Wiederholen (eine künftig ECHTE
+   153-Fahrt über die Option darf beim nächsten App-Start nicht gelöscht werden). */
+function migrateS153() {
+  try {
+    if (localStorage.getItem("sk_mig_153")) return;
+    var changed = false;
+    state.entries.forEach(function (e) {
+      (e.fahrten || []).forEach(function (f) {
+        [f, f.retour].forEach(function (t) {
+          if (t && Array.isArray(t.chain) && t.chain.indexOf("S153") >= 0) {
+            t.chain = t.chain.filter(function (s) { return s !== "S153"; });
+            changed = true;
+          }
+        });
+      });
+    });
+    if (changed) persist();
+    localStorage.setItem("sk_mig_153", "1");
+  } catch (e) {}
+}
+migrateS153();
 
 /* Aktueller Halbjahr-Block (Jürgen 08.11.2026: Der Zettel bildet immer nur ein Halbjahr ab –
    Jan–Jun oder Jul–Dez – und wird nach Ablauf abgegeben; die Auswertung zeigt standardmäßig
