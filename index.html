@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-17: Süd 153 aus den Regelweg-Ketten entfernt und als immer wählbare Option "Via 153" (Obertürkheim → Bad Cannstatt, danach zurück auf die 1/3) umgebaut (Jürgen 17.11.2026) – Cache-Buster -->
+<!-- v2 build 2026-11-17a: 153-Option umbenannt in „Über Obertürkheim → Bad Cannstatt (Via 153)“ (Jürgen) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -321,7 +321,7 @@ var OPT = {
      Regelgleis), ab Bad Cannstatt zurück auf die 1/3 zum richtigen Bahnsteig im Hbf.
      Immer wählbar bei Stuttgart-Ketten (Gründe jeweils unterschiedlich, wie bei
      "Über Niederrad"), Coburg-Prinzip: 1/3 → 153 → 1/3. */
-  "st_153":       { n: "Via 153 (Obertürkheim → Bad Cannstatt)", add: ["S153", "S1/3"], at: "afterSection", ref: "S1/3", cond: "chainHas:S1/3" }
+  "st_153":       { n: "Über Obertürkheim → Bad Cannstatt (Via 153)", add: ["S153", "S1/3"], at: "afterSection", ref: "S1/3", cond: "chainHas:S1/3" }
 };
 
 /* ---------- Regelwege (Routen) ---------- */
@@ -2012,4 +2012,3 @@ render();
 </script>
 </body>
 </html>
-
