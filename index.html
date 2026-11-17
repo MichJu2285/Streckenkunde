@@ -762,3 +762,1254 @@ function seedFromFrist(frist) {
   if (!frist) return null;
   var d = new Date(frist);
   d.setFullYear(d.getFullYear() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function fmtDate(iso) {
+  if (!iso) return "—";
+  var p = iso.split("-");
+  return p[2] + "." + p[1] + "." + p[0];
+}
+/* ============ Streckenkunde v2 – App-Oberfläche ============ */
+
+/* Wunschreihenfolge der Bahnhöfe (Jürgen 08.11.2026) – überall gleich:
+   Zielauswahl UND „Anderer Hbf…“. München ▸ zuerst, Frankfurt ▸ nach Würzburg. */
+var ZIEL_BAHNHOF = ["augsburg", "stuttgart", "mannheim", "nuernberg", "wuerzburg"]; /* vor Frankfurt ▸ */
+var ZIEL_BAHNHOF2 = ["fulda", "kassel", "hannover", "erfurt", "leipzig"];           /* nach Frankfurt ▸ */
+var FF_GRUPPE = ["ff_hbf", "ff_ffs", "ff_flh"];
+/* Berlin – Platzhalter Nr. 13 (Jürgen 08.11.2026): ausgegraut, nicht anklickbar,
+   für die Zukunft. Wenn Berlin als Ziel dazukommt: Chip hier entfernen und
+   "berlin" in ZIEL_BAHNHOF2 bzw. mit eigenen Routen aufnehmen. */
+var BERLIN_CHIP = '<button type="button" class="chip" disabled style="opacity:.45;cursor:default">Berlin</button>';
+
+/* Gesperrte Hbf-Kombinationen (Jürgen 09.11.2026): ausgegraut, nicht antippbar –
+   wie bei den ALW-Konflikten. BLOCKED (data.js) gilt automatisch in beide Richtungen. */
+function isBlocked(start, ziel) {
+  return BLOCKED.some(function (p) {
+    return (p[0] === start && p[1] === ziel) || (p[0] === ziel && p[1] === start);
+  });
+}
+function zielChip(i, start, t) {
+  var b = isBlocked(start, t);
+  var h = '<button type="button" class="chip"';
+  if (b) h += ' disabled style="opacity:.45;cursor:default"';
+  else h += ' onclick="pickZiel(' + i + ",'" + t + '\')"';
+  h += '>' + esc(HBF[t]);
+  if (b) h += " <span class='muted' style='font-size:12px'>(nicht fahrbar)</span>";
+  return h + "</button>";
+}
+
+var state = {
+  tab: "form",
+  entries: loadEntries(),
+  w: null,          /* Wizard-Zustand */
+  saved: false,
+  confirmId: null,
+  editId: null,
+  backupOpen: false,
+  zielGroup: false,  /* Frankfurt-Gruppe aufgeklappt */
+  muenchenGroup: false, /* München-Gruppe aufgeklappt */
+  startMuenchen: false, /* München-Gruppe im Start-Schritt aufgeklappt */
+  andererFf: false, /* Frankfurt-Gruppe in „Anderer Hbf…“ aufgeklappt */
+  dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
+  jahr: new Date().getFullYear(),
+  block: null /* Halbjahr-Block der Auswertung: null = automatisch (aktuelles Halbjahr), "H1" = Jan–Jun, "H2" = Jul–Dez (Jürgen 08.11.2026) */
+};
+
+/* Aktueller Halbjahr-Block (Jürgen 08.11.2026: Der Zettel bildet immer nur ein Halbjahr ab –
+   Jan–Jun oder Jul–Dez – und wird nach Ablauf abgegeben; die Auswertung zeigt standardmäßig
+   das aktuelle Halbjahr, umschaltbar per Button). */
+function blockInfo() {
+  var h2 = state.block ? state.block === "H2" : new Date().getMonth() >= 6;
+  return h2
+    ? { h2: true, start: 6, labels: ["Jul", "Aug", "Sep", "Okt", "Nov", "Dez"] }
+    : { h2: false, start: 0, labels: ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun"] };
+}
+function setBlock(b) { state.block = b; render(); }
+/* Jahres-Umschalter (Jürgen 15.11.2026): Auswertung/Excel zeigen sonst nur das aktuelle Jahr –
+   ein Jahr zurück reicht (Zettel nachtragen), das aktuelle ist das Maximum. */
+function setJahr(d) {
+  var cur = new Date().getFullYear();
+  var y = state.jahr + d;
+  if (y < cur - 1 || y > cur) return;
+  state.jahr = y;
+  render();
+}
+
+/* Die vier Münchner Bahnhöfe – als Gruppe im Start- und Ziel-Schritt (Jürgen 06.11.2026) */
+var MUC_HOFE = ["muenchen_hbf", "muenchen_ost", "laim_rbf", "pasing_bbf"];
+
+/* ---------- Helfer ---------- */
+function loadEntries() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    var parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) { return []; }
+}
+function todayISO() {
+  var d = new Date();
+  return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function secName(id) { return SECTIONS[id] ? SECTIONS[id].n : id; }
+function chainChips(secs) {
+  return '<span class="chips static">' + secs.map(function (s) {
+    return '<span class="chip small">' + esc(secName(s)) + "</span>";
+  }).join("") + "</span>";
+}
+function deltaChips(d) {
+  var h = "";
+  if (d.entf.length) h += d.entf.map(function (s) {
+    return '<span class="chip small weg">' + esc(secName(s)) + "</span>";
+  }).join("");
+  if (d.dazu.length) h += d.dazu.map(function (s) {
+    return '<span class="chip small dazu">' + esc(secName(s)) + "</span>";
+  }).join("");
+  return h;
+}
+function ampelHTML(a) {
+  var c = a === "gruen" ? "#9AE65C" : a === "gelb" ? "#F59E0B" : a === "rot" ? RED : "#94a3b8";
+  return '<span class="ampel" style="background:' + c + '"></span>';
+}
+
+/* Routen für Start → Ziel, mit Spiegelungs-Fallback (Grundregel: beide Richtungen).
+   Fernziel → Laim Rbf / Pasing Bbf: gespiegelte Hbf-Route + Anschließbein (07.11.2026). */
+function routesForWithFallback(start, ziel) {
+  var direct = routesFor(start, ziel);
+  if (direct.length) return direct;
+  var back = routesFor(ziel, start);
+  if (back.length) return back.map(function (r) { return mirrorRoute(r, ziel); });
+  var tails = { laim_rbf: ["S107"], pasing_bbf: ["S107", "S91", "S1037"] };
+  if (tails[ziel]) {
+    var mh = routesFor("muenchen_hbf", start);
+    if (mh.length) return mh.map(function (r) {
+      var m = mirrorRoute(r, ziel);
+      m.secs = m.secs.concat(tails[ziel]);
+      m.n = r.n + (ziel === "laim_rbf" ? " – weiter über die 107 nach Laim" : " – weiter über 107 → 91 → 1037 nach Pasing");
+      return m;
+    });
+  }
+  return [];
+}
+
+/* ---------- Wizard ---------- */
+function startWizard() {
+  state.w = {
+    steps: [{ k: "datum" }],
+    baureihen: [],
+    nichts: false,
+    fahrten: [],
+    note: "",
+    date: todayISO()
+  };
+  state.saved = false;
+  state.zielGroup = false;
+  state.muenchenGroup = false;
+  state.startMuenchen = false;
+  state.andererFf = false;
+  state.dateCustom = false;
+}
+function curStep() { return state.w.steps[state.w.steps.length - 1]; }
+function pushStep(s) { state.w.steps.push(s); render(); window.scrollTo(0, 0); }
+function backStep() {
+  if (state.w.steps.length > 1) { state.w.steps.pop(); render(); window.scrollTo(0, 0); }
+}
+function fahrtOf(i) {
+  if (!state.w.fahrten[i]) {
+    state.w.fahrten[i] = { start: null, ziel: null, routeId: null, drehId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false, retour: null };
+  }
+  return state.w.fahrten[i];
+}
+function letztesZiel() {
+  /* Ziel der letzten Fahrt (heute oder im letzten Eintrag) – für die Fahrtenkette */
+  if (state.w && state.w.fahrten.length) {
+    var f = state.w.fahrten[state.w.fahrten.length - 1];
+    if (f && f.ziel) return f.ziel;
+  }
+  if (state.entries.length) {
+    var e = state.entries[state.entries.length - 1];
+    if (e && e.fahrten && e.fahrten.length) return e.fahrten[e.fahrten.length - 1].ziel;
+  }
+  return null;
+}
+
+function toggleBaureihe(br) {
+  var i = state.w.baureihen.indexOf(br);
+  if (i >= 0) state.w.baureihen.splice(i, 1);
+  else state.w.baureihen.push(br);
+  render();
+}
+/* Jede Baureihen-Gruppe = EIN Feld wie im Streckenkundeblatt (Jürgen 01.11.2026):
+   Antippen wählt alle Baureihen der Gruppe zusammen, nochmal tippen nimmt alle raus. */
+function toggleBrGroup(gi) {
+  var grp = BR_GROUPS[gi];
+  var all = grp.every(function (b) { return state.w.baureihen.indexOf(b) >= 0; });
+  grp.forEach(function (b) {
+    var i = state.w.baureihen.indexOf(b);
+    if (all && i >= 0) state.w.baureihen.splice(i, 1);
+    if (!all && i < 0) state.w.baureihen.push(b);
+  });
+  render();
+}
+/* Baureihen eines Eintrags als Gruppen-Labels anzeigen (wie auf der Liste) */
+function brGruppenText(brs) {
+  var shown = [];
+  BR_GROUPS.forEach(function (grp, gi) {
+    if (grp.some(function (b) { return (brs || []).indexOf(b) >= 0; })) shown.push(BR_LABELS[gi]);
+  });
+  var covered = {};
+  BR_GROUPS.forEach(function (grp) { grp.forEach(function (b) { covered[b] = 1; }); });
+  (brs || []).forEach(function (b) {
+    if (!covered[b] && shown.indexOf(b) < 0) shown.push(b);
+  });
+  return shown.join(" · ");
+}
+function nichtsZuEintragen() {
+  /* Baureihe(n) ohne Fahrt – z. B. Fahrzeug bereitgestellt (Jürgen 01.11.2026):
+     Die Baureihe wird trotzdem als Eintrag gespeichert. */
+  if (state.w.baureihen.length) {
+    state.entries.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      date: state.w.date || todayISO(),
+      baureihen: state.w.baureihen.slice(),
+      fahrten: [],
+      note: ""
+    });
+    persist();
+    state.w.nichtsBrs = state.w.baureihen.slice();
+  } else {
+    state.w.nichtsBrs = null;
+  }
+  state.w.nichts = true;
+  render();
+  window.scrollTo(0, 0);
+}
+function pickStart(i, h) {
+  var f = fahrtOf(i);
+  f.start = h;
+  state.zielGroup = false;
+  state.muenchenGroup = false;
+  state.startMuenchen = false;
+  state.andererFf = false;
+  state.anderer = false;
+  pushStep({ k: "ziel", i: i });
+}
+function pickZiel(i, h) {
+  var f = fahrtOf(i);
+  f.ziel = h;
+  f.routeId = null; f.alws = []; f.opts = []; f.alwOpen = false;
+  f.drehId = null;
+  /* Drehfahrt: Start = Ziel → eigene Drehfahrten-Auswahl statt Regelweg (Jürgen 01.11.2026) */
+  pushStep({ k: (h === f.start && DREHFAHRTEN[h]) ? "dreh" : "weg", i: i });
+}
+function setDreh(i, did) {
+  var f = fahrtOf(i);
+  f.drehId = did;
+  render();
+}
+function setRoute(i, rid) {
+  var f = fahrtOf(i);
+  f.routeId = rid;
+  f.alws = []; f.opts = [];
+  render();
+}
+function toggleAlw(i, aid, isRet) {
+  var f = fahrtOf(i);
+  var sel = isRet && f.retour ? f.retour.alws : f.alws;
+  var p = sel.indexOf(aid);
+  if (p >= 0) sel.splice(p, 1); else sel.push(aid);
+  render();
+}
+function toggleOpt(i, oid, isRet) {
+  var f = fahrtOf(i);
+  var sel = isRet && f.retour ? f.retour.opts : f.opts;
+  var p = sel.indexOf(oid);
+  if (p >= 0) sel.splice(p, 1); else sel.push(oid);
+  render();
+}
+function toggleAlwOpen(i, isRet) {
+  var f = fahrtOf(i);
+  if (isRet && f.retour) f.retour.alwOpen = !f.retour.alwOpen;
+  else f.alwOpen = !f.alwOpen;
+  render();
+}
+function toggleAlwOpen2(i, isRet) {
+  var f = fahrtOf(i);
+  if (isRet && f.retour) f.retour.alwOpen2 = !f.retour.alwOpen2;
+  else f.alwOpen2 = !f.alwOpen2;
+  render();
+}
+function startRetour(i) {
+  var f = fahrtOf(i);
+  f.retour = { ziel: null, routeId: null, alws: [], opts: [], alwOpen: false, alwOpen2: false };
+  pushStep({ k: "rziel", i: i });
+}
+function keineRetour(i) {
+  var f = fahrtOf(i);
+  f.retour = null;
+  pushStep({ k: "mehr", i: i });
+}
+function pickRuckziel(i, h) {
+  var f = fahrtOf(i);
+  f.retour.ziel = h;
+  f.retour.routeId = null; f.retour.alws = []; f.retour.opts = [];
+  pushStep({ k: "rweg", i: i });
+}
+function setRetourRoute(i, rid) {
+  var f = fahrtOf(i);
+  f.retour.routeId = rid;
+  f.retour.alws = []; f.retour.opts = [];
+  render();
+}
+function weitereFahrt(i) {
+  var letzte = fahrtOf(i);
+  var nf = fahrtOf(i + 1);
+  nf.start = letzte.ziel;
+  pushStep({ k: "start", i: i + 1 });
+}
+function keineWeitere(i) { pushStep({ k: "note" }); }
+function setNote(v) { state.w.note = v; }
+function setDate(v) { state.w.date = v; }
+function pickHeute() {
+  state.w.date = todayISO();
+  state.dateCustom = false;
+  pushStep({ k: "br" });
+}
+function pickDatum(v) {
+  if (!v) return;
+  state.w.date = v;
+  state.dateCustom = false;
+  pushStep({ k: "br" });
+}
+function submitEntry() {
+  var w = state.w;
+  if (!w.baureihen.length || !w.fahrten.length) return;
+  var fahrten = w.fahrten.map(function (f) {
+    var out = { start: f.start, ziel: f.ziel, routeId: f.routeId, alws: f.alws.slice(), opts: f.opts.slice(), chain: [] };
+    /* Drehfahrt: Rundfahrt aus der Drehfahrten-Bibliothek, ohne Retour (Jürgen 01.11.2026) */
+    if (f.start === f.ziel && DREHFAHRTEN[f.start]) {
+      var dlist = DREHFAHRTEN[f.start];
+      var dw = dlist.filter(function (x) { return x.id === f.drehId; })[0] ||
+               dlist.filter(function (x) { return x.d; })[0] || dlist[0];
+      out.routeId = dw.id;
+      out.dreh = 1;
+      out.drehName = dw.n;
+      out.chain = dw.secs.slice();
+      return out;
+    }
+    var rs = routesForWithFallback(f.start, f.ziel);
+    var r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
+    if (r) {
+      var leg = composeLeg(r, f.alws, f.opts);
+      out.routeId = r.id;
+      out.chain = leg.chain;
+      out.alwLabels = leg.alwLabels;
+      out.warnings = leg.warnings;
+    }
+    if (f.retour && f.retour.ziel) {
+      var rrs = retourRoutes(f.ziel, f.retour.ziel);
+      var rr = rrs.filter(function (x) { return x.id === f.retour.routeId; })[0] || rrs.filter(function (x) { return x.d; })[0] || rrs[0];
+      if (rr) {
+        var rleg = composeLeg(rr, f.retour.alws, f.retour.opts);
+        out.retour = { ziel: f.retour.ziel, routeId: rr.id, alws: f.retour.alws.slice(), opts: f.retour.opts.slice(), chain: rleg.chain, alwLabels: rleg.alwLabels, warnings: rleg.warnings };
+      }
+    }
+    return out;
+  });
+  state.entries.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    date: w.date || todayISO(),
+    baureihen: w.baureihen.slice(),
+    fahrten: fahrten,
+    note: (w.note || "").trim()
+  });
+  persist();
+  state.saved = true;
+  render();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Fahrweg-Schritt (Hin- und Rückfahrt) ---------- */
+function wegStepHTML(f, i, isRet) {
+  var rs, r, sel, alws, opts, alwSel, optSel, alwOpen, alwOpen2;
+  if (isRet) {
+    rs = retourRoutes(f.ziel, f.retour.ziel);
+    r = rs.filter(function (x) { return x.id === f.retour.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
+    sel = f.retour; alwSel = f.retour.alws; optSel = f.retour.opts; alwOpen = f.retour.alwOpen; alwOpen2 = f.retour.alwOpen2;
+  } else {
+    rs = routesForWithFallback(f.start, f.ziel);
+    r = rs.filter(function (x) { return x.id === f.routeId; })[0] || rs.filter(function (x) { return x.d; })[0] || rs[0];
+    sel = f; alwSel = f.alws; optSel = f.opts; alwOpen = f.alwOpen; alwOpen2 = f.alwOpen2;
+  }
+  var html = "";
+  if (!rs.length) {
+    return '<div class="hint">⚠️ Für <b>' + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) +
+      '</b> ist noch kein Fahrweg in der Bibliothek. Speichere die Fahrt trotzdem – und sag mir danach den Fahrweg, dann lege ich ihn an.</div>' +
+      '<button class="btn-main" onclick="pushStep({k:\'' + (isRet ? "mehr" : "ret") + "',i:" + i + '})">Weiter ohne Fahrweg</button>';
+  }
+  /* Regelweg(e) / Routen-Auswahl */
+  html += '<div class="section-t">' + (rs.length > 1 ? "Welcher Regelweg?" : "Regelweg") + "</div>";
+  rs.forEach(function (rt) {
+    var on = r && rt.id === r.id;
+    html += '<button type="button" class="opt route' + (on ? " on" : "") + '" onclick="' +
+      (isRet ? "setRetourRoute(" : "setRoute(") + i + ",'" + rt.id + '\')">' +
+      '<div class="rt-name">' + (on ? "✓ " : "") + esc(rt.n) + "</div>" + chainChips(rt.secs) + "</button>";
+  });
+  if (!r) return html;
+  var leg = composeLeg(r, alwSel, optSel);
+  /* ALW – einklappbar, MEHRFACHAUSWAHL; München-Knoten als eigene Gruppe zuerst */
+  var avail = r.alws.filter(function (aid) { return !!ALW[aid]; });
+  var muc = avail.filter(function (aid) { return !!MUC_ALW[aid]; });
+  /* via Str. Landshut an ERSTER Stelle der München-ALW (Jürgen 09.11.2026) */
+  muc.sort(function (a, b) { return (b === "ls_om") - (a === "ls_om"); });
+  var rest = avail.filter(function (aid) { return !MUC_ALW[aid]; });
+  var mir = !!r.mirrored;
+  var exclSel = alwSel.filter(function (aid) { return ALW[aid] && ALW[aid].excl; })[0] || null;
+  /* Selektive ALW-Ausschlüsse (Jürgen 09.11.2026): z. B. schließen via Wendlingen und
+     via Donauwörth die ALW via Nördlingen und via Ansbach aus – symmetrisch geprüft:
+     kandidat ausgeschlossen, wenn eine gewählte ALW ihn in exclIds hat ODER der
+     Kandidat eine gewählte ALW in seinen exclIds hat. */
+  function exclBy(aid) {
+    var a = ALW[aid] || {};
+    for (var j = 0; j < alwSel.length; j++) {
+      var s = ALW[alwSel[j]];
+      if (!s) continue;
+      if (s.exclIds && s.exclIds.indexOf(aid) >= 0) return alwSel[j];
+      if (a.exclIds && a.exclIds.indexOf(alwSel[j]) >= 0) return alwSel[j];
+    }
+    return null;
+  }
+  function alwBtn(aid) {
+    var a = ALW[aid];
+    var on = alwSel.indexOf(aid) >= 0;
+    var conf = leg.warnings.filter(function (wx) { return wx.id === aid; })[0];
+    var nm = leg.warnings.filter(function (wx) { return wx.withId === aid; })[0];
+    var d;
+    if (on) { d = leg.deltas[aid] || { entf: [], dazu: [] }; }
+    else {
+      var single = planAlws(r.secs, [aid], mir);
+      d = delta(r.secs, composeChain(r.secs, single));
+    }
+    var dis = false, disTxt = "";
+    if (!on) {
+      if (exclSel && aid !== exclSel) { dis = true; }
+      else if (exclBy(aid)) { dis = true; }
+      else {
+        var probe = planAlws(r.secs, alwSel.concat([aid]), mir);
+        var pc = probe.conflicts.filter(function (c) { return c.id === aid; })[0];
+        if (pc) { dis = true; disTxt = "Überschneidet sich mit einer gewählten ALW – nur eine der beiden wirkt"; }
+        else if (probe.noMatch.indexOf(aid) >= 0) { dis = true; disTxt = "passt nicht zum gewählten Fahrweg"; }
+      }
+    }
+    var h = '<button type="button" class="opt alw' + (on ? " on" : "") + (dis ? " dis" : "") + '" ' + (dis ? "disabled " : "") +
+      'onclick="toggleAlw(' + i + ",'" + aid + "'," + (isRet ? "true" : "false") + ')">' +
+      '<div class="rt-name">' + (on ? "☑ " : "☐ ") + esc(a.n) +
+      (a.excl ? " <span class='muted' style='font-size:13px'>(schließt andere ALW aus)</span>" : "") + "</div>" +
+      (d.entf.length || d.dazu.length ? '<div class="delta">' + deltaChips(d) + "</div>" : '<div class="muted" style="font-size:12px">ergänzt den Regelweg</div>') +
+      (dis && disTxt ? '<div class="muted" style="font-size:12px">' + disTxt + "</div>" : "") +
+      (conf ? '<div class="warn">⚠️ Überschneidet sich' + (conf.withId ? " mit „" + esc(ALW[conf.withId].n) + "“" : "") + " – nur eine der beiden wirkt</div>" : "") +
+      (nm ? '<div class="warn">⚠️ Dieser ALW verdrängt eine andere Auswahl</div>' : "") +
+      "</button>";
+    return h;
+  }
+  function groupToggle(list, open, fn, label) {
+    var sel = alwSel.filter(function (a2) { return list.indexOf(a2) >= 0; }).length;
+    var txt = (sel ? sel + " ausgewählt – " : "") + list.length + " " + label;
+    return '<button type="button" class="opt toggle" onclick="' + fn + '(' + i + "," + (isRet ? "true" : "false") + ')">' +
+      (open ? "▴" : "▾") + " " + esc(txt) + "</button>";
+  }
+  html += '<div class="section-t">Alternative Laufwege (ALW)</div>';
+  if (!avail.length) {
+    html += '<div class="card" style="padding:10px 14px;margin:0 16px 8px"><div class="muted" style="font-size:14px">Keine ALW verfügbar</div></div>';
+  } else {
+    /* Gruppen-Reihenfolge nach Fahrtrichtung (Jürgen 09.11.2026):
+       Start in München → München-ALW zuerst; Start anderswo (z. B. Stuttgart → München)
+       → die anderen ALW zuerst, München-Gruppe danach. */
+    var startNow = isRet ? f.ziel : f.start;
+    var mucStart = MUC_HOFE.indexOf(startNow) >= 0;
+    var gFirst = mucStart ? muc : rest;
+    var gFirstFn = mucStart ? "toggleAlwOpen" : "toggleAlwOpen2";
+    var gFirstOpen = mucStart ? alwOpen : alwOpen2;
+    var gFirstLbl = mucStart ? "München-ALW" : "weitere ALW";
+    var gSecond = mucStart ? rest : muc;
+    var gSecondFn = mucStart ? "toggleAlwOpen2" : "toggleAlwOpen";
+    var gSecondOpen = mucStart ? alwOpen2 : alwOpen;
+    var gSecondLbl = mucStart ? "weitere ALW" : "München-ALW";
+    if (gFirst.length) {
+      html += groupToggle(gFirst, gFirstOpen, gFirstFn, gFirstLbl);
+      if (gFirstOpen) gFirst.forEach(function (aid) { html += alwBtn(aid); });
+    }
+    if (gSecond.length) {
+      html += groupToggle(gSecond, gSecondOpen, gSecondFn, gSecondLbl);
+      if (gSecondOpen) gSecond.forEach(function (aid) { html += alwBtn(aid); });
+    }
+  }
+  /* Optionen */
+  var oavail = r.opts.filter(function (oid) { return !!OPT[oid]; });
+  if (oavail.length) {
+    html += '<div class="section-t">Zusätzlich anwählbare Optionen</div>';
+    oavail.forEach(function (oid) {
+      var o = OPT[oid];
+      var on = optSel.indexOf(oid) >= 0;
+      var ok2 = optAvailable(oid, leg.chain);
+      html += '<button type="button" class="opt alw' + (on && ok2 ? " on" : "") + (ok2 ? "" : " dis") + '" ' +
+        (ok2 ? "" : "disabled ") + 'onclick="toggleOpt(' + i + ",'" + oid + "'," + (isRet ? "true" : "false") + ')">' +
+        '<div class="rt-name">' + (on && ok2 ? "☑ " : "☐ ") + esc(o.n) + "</div>" +
+        (!ok2 ? '<div class="muted" style="font-size:12px">erst verfügbar, wenn der passende Fahrweg/ALW gewählt ist</div>' : "") +
+        "</button>";
+    });
+  }
+  /* Ergebnis-Kette */
+  html += '<div class="section-t">Deine Fahrt</div><div class="card">' + chainChips(leg.chain);
+  leg.warnings.forEach(function (wx) {
+    if (!ALW[wx.id]) return;
+    html += '<div class="warn">⚠️ „' + esc(ALW[wx.id].n) + "“ überschneidet sich mit einer anderen Auswahl – wirkt hier nicht</div>";
+  });
+  html += "</div>";
+  var next = isRet ? "mehr" : "ret";
+  html += '<button class="btn-main" onclick="pushStep({k:\'' + next + "',i:" + i + '})">Weiter</button>';
+  return html;
+}
+
+/* ---------- Eintragen-Ansicht ---------- */
+function viewForm() {
+  var w = state.w;
+  if (state.saved) {
+    return '<div class="center"><div class="msg-card"><div class="big-emoji">✅</div>' +
+      '<h2 style="margin:0 0 6px;font-size:22px">Gespeichert!</h2>' +
+      '<p class="muted" style="margin:0 0 24px">Alle Fahrten sind eingetragen. Mach\'s gut, Jürgen! 👋🏻</p></div>' +
+      '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Neuer Eintrag</button>' +
+      '<button class="btn-ghost" onclick="go(\'stats\')">Auswertung ansehen 📊</button></div>';
+  }
+  if (w.nichts) {
+    var brOnly = w.nichtsBrs && w.nichtsBrs.length;
+    return '<div class="center"><div class="msg-card"><div class="big-emoji">' + (brOnly ? "✅" : "👍") + '</div>' +
+      '<h2 style="margin:0 0 6px;font-size:22px">Notiert!</h2>' +
+      '<p class="muted" style="margin:0 0 24px">' + (brOnly
+        ? 'Gespeichert – <b>' + esc(brGruppenText(w.nichtsBrs)) + '</b> ohne Fahrt (z. B. Fahrzeug bereitgestellt). Mach\'s gut, Jürgen! 👋🏻'
+        : 'Heute gibt es nichts einzutragen – es wurde kein Eintrag gespeichert.') + '</p></div>' +
+      '<button class="btn-main" style="margin-bottom:10px" onclick="startWizard();render()">Eintragen</button></div>';
+  }
+  if (!w) { startWizard(); }
+  var s = curStep();
+  var html = '<div class="content">';
+  if (w.steps.length > 1) {
+    html += '<button type="button" class="opt back" onclick="backStep()">↩︎ Zurück</button>';
+  }
+  if (s.k === "datum") {
+    html += '<div class="welcome">Servus, Jürgen! 👋🏻<span class="w1">Bereit für die nächste Runde Streckenkunde?</span><span class="w1">Mit ein paar Klicks ist alles erfasst. Also, ned lang rumtun …</span><span class="w2">Auf geht’s – pack ma’s!</span></div>';
+    html += '<div class="card"><div class="qlabel">📅 Wann war die Fahrt?</div>' +
+      '<button type="button" class="opt" onclick="pickHeute()">📅 Heute <span class="muted">(' + fmtDate(todayISO()) + ')</span></button>' +
+      '<div style="position:relative">' +
+        '<input type="date" value="' + state.w.date + '" onchange="if(this.value)pickDatum(this.value)" class="opt datumInput">' +
+        '<span style="position:absolute;top:0;left:0;padding:12px 14px;font-size:18px;color:#334155;pointer-events:none">📆 Anderer Tag…</span></div>';
+    html += "</div>";
+  } else if (s.k === "br") {
+    html += '<div class="card"><div class="qlabel">🚆 Welche Baureihe(n) heute?</div>';
+    /* Wie im Streckenkundeblatt (Jürgen 01.11.2026): jede Gruppe = EIN Feld */
+    html += '<div class="chips wrap">' + BR_GROUPS.map(function (grp, gi) {
+      var all = grp.every(function (b) { return w.baureihen.indexOf(b) >= 0; });
+      return '<button type="button" class="chip' + (all ? " on" : "") + '" onclick="toggleBrGroup(' + gi + ')">' + esc(BR_LABELS[gi]) + "</button>";
+    }).join("") + "</div>";
+    html += '<div class="muted" style="font-size:13px;margin-top:6px">Mehrfachauswahl – jedes Feld steht wie auf der Liste, tippe alle an, die du heute gefahren bist.</div></div>';
+    html += '<button type="button" class="btn-ghost" onclick="nichtsZuEintragen()">Heute gibt es nichts weiteres einzutragen</button>';
+    if (w.baureihen.length) {
+      html += '<button class="btn-main" onclick="pushStep({k:\'start\',i:0})">Weiter – Fahrt eintragen</button>';
+    }
+  } else if (s.k === "start") {
+    var f0 = fahrtOf(s.i);
+    var auto = f0.start && s.i > 0;
+    html += '<div class="card"><div class="qlabel">🚉 Fahrt ' + (s.i + 1) + ' – Wo hast du begonnen?</div>';
+    if (auto) html += '<div class="muted" style="font-size:13px;margin-bottom:8px">📍 Start automatisch übernommen: <b>' + esc(HBF[f0.start]) + "</b></div>";
+    var lz = letztesZiel();
+    if (lz && !auto && s.i > 0) html += '<button type="button" class="opt" onclick="pickStart(' + s.i + ',\'' + lz + '\')">📍 ' + esc(HBF[lz]) + " <span class='muted'>(letztes Ziel)</span></button>";
+    /* München als EINEN aufklappbaren Auswahlpunkt (Jürgen 06.11.2026) – wie bei der
+       Ziel-Auswahl: antippen zeigt die vier Münchner Bahnhöfe (Hbf, Ost, Laim Rbf, Pasing Bbf). */
+    html += '<button type="button" class="opt' + (state.startMuenchen ? " on" : "") + '" onclick="state.startMuenchen=!state.startMuenchen;state.anderer=false;render()">München ▸</button>';
+    if (state.startMuenchen) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + MUC_HOFE.map(function (h) {
+        return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+      }).join("") + "</div>";
+    }
+    html += '<button type="button" class="opt" onclick="state.anderer=!state.anderer;state.startMuenchen=false;state.andererFf=false;render()">🚉 Anderer Hbf…</button>';
+    if (state.anderer) {
+      /* Gleiche Wunschreihenfolge wie in der Zielauswahl (Jürgen 08.11.2026),
+         Frankfurt als aufklappbare Gruppe ▸ – München bleibt eigener Punkt darüber. */
+      html += '<div class="chips wrap" style="margin-top:8px">' + ZIEL_BAHNHOF.map(function (h) {
+        return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+      }).join("") +
+        '<button type="button" class="chip' + (state.andererFf ? " on" : "") + '" onclick="state.andererFf=!state.andererFf;render()">Frankfurt ▸</button></div>';
+      if (state.andererFf) {
+        html += '<div class="chips wrap" style="margin-top:8px">' + FF_GRUPPE.map(function (h) {
+          return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+        }).join("") + "</div>";
+      }
+      html += '<div class="chips wrap" style="margin-top:8px">' + ZIEL_BAHNHOF2.map(function (h) {
+        return '<button type="button" class="chip" onclick="pickStart(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+      }).join("") + BERLIN_CHIP + "</div>";
+    }
+    html += "</div>";
+    if (auto) {
+      html += '<button class="btn-main" onclick="pushStep({k:\'ziel\',i:' + s.i + '})">Weiter mit ' + esc(HBF[f0.start]) + "</button>";
+    }
+  } else if (s.k === "ziel") {
+    var fg = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🎯 Fahrt ' + (s.i + 1) + " – Wohin ging es?</div>" +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Von: <b>' + esc(HBF[fg.start]) + "</b></div>";
+    /* Wunschreihenfolge (Jürgen 08.11.2026): München ▸ zuerst, dann Augsburg, Stuttgart,
+       Mannheim, Nürnberg, Würzburg, Frankfurt ▸, Fulda, Kassel, Hannover, Erfurt, Leipzig. */
+    html += '<button type="button" class="chip' + (state.muenchenGroup ? " on" : "") + '" onclick="state.muenchenGroup=!state.muenchenGroup;state.zielGroup=false;render()">München ▸</button>';
+    if (state.muenchenGroup) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + ["muenchen_hbf", "muenchen_ost", "laim_rbf", "pasing_bbf"].filter(function (t) { return t !== fg.start; }).map(function (t) {
+        return zielChip(s.i, fg.start, t);
+      }).join("") + "</div>";
+    }
+    html += '<div class="chips wrap">' + ZIEL_BAHNHOF.map(function (t) {
+      return zielChip(s.i, fg.start, t);
+    }).join("") +
+      '<button type="button" class="chip' + (state.zielGroup ? " on" : "") + '" onclick="state.zielGroup=!state.zielGroup;state.muenchenGroup=false;render()">Frankfurt ▸</button></div>';
+    if (state.zielGroup) {
+      html += '<div class="chips wrap" style="margin-top:8px">' + FF_GRUPPE.map(function (t) {
+        return zielChip(s.i, fg.start, t);
+      }).join("") + "</div>";
+    }
+    html += '<div class="chips wrap">' + ZIEL_BAHNHOF2.map(function (t) {
+      return zielChip(s.i, fg.start, t);
+    }).join("") + BERLIN_CHIP + "</div>";
+    /* Drehfahrt: Start = Ziel, nur für München Hbf / Laim Rbf (Jürgen 01.11.2026) */
+    if (DREHFAHRTEN[fg.start]) {
+      html += '<button type="button" class="opt" style="margin-top:10px" onclick="pickZiel(' + s.i + ',\'' + fg.start + '\')">🔄 Drehfahrt – Fahrzeug wurde in ' + esc(HBF[fg.start]) + " gedreht</button>";
+    }
+    html += "</div></div>";
+  } else if (s.k === "weg") {
+    var f1 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🛤️ Fahrt ' + (s.i + 1) + ": " + esc(HBF[f1.start]) + " → " + esc(HBF[f1.ziel]) + "</div>";
+    if (isBlocked(f1.start, f1.ziel)) {
+      html += '<div class="muted" style="font-size:13px;margin-top:6px">⚠️ Diese Verbindung ist bei dir gesperrt (wird praktisch nicht gefahren) – normalerweise wählst du sie nicht. Bitte prüfen!</div>';
+    }
+    html += '<div class="muted" style="font-size:13px">Regelweg ist vorausgewählt. ALW kannst du jetzt <b>mehrfach</b> antippen – einer pro Störung.</div></div>';
+    html += wegStepHTML(f1, s.i, false);
+  } else if (s.k === "dreh") {
+    /* Drehfahrten-Auswahl: Rundfahrt Start = Ziel, ohne Retour (Jürgen 01.11.2026) */
+    var fd = fahrtOf(s.i);
+    var dlist = DREHFAHRTEN[fd.start] || [];
+    html += '<div class="card"><div class="qlabel">🔄 Drehfahrt: ' + esc(HBF[fd.start]) + " → " + esc(HBF[fd.ziel]) + "</div>" +
+      '<div class="muted" style="font-size:13px">Das Fahrzeug wurde gedreht – welche Runde wurde gefahren?</div></div>';
+    dlist.forEach(function (d) {
+      var on = fd.drehId === d.id || (!fd.drehId && d.d);
+      html += '<button type="button" class="opt route' + (on ? " on" : "") + '" onclick="setDreh(' + s.i + ',\'' + d.id + '\')">' +
+        '<div class="rt-name">' + (on ? "✓ " : "") + esc(d.n) + " <span class='muted' style='font-size:12px'>(in beide Richtungen befahrbar)</span></div>" +
+        '<div class="muted" style="font-size:12px;margin:2px 0 4px">' + esc(d.txt) + "</div>" +
+        chainChips(d.secs) + "</button>";
+    });
+    html += '<button class="btn-main" onclick="pushStep({k:\'mehr\',i:' + s.i + '})">Weiter</button>';
+  } else if (s.k === "ret") {
+    var f2 = fahrtOf(s.i);
+    if (f2.ziel === "muenchen_hbf" || f2.ziel === "muenchen_ost") {
+      /* endet in München → Retour entfällt */
+      f2.retour = null;
+      return { html: html, skip: { k: "mehr", i: s.i } };
+    }
+    html += '<div class="card"><div class="qlabel">↩️ Und retour?</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Die Rückfahrt bekommt ihren eigenen Fahrweg – eine Umleitung kann auch nur retour gelten.</div>' +
+      '<button type="button" class="opt" onclick="startRetour(' + s.i + ')">Ja, retour nach München</button>' +
+      '<button type="button" class="opt" onclick="keineRetour(' + s.i + ')">Nein, ohne Retour</button></div>';
+  } else if (s.k === "rziel") {
+    var f3 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🏠 Rückziel?</div>';
+    ["muenchen_hbf", "muenchen_ost"].forEach(function (h) {
+      html += '<button type="button" class="opt" onclick="pickRuckziel(' + s.i + ',\'' + h + '\')">' + esc(HBF[h]) + "</button>";
+    });
+    if (f3.start !== "muenchen_hbf" && f3.start !== "muenchen_ost") {
+      html += '<button type="button" class="opt" onclick="pickRuckziel(' + s.i + ',\'' + f3.start + '\')">Zurück nach ' + esc(HBF[f3.start]) + "</button>";
+    }
+    html += "</div>";
+  } else if (s.k === "rweg") {
+    var f4 = fahrtOf(s.i);
+    html += '<div class="card"><div class="qlabel">🛤️ Retour: ' + esc(HBF[f4.ziel]) + " → " + esc(HBF[f4.retour.ziel]) + "</div>";
+    html += '<div class="muted" style="font-size:13px">ALW gelten automatisch retour gespiegelt – die Abweichungsbahnhöfe passen sich an.</div></div>';
+    html += wegStepHTML(f4, s.i, true);
+  } else if (s.k === "mehr") {
+    html += '<div class="card"><div class="qlabel">🔁 Gab es heute noch eine weitere Fahrt?</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Der Startbahnhof der nächsten Fahrt wird automatisch übernommen.</div>' +
+      '<button type="button" class="opt" onclick="weitereFahrt(' + s.i + ')">Ja, weitere Fahrt</button>' +
+      '<button type="button" class="opt" onclick="keineWeitere(' + s.i + ')">Nein, das war alles</button></div>';
+  } else if (s.k === "note") {
+    var cnt = state.w.fahrten.length;
+    html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
+      '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
+    html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
+  }
+  html += "</div>";
+  return html;
+}
+
+/* ---------- Auswertung ---------- */
+function collectDriven() {
+  var driven = {}; /* secId -> [dates] */
+  state.entries.forEach(function (e) {
+    (e.fahrten || []).forEach(function (f) {
+      (f.chain || []).forEach(function (s) { (driven[s] = driven[s] || []).push(e.date); });
+      if (f.retour) (f.retour.chain || []).forEach(function (s) { (driven[s] = driven[s] || []).push(e.date); });
+    });
+  });
+  return driven;
+}
+function lastOf(dates) {
+  return dates && dates.length ? dates.slice().sort().pop() : null;
+}
+/* Jürgen 14.11.2026: Die Kdg-bis-Frist zählt als Fahrt – Frist − 12 Monate ist die
+   letzte Fahrt laut Zettel/DB-System (z. B. Frist Juli 2027 = gefahren Juli 2026).
+   Fließt in "letzte Fahrt", Ampel, Fristen-Karte UND die Monats-Chips ein –
+   Strecken ohne App-Eintrag zeigen sonst lauter X, obwohl laut Zettel gefahren. */
+function lfMitFrist(dates, frist) {
+  var l = lastOf(dates);
+  var s = seedFromFrist(frist);
+  if (l && s) return l > s ? l : s;
+  return l || s || null;
+}
+function viewStats() {
+  var driven = collectDriven();
+  var today = todayISO();
+  var html = '<div class="content">';
+  /* Fristen-Alarm */
+  var rows = [];
+  Object.keys(SECTIONS).forEach(function (sid) {
+    var lf = lfMitFrist(driven[sid], SECTIONS[sid].f);
+    if (!lf) return;
+    var frist = new Date(lf);
+    frist.setFullYear(frist.getFullYear() + 1);
+    rows.push({ sid: sid, lf: lf, frist: frist.toISOString().slice(0, 10), a: ampelOf(lf, today) });
+  });
+  rows.sort(function (a, b) { return a.frist < b.frist ? -1 : 1; });
+  html += '<div class="card"><div class="qlabel">⏰ Nächste Fristen (12-Monats-Regel)</div>';
+  rows.slice(0, 6).forEach(function (r2) {
+    html += '<div class="dist-lbl" style="margin-bottom:5px"><span>' + ampelHTML(r2.a) + " " + esc(SECTIONS[r2.sid].n) + "</span>" +
+      '<span class="muted" style="display:block;margin-top:2px">Frist ' + fmtDate(r2.frist) + "</span></div>";
+  });
+  html += '<div class="muted" style="font-size:12px;margin-top:6px">Rot = über 12 Monate ohne Fahrt → mit dem Dienstplaner sprechen. Gelb = in ~3 Monaten fällig.</div></div>';
+  /* Abschnitte nach Regionalbereich */
+  var year = state.jahr;
+  var blk = blockInfo();
+  var heuteH2 = new Date().getMonth() >= 6;
+  var aktH2 = heuteH2 ? "H2" : "H1";
+  var curJahr = new Date().getFullYear();
+  html += '<div class="card"><div class="qlabel">📅 Halbjahr (wie auf dem Zettel)</div>' +
+    '<div class="chips wrap" style="padding:0">' +
+    '<button class="chip"' + (year < curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(-1)">◀ ' + (year - 1) + '</button>' +
+    '<span class="chip" style="background:var(--akzent);border-color:var(--akzent);color:#0f172a;cursor:default">' + year + '</span>' +
+    '<button class="chip"' + (year >= curJahr ? ' disabled style="opacity:.45"' : '') + ' onclick="setJahr(1)">' + (year + 1) + ' ▶</button>' +
+    '</div><div class="chips wrap" style="padding:0;margin-top:8px">' +
+    '<button class="chip' + (blk.h2 ? "" : " on") + '" onclick="setBlock(\'H1\')">Jan – Jun</button>' +
+    '<button class="chip' + (blk.h2 ? " on" : "") + '" onclick="setBlock(\'H2\')">Jul – Dez</button>' +
+    '</div><div class="muted" style="font-size:12px;margin-top:6px">Angezeigt: ' +
+    (blk.h2 ? "Jul – Dez " : "Jan – Jun ") + year +
+    (year === curJahr && aktH2 === (blk.h2 ? "H2" : "H1") ? " (aktuelles Halbjahr)" : "") +
+    '. Nach Ablauf abgeben wie beim Zettel. Zahl = Tag deiner letzten Fahrt im Monat, X = keine Fahrt.</div></div>';
+  /* Monats-Chips nur für den gewählten Halbjahr-Block */
+  /* Monats-Chips (Jürgen 09.11.2026): Statt grün-Anhäkchen zeigt jeder Monat den
+     TAG der letzten Fahrt in diesem Monat; ohne Fahrt ein X. */
+  function monthsHTML(dates) {
+    var out = "";
+    for (var m = 0; m < 6; m++) {
+      var mo = blk.start + m;
+      var last = "";
+      dates.forEach(function (d) {
+        if (+d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1 && d > last) last = d;
+      });
+      out += '<span class="mo' + (last ? " hit" : "") + '">' + blk.labels[m] +
+        '<b class="mo-day">' + (last ? String(+last.slice(8, 10)) : "X") + "</b></span>";
+    }
+    return '<div class="months">' + out + "</div>";
+  }
+  /* Jürgen 14.11.2026: Bereichs-Reihenfolge wie auf dem Zettel – Mitte, Nord, Süd, Südost. */
+  ["M", "N", "S", "SO"].forEach(function (rb) {
+    html += '<div class="section-t">' + ({ S: "Süd", M: "Mitte", N: "Nord", SO: "Südost" })[rb] + "</div>";
+    RB[rb].forEach(function (sid, ri) {
+      var extra = RB_EXTRA[rb] || [];
+      if (extra.length && ri === RB[rb].length - extra.length) {
+        html += '<div style="text-align:center;margin:0 16px 6px"><span class="sep-chip">— nicht auf dem Zettel —</span></div>';
+      }
+      var sec = SECTIONS[sid];
+      var lf = lfMitFrist(driven[sid], sec.f);
+      /* Frist-Rückrechnung (Jürgen 14.11.2026) auch in den Monats-Chips:
+         Frist − 12 Monate zählt als Fahrtermin, sofern nicht schon echt erfasst. */
+      var mDates = driven[sid] || [];
+      var sSeed = seedFromFrist(sec.f);
+      if (sSeed && mDates.indexOf(sSeed) < 0) mDates = mDates.concat([sSeed]);
+      var a = lf ? ampelOf(lf, today) : "none";
+      html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
+        '<span>' + ampelHTML(a) + " <b>" + esc(sec.n) + "</b> <span class='muted' style='font-size:12px;display:block'>" + esc(sec.v) + " → " + esc(sec.b) + "</span></span>" +
+        '<span class="muted" style="font-size:12px;display:block;margin-top:2px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nie gefahren") + "</span></div>" +
+        monthsHTML(mDates) + "</div>";
+    });
+  });
+  /* Baureihen – zusammengefasst in Gruppen wie in der Baureihen-Frage / auf dem Zettel (Jürgen 09.11.2026) */
+  html += '<div class="section-t">Baureihen</div>';
+  var brDriven = {};
+  state.entries.forEach(function (e) {
+    (e.baureihen || []).forEach(function (b) { (brDriven[b] = brDriven[b] || []).push(e.date); });
+  });
+  BR_GROUPS.forEach(function (grp, gi) {
+    var dates = [];
+    grp.forEach(function (b) { (brDriven[b] || []).forEach(function (d) { dates.push(d); }); });
+    var lf = lastOf(dates);
+    var a = lf ? ampelOf(lf, today) : "none";
+    html += '<div class="card sec"><div class="dist-lbl" style="margin-bottom:4px">' +
+      '<span>' + ampelHTML(a) + " <b>" + esc(BR_LABELS[gi]) + "</b></span>" +
+      '<span class="muted" style="font-size:12px;display:block;margin-top:2px">' + (lf ? "letzte Fahrt " + fmtDate(lf) : "noch nicht eingetragen") + "</span></div>" +
+      monthsHTML(dates) + "</div>";
+  });
+  /* Export & Backup: Excel-Button + Backup-Panel (Jürgen 15.11.2026) */
+  html += exportCard();
+  html += "</div>";
+  return html;
+}
+
+/* ---------- Verlauf ---------- */
+function viewLog() {
+  if (!state.entries.length) {
+    return '<div class="center"><div class="msg-card"><div class="big-emoji">🗂️</div><h2 style="margin:0 0 6px;font-size:20px">Noch nichts drin</h2>' +
+      '<p class="muted">Deine eingetragenen Fahrten landen hier.</p></div></div>';
+  }
+  var html = '<div class="content">';
+  state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
+    /* Bearbeiten-Modus (Jürgen 09.11.2026): NUR Datum + Baureihen änderbar,
+       Fahrten/ALW/Notiz nur anzeigen, Abbrechen neben Fertig */
+    if (state.editId === e.id) {
+      html += '<div class="card"><div class="dist-lbl" style="margin-bottom:8px">' +
+        '<span style="font-weight:600;color:#0f172a">✏️ Eintrag bearbeiten</span></div>';
+      html += '<div class="qlabel" style="margin-bottom:6px;font-size:15px">📆 Datum</div>' +
+        '<div style="position:relative">' +
+        '<input type="date" value="' + esc(e.date) + '" onchange="editDate(this.value)" class="opt datumInput">' +
+        '<span style="position:absolute;top:0;left:0;padding:12px 14px;font-size:18px;color:#334155;pointer-events:none">📆 ' + fmtDate(e.date) + '</span></div>';
+      html += '<div class="qlabel" style="margin:12px 0 6px;font-size:15px">🚆 Baureihen</div><div class="chips wrap">' +
+        BR_GROUPS.map(function (grp, gi) {
+          var all = grp.every(function (b) { return (e.baureihen || []).indexOf(b) >= 0; });
+          return '<button type="button" class="chip' + (all ? " on" : "") + '" onclick="editToggleBr(' + gi + ')">' + esc(BR_LABELS[gi]) + "</button>";
+        }).join("") + "</div>";
+      html += '<div class="qlabel" style="margin:12px 0 6px;font-size:15px">🚆 Fahrten</div>';
+      if (!(e.fahrten || []).length) {
+        html += '<div class="muted" style="font-size:12px;margin-bottom:4px">ohne Fahrt – nur Baureihen eingetragen</div>';
+      } else {
+        (e.fahrten || []).forEach(function (f) {
+          html += '<div class="trip"><div class="rt-name" style="margin-top:4px">' +
+            "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
+          if (f.dreh && f.drehName) {
+            html += '<div class="muted" style="font-size:12px;margin-top:2px">🔄 ' + esc(f.drehName) + "</div>";
+          }
+          if (f.chain && f.chain.length) html += chainChips(f.chain);
+          else html += '<div class="warn" style="font-size:12px">ohne Fahrweg gespeichert</div>';
+          (f.alwLabels || []).forEach(function (l) {
+            html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+          });
+          if (f.retour) {
+            html += '<div class="rt-name" style="margin-top:8px">↩️ Retour → ' + esc(HBF[f.retour.ziel]) + "</div>";
+            if (f.retour.chain) html += chainChips(f.retour.chain);
+            (f.retour.alwLabels || []).forEach(function (l) {
+              html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+            });
+          }
+          html += "</div>";
+        });
+      }
+      if (e.note) html += '<div class="note">„' + esc(e.note) + "“</div>";
+      html += '<div class="flexrow" style="margin-top:10px">' +
+        '<button type="button" class="btn-sm btn-red" style="padding:13px" onclick="editDone()">Fertig ✅</button>' +
+        '<button type="button" class="btn-sm btn-grey" style="padding:13px" onclick="editCancel()">Abbrechen</button></div>';
+      html += "</div>";
+      return;
+    }
+    html += '<div class="card"><div class="dist-lbl" style="margin-bottom:6px">' +
+      '<span style="font-weight:600;color:#0f172a">📆 ' + fmtDate(e.date) + "</span>" +
+      '<span class="tag">' + esc(brGruppenText(e.baureihen)) + "</span></div>";
+    if (!(e.fahrten || []).length) {
+      html += '<div class="muted" style="font-size:12px;margin-top:2px">ohne Fahrt – nur Baureihen eingetragen (z. B. Fahrzeug bereitgestellt)</div>';
+    }
+    (e.fahrten || []).forEach(function (f, fi) {
+      html += '<div class="trip"><div class="rt-name" style="margin-top:' + (fi ? 10 : 4) + 'px">' +
+        "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
+      if (f.dreh && f.drehName) {
+        html += '<div class="muted" style="font-size:12px;margin-top:2px">🔄 ' + esc(f.drehName) + "</div>";
+      }
+      if (f.chain && f.chain.length) html += chainChips(f.chain);
+      else html += '<div class="warn" style="font-size:12px">ohne Fahrweg gespeichert</div>';
+      (f.alwLabels || []).forEach(function (l) {
+        html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+      });
+      if (f.retour) {
+        html += '<div class="rt-name" style="margin-top:8px">↩️ Retour → ' + esc(HBF[f.retour.ziel]) + "</div>";
+        if (f.retour.chain) html += chainChips(f.retour.chain);
+        (f.retour.alwLabels || []).forEach(function (l) {
+          html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
+        });
+      }
+      html += "</div>";
+    });
+    if (e.note) html += '<div class="note">„' + esc(e.note) + "“</div>";
+    if (state.confirmId === e.id) {
+      html += '<div class="flexrow"><button type="button" class="btn-sm btn-red" onclick="deleteEntry(\'' + e.id + '\')">Ja, löschen</button>' +
+        '<button type="button" class="btn-sm btn-grey" onclick="state.confirmId=null;render()">Abbrechen</button></div>';
+    } else {
+      html += '<button type="button" class="del" onclick="state.editId=\'' + e.id + '\';render()">✏️ Bearbeiten</button>';
+      html += '<button type="button" class="del" style="margin-left:12px" onclick="state.confirmId=\'' + e.id + '\';render()">Eintrag löschen</button>';
+    }
+    html += "</div>";
+  });
+  return html + "</div>";
+}
+
+/* ---------- Export & Backup (Jürgen 15.11.2026: Excel-Button + Backup-Panel statt Text-Sicherung) ---------- */
+function exportCard() {
+  var html = '<button type="button" class="btn-petrol" onclick="exportExcel()">📊 Excel-Liste erstellen</button>' +
+    '<button type="button" class="btn-petrol-ghost" onclick="toggleBackupPanel()">💾 Backup</button>';
+  if (state.backupOpen) {
+    html += '<div class="card" style="margin-top:10px">' +
+      '<div class="muted" style="font-size:13px;margin:0 0 4px">Deine Einträge liegen nur auf diesem Gerät. „Sichern“ erstellt eine Backup-Datei – „Laden“ stellt sie wieder her.</div>' +
+      '<div class="flexrow">' +
+      '<button type="button" class="btn-sm btn-petrol-soft" onclick="saveBackup()">⬇️ Sichern</button>' +
+      '<button type="button" class="btn-sm btn-petrol-solid" onclick="backupPickFile()">📂 Laden…</button>' +
+      '</div>' +
+      '<input type="file" id="backupFile" accept=".json,application/json" style="display:none" onchange="loadBackupFile(this)">' +
+      '</div>';
+  }
+  html += '<div id="backupMsg" style="text-align:center;font-size:14px;color:#475569;margin:8px 16px 0"></div>';
+  return html;
+}
+function toggleBackupPanel() { state.backupOpen = !state.backupOpen; render(); }
+function backupMsg(text) {
+  var el = document.getElementById("backupMsg");
+  if (el) el.textContent = text;
+  setTimeout(function () { if (el) el.textContent = ""; }, 2600);
+}
+function backupPickFile() {
+  var el = document.getElementById("backupFile");
+  if (el) el.click();
+}
+function downloadBlob(blob, name) {
+  var a = document.createElement("a");
+  var url = URL.createObjectURL(blob);
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { if (a.parentNode) document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+}
+function saveBackup() {
+  try {
+    var data = { app: "streckenkunde", typ: "backup", erstellt: todayISO(), eintraege: state.entries };
+    var blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    downloadBlob(blob, "streckenkunde-backup-" + todayISO() + ".json");
+    backupMsg("Backup-Datei erstellt! ✅");
+  } catch (e) { backupMsg("Backup fehlgeschlagen ❌"); }
+}
+function loadBackupFile(input) {
+  var file = input.files && input.files[0];
+  try { input.value = ""; } catch (e) {}
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function () {
+    try {
+      var parsed = JSON.parse(reader.result);
+      var arr = Array.isArray(parsed) ? parsed :
+        (parsed && Array.isArray(parsed.eintraege || parsed.entries) ? (parsed.eintraege || parsed.entries) : null);
+      if (!arr) throw new Error("kein Format");
+      var byId = {};
+      state.entries.concat(arr).forEach(function (e) { if (e && e.id) byId[e.id] = e; });
+      state.entries = Object.keys(byId).map(function (k) { return byId[k]; })
+        .sort(function (a, b) { return (a.date || "") < (b.date || "") ? -1 : 1; });
+      persist(); render();
+      backupMsg("Daten geladen! ✅");
+    } catch (err) { backupMsg("Das ist kein gültiges Backup. ❌"); }
+  };
+  reader.readAsText(file);
+}
+function exportExcel() {
+  try {
+    var sheets = buildExportWorkbook();
+    var bytes = xlsxFromSheets(sheets);
+    var blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    downloadBlob(blob, "streckenkunde-liste-" + todayISO() + ".xlsx");
+    backupMsg("Excel-Liste erstellt! ✅");
+  } catch (e) { backupMsg("Export fehlgeschlagen ❌"); }
+}
+/* Arbeitsmappe: Blatt 1 Strecken (Zettel-Reihenfolge, ohne Kdg. bis/Ampel – Jürgen 15.11.2026),
+   Blatt 2 Baureihen (Gruppen mit Monaten), Blatt 3 Fahrten (Rohdaten). */
+function buildExportWorkbook() {
+  var driven = collectDriven();
+  var blk = blockInfo();
+  var year = state.jahr;
+  var labels = blk.labels;
+  var sheets = [];
+  /* Blatt 1: Strecken */
+  var bereiche = { S: "Süd", M: "Mitte", N: "Nord", SO: "Südost" };
+  var rows = [["Bereich", "Strecke", "Von", "Bis", "Letzte Fahrt"].concat(labels)];
+  ["M", "N", "S", "SO"].forEach(function (rb) {
+    var extra = RB_EXTRA[rb] || [];
+    RB[rb].forEach(function (sid, ri) {
+      var onZettel = extra.length ? ri < RB[rb].length - extra.length : true;
+      if (extra.length && ri === RB[rb].length - extra.length) {
+        rows.push(["", "— nicht auf dem Zettel —", "", "", "", "", "", "", "", "", ""]);
+      }
+      var sec = SECTIONS[sid];
+      var lf = lfMitFrist(driven[sid], sec.f);
+      var mDates = driven[sid] || [];
+      var sSeed = seedFromFrist(sec.f);
+      if (sSeed && mDates.indexOf(sSeed) < 0) mDates = mDates.concat([sSeed]);
+      var chips = labels.map(function (lab, m) {
+        var mo = blk.start + m, last = "";
+        mDates.forEach(function (d) {
+          if (+d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1 && d > last) last = d;
+        });
+        return last ? String(+last.slice(8, 10)) : "X";
+      });
+      rows.push([
+        onZettel ? bereiche[rb] : "",
+        sec.n + (onZettel ? "" : " *"),
+        sec.v || "", sec.b || "",
+        lf ? fmtDate(lf) : (onZettel ? "noch nie gefahren" : "")
+      ].concat(chips));
+    });
+  });
+  sheets.push({ name: "Strecken", rows: rows, widths: [8, 30, 26, 26, 16, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5] });
+  /* Blatt 2: Baureihen */
+  var brDriven = {};
+  state.entries.forEach(function (e) {
+    (e.baureihen || []).forEach(function (b) { (brDriven[b] = brDriven[b] || []).push(e.date); });
+  });
+  var rows2 = [["Baureihen", "Letzte Fahrt"].concat(labels)];
+  BR_GROUPS.forEach(function (grp, gi) {
+    var dates = [];
+    grp.forEach(function (b) { (brDriven[b] || []).forEach(function (d) { dates.push(d); }); });
+    var lf = lastOf(dates);
+    var chips = labels.map(function (lab, m) {
+      var mo = blk.start + m, last = "";
+      dates.forEach(function (d) {
+        if (+d.slice(0, 4) === year && +d.slice(5, 7) === mo + 1 && d > last) last = d;
+      });
+      return last ? String(+last.slice(8, 10)) : "X";
+    });
+    rows2.push([BR_LABELS[gi], lf ? fmtDate(lf) : "noch nicht eingetragen"].concat(chips));
+  });
+  sheets.push({ name: "Baureihen", rows: rows2, widths: [26, 16, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5] });
+  /* Blatt 3: Fahrten (Rohdaten) */
+  var rows3 = [["Datum", "Baureihen", "Fahrt", "Fahrweg", "Retour", "Notiz"]];
+  state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
+    var brs = brGruppenText(e.baureihen || []);
+    if (!(e.fahrten || []).length) {
+      rows3.push([fmtDate(e.date), brs, "— ohne Fahrt (bereitgestellt)", "", "", e.note || ""]);
+      return;
+    }
+    (e.fahrten || []).forEach(function (f) {
+      var fahrt = (HBF[f.start] || f.start) + " → " + (HBF[f.ziel] || f.ziel) +
+        (f.dreh ? " (" + (f.drehName || "Drehfahrt") + ")" : "");
+      var weg = (f.chain || []).map(function (s) { return SECTIONS[s] ? SECTIONS[s].n : s; }).join(" · ");
+      var ret = "";
+      if (f.retour && f.retour.ziel) {
+        ret = "→ " + (HBF[f.retour.ziel] || f.retour.ziel) + " (" +
+          (f.retour.chain || []).map(function (s) { return SECTIONS[s] ? SECTIONS[s].n : s; }).join(" · ") + ")";
+      }
+      rows3.push([fmtDate(e.date), brs, fahrt, weg, ret, e.note || ""]);
+    });
+  });
+  sheets.push({ name: "Fahrten", rows: rows3, widths: [11, 22, 30, 60, 55, 26] });
+  return sheets;
+}
+/* ---------- Mini-XLSX-Writer (pure JS, keine externe Bibliothek): ZIP ohne Kompression + SpreadsheetML ---------- */
+var XLSX_CRC = (function () {
+  var t = [], c;
+  for (var n = 0; n < 256; n++) {
+    c = n;
+    for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function xlsxBytes(str) {
+  var s = unescape(encodeURIComponent(str)), out = [];
+  for (var i = 0; i < s.length; i++) out.push(s.charCodeAt(i) & 0xff);
+  return out;
+}
+function xlsxCrc(bytes) {
+  var c = 0xffffffff;
+  for (var i = 0; i < bytes.length; i++) c = XLSX_CRC[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+function xlsxXml(s) {
+  return String(s).replace(/[&<>"]/g, function (m) {
+    if (m === "&") return "&amp;";
+    if (m === "<") return "&lt;";
+    if (m === ">") return "&gt;";
+    return "&quot;";
+  });
+}
+function xlsxColRef(n) {
+  var s = "";
+  while (n > 0) { var r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); }
+  return s;
+}
+function xlsxSheetXml(sheet) {
+  var xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
+    '<cols>';
+  sheet.widths.forEach(function (w, i) {
+    xml += '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>';
+  });
+  xml += '</cols><sheetData>';
+  sheet.rows.forEach(function (row, ri) {
+    xml += '<row r="' + (ri + 1) + '">';
+    row.forEach(function (v, ci) {
+      if (v === "" || v === null || v === undefined) return;
+      xml += '<c r="' + xlsxColRef(ci + 1) + (ri + 1) + '"' + (ri === 0 ? ' s="1"' : '') +
+        ' t="inlineStr"><is><t xml:space="preserve">' + xlsxXml(v) + '</t></is></c>';
+    });
+    xml += '</row>';
+  });
+  xml += '</sheetData></worksheet>';
+  return xml;
+}
+function xlsxZip(files) {
+  var u16 = function (v) { return [v & 0xff, (v >>> 8) & 0xff]; };
+  var u32 = function (v) { return [v & 0xff, (v >>> 8) & 0xff, (v >>> 16) & 0xff, (v >>> 24) & 0xff]; };
+  var parts = [], central = [], offset = 0;
+  files.forEach(function (f) {
+    var name = xlsxBytes(f.name), data = f.data;
+    var crc = xlsxCrc(data);
+    var local = [].concat(u32(0x04034b50), u16(20), u16(0), u16(0), u16(0x6000), u16(0x5d6f),
+      u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+    parts.push(local, name, data);
+    central.push({ name: name, crc: crc, size: data.length, offset: offset });
+    offset += local.length + name.length + data.length;
+  });
+  var cd = [], cdSize = 0;
+  central.forEach(function (e) {
+    var c = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0), u16(0), u16(0x6000), u16(0x5d6f),
+      u32(e.crc), u32(e.size), u32(e.size), u16(e.name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(e.offset));
+    cd.push(c, e.name);
+    cdSize += c.length + e.name.length;
+  });
+  var eocd = [].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length),
+    u32(cdSize), u32(offset), u16(0));
+  var all = parts.concat(cd, [eocd]);
+  var total = 0;
+  all.forEach(function (p) { total += p.length; });
+  var out = new Uint8Array(total), pos = 0;
+  all.forEach(function (p) { for (var i = 0; i < p.length; i++) out[pos++] = p[i]; });
+  return out;
+}
+function xlsxFromSheets(sheets) {
+  var files = [];
+  var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+    '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>';
+  var wbSheets = '', wbRels = '';
+  sheets.forEach(function (s, i) {
+    ct += '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
+    wbSheets += '<sheet name="' + xlsxXml(s.name) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>';
+    wbRels += '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>';
+    files.push({ name: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: xlsxBytes(xlsxSheetXml(s)) });
+  });
+  ct += '</Types>';
+  files.unshift({ name: '[Content_Types].xml', data: xlsxBytes(ct) });
+  files.push({ name: '_rels/.rels', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>') });
+  files.push({ name: 'xl/workbook.xml', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' + wbSheets + '</sheets></workbook>') });
+  files.push({ name: 'xl/_rels/workbook.xml.rels', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + wbRels + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>') });
+  files.push({ name: 'xl/styles.xml', data: xlsxBytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><name val="Arial"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>') });
+  return xlsxZip(files);
+}
+
+/* ---------- Aktionen / Persistenz ---------- */
+function persist() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries)); } catch (e) {}
+}
+/* Eintrag aus dem Verlauf löschen (Jürgen 09.11.2026: „Ja, löschen“-Button tat nichts –
+   die aufgerufene Funktion existierte nicht). */
+function deleteEntry(id) {
+  state.entries = state.entries.filter(function (e) { return e.id !== id; });
+  state.confirmId = null;
+  persist();
+  render();
+}
+/* ---------- Eintrag bearbeiten (Jürgen 09.11.2026) ---------- */
+function entryById(id) {
+  return state.entries.filter(function (e) { return e.id === id; })[0] || null;
+}
+function editDate(v) {
+  if (!v) return;
+  var e = entryById(state.editId);
+  if (e) { e.date = v; persist(); render(); }
+}
+/* Baureihen-Gruppe im Eintrag an/aus – gleiche Logik wie im Eintragen-Schritt */
+function editToggleBr(gi) {
+  var e = entryById(state.editId);
+  if (!e) return;
+  e.baureihen = e.baureihen || [];
+  var grp = BR_GROUPS[gi];
+  var all = grp.every(function (b) { return e.baureihen.indexOf(b) >= 0; });
+  if (all) e.baureihen = e.baureihen.filter(function (b) { return grp.indexOf(b) < 0; });
+  else grp.forEach(function (b) { if (e.baureihen.indexOf(b) < 0) e.baureihen.push(b); });
+  persist();
+  render();
+}
+/* Abbrechen: Bearbeiten-Modus verlassen (Jürgen 09.11.2026) */
+function editCancel() {
+  state.editId = null;
+  render();
+}
+function editDone() {
+  state.editId = null;
+  persist();
+  render();
+}
+function go(tab) { state.tab = tab; render(); window.scrollTo(0, 0); }
+
+function render() {
+  var wrap = document.getElementById("wrap");
+  if (state.tab === "form" && !state.w && !state.saved) startWizard();
+  /* Auto-Skip: Fahrt endet in München → Retour entfällt */
+  if (state.tab === "form" && state.w && state.w.steps.length) {
+    var cs = curStep();
+    if (cs.k === "ret") {
+      var f = fahrtOf(cs.i);
+      if (f.ziel === "muenchen_hbf" || f.ziel === "muenchen_ost") {
+        f.retour = null;
+        state.w.steps.push({ k: "mehr", i: cs.i });
+      }
+    }
+  }
+  var body = state.tab === "form" ? viewForm() : state.tab === "stats" ? viewStats() : viewLog();
+  if (typeof body === "object" && body.skip) { state.w.steps.push(body.skip); return render(); }
+  var tabs = [
+    { id: "form", ico: "📝", label: "Eintragen" },
+    { id: "stats", ico: "📊", label: "Auswertung" },
+    { id: "log", ico: "🗂️", label: "Verlauf" }
+  ];
+  var tabbar = '<div class="tabbar">' + tabs.map(function (t) {
+    return '<button type="button" class="tab' + (state.tab === t.id ? " on" : "") + '" onclick="go(\'' + t.id + '\')">' +
+      '<span class="ico">' + t.ico + "</span>" + t.label + "</button>";
+  }).join("") + "</div>";
+  var stepsH = "";
+  if (state.tab === "form" && state.w && !state.saved && state.w.fahrten.length) {
+    stepsH = '<div class="crumbs">' + state.w.fahrten.length + ". Fahrt" + "</div>";
+  }
+  wrap.innerHTML =
+    '<header><div class="logo">🛤️</div><div><h1>Streckenkunde</h1></div></header>' +
+    body + tabbar;
+  if (state.tab === "form" && state.w && !state.saved) {
+    var na = document.getElementById("noteArea");
+    if (na) na.value = state.w.note || "";
+  }
+}
+
+render();
+
+</script>
+</body>
+</html>
+
