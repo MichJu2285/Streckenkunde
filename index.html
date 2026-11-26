@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-26d: U98 – Statistik Quartals-Chips mit Monatsnamen (Jan – Mär statt Q1), auch in der Angezeigt-Zeile – Cache-Buster -->
+<!-- v2 build 2026-11-26e: U99 – Statistik-Zeitraum: kein 2025 mehr wählbar (ältestes Eintragsjahr als Untergrenze, Auswertung unverändert) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1661,11 +1661,21 @@ function zeitEntries() {
   var r = zeitRange();
   return state.entries.filter(function (e) { return e.date >= r.s && e.date <= r.e; });
 }
+/* Ältestes wählbares Jahr im Statistik-Filter (Jürgen 26.11.2026: 2025 und früher sind unnötig,
+   Daten werden erst ab Oktober 2026 erfasst) = Jahr des ältesten Eintrags, maximal das aktuelle Jahr */
+function statMinJahr() {
+  var cur = new Date().getFullYear();
+  var min = cur;
+  state.entries.forEach(function (e) {
+    if (e.date && e.date.length >= 4) { var y = +e.date.slice(0, 4); if (y < min) min = y; }
+  });
+  return min;
+}
 function setStatZeit(a) { state.statZeit = a; render(); }
 function setStatJahr(d) {
   var cur = new Date().getFullYear();
   var y = state.statJahr + d;
-  if (y < cur - 1 || y > cur) return;
+  if (y < statMinJahr() || y > cur) return;
   state.statJahr = y; render();
 }
 function setStatVal(id) {
@@ -1685,7 +1695,7 @@ function zeitFilterCard() {
       return '<button class="chip' + (state.statZeit === a[0] ? " on" : "") + '" onclick="setStatZeit(\'' + a[0] + '\')">' + a[1] + "</button>";
     }).join("") + "</div>" +
     '<div class="chips wrap" style="padding:0;margin-top:8px">' +
-    '<button class="chip"' + (state.statJahr <= cur - 1 ? ' disabled style="opacity:.45"' : "") + ' onclick="setStatJahr(-1)">◀ ' + (state.statJahr - 1) + "</button>" +
+    '<button class="chip"' + (state.statJahr <= statMinJahr() ? ' disabled style="opacity:.45"' : "") + ' onclick="setStatJahr(-1)">◀ ' + (state.statJahr - 1) + "</button>" +
     '<span class="chip" style="background:var(--akzent);border-color:var(--akzent);color:#0f172a;cursor:default">' + state.statJahr + "</span>" +
     '<button class="chip"' + (state.statJahr >= cur ? ' disabled style="opacity:.45"' : "") + ' onclick="setStatJahr(1)">' + (state.statJahr + 1) + " ▶</button></div>";
   var werte = '<div class="chips wrap" style="padding:0;margin-top:8px">';
