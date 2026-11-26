@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-17b: Migration U93 – Süd 153 einmalig aus allen Alt-Einträgen entfernt (war bis U92 fix im Regelweg) + 153-Option (Obertürkheim → Bad Cannstatt) – Cache-Buster -->
+<!-- v2 build 2026-11-26: U94 – Zugnummer-Felder im Notiz-Schritt (pro Fahrt + Retour), Statistik-Tab („Was ich so fahre" / „Wohin ich so fahre"), Tab-Reihenfolge Eintragen/Verlauf/Auswertung/Statistik, Zug-Spalte im Excel-Fahrten-Blatt – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -66,6 +66,17 @@
   .btn-petrol-solid { background: #146565; color: #fff; }
   textarea { width: 100%; background: rgba(248,250,252,var(--feld-alpha)); border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-size: 18px; font-family: inherit; color: #0f172a; }
   textarea:focus { outline: none; border-color: var(--akzent); }
+  /* Zugnummer-Eingabe (Jürgen 26.11.2026): gleiche Optik wie Notiz-Feld */
+  input.zug { width: 100%; background: rgba(248,250,252,var(--feld-alpha)); border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-size: 18px; font-family: inherit; color: #0f172a; }
+  input.zug:focus { outline: none; border-color: var(--akzent); }
+  /* Statistik-Reihen (Jürgen 26.11.2026): Name + Petrol-Balken + Anzahl */
+  .stat-lbl { font-size: 15px; font-weight: 600; color: #0f4c4c; margin: 14px 0 8px; }
+  .stat-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f1f5f9; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-name { flex: none; width: 46%; font-size: 16px; font-weight: 600; }
+  .stat-bar { flex: 1; height: 8px; border-radius: 99px; background: rgba(15,76,76,.12); overflow: hidden; }
+  .stat-bar i { display: block; height: 8px; border-radius: 99px; background: #146565; }
+  .stat-cnt { flex: none; font-size: 15px; font-weight: 700; color: #0f4c4c; min-width: 34px; text-align: right; }
   .hint { margin: 0 16px 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 12px; font-size: 15px; }
   .center { text-align: center; padding: 48px 20px; }
   .big-emoji { font-size: 54px; margin-bottom: 12px; }
@@ -813,7 +824,8 @@ var state = {
   andererFf: false, /* Frankfurt-Gruppe in „Anderer Hbf…“ aufgeklappt */
   dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
   jahr: new Date().getFullYear(),
-  block: null /* Halbjahr-Block der Auswertung: null = automatisch (aktuelles Halbjahr), "H1" = Jan–Jun, "H2" = Jul–Dez (Jürgen 08.11.2026) */
+  block: null, /* Halbjahr-Block der Auswertung: null = automatisch (aktuelles Halbjahr), "H1" = Jan–Jun, "H2" = Jul–Dez (Jürgen 08.11.2026) */
+  statView: null /* Statistik-Tab (Jürgen 26.11.2026): null = Auswahl der zwei Felder, "was" = Baureihen/Strecken, "wohin" = Zielbahnhöfe */
 };
 
 /* Migration U93 (Jürgen 17.11.2026): Bis Update 92 war die Süd 153 fix im Regelweg der
@@ -1099,6 +1111,12 @@ function weitereFahrt(i) {
 }
 function keineWeitere(i) { pushStep({ k: "note" }); }
 function setNote(v) { state.w.note = v; }
+/* Zugnummer pro Fahrt speichern (Jürgen 26.11.2026): ret=0 Hinfahrt, ret=1 Retour */
+function setZug(i, ret, v) {
+  var f = fahrtOf(i);
+  if (ret) { if (!f.retour) f.retour = {}; f.retour.zug = v; }
+  else f.zug = v;
+}
 function setDate(v) { state.w.date = v; }
 function pickHeute() {
   state.w.date = todayISO();
@@ -1115,7 +1133,7 @@ function submitEntry() {
   var w = state.w;
   if (!w.baureihen.length || !w.fahrten.length) return;
   var fahrten = w.fahrten.map(function (f) {
-    var out = { start: f.start, ziel: f.ziel, routeId: f.routeId, alws: f.alws.slice(), opts: f.opts.slice(), chain: [] };
+    var out = { start: f.start, ziel: f.ziel, routeId: f.routeId, zug: (f.zug || "").trim(), alws: f.alws.slice(), opts: f.opts.slice(), chain: [] };
     /* Drehfahrt: Rundfahrt aus der Drehfahrten-Bibliothek, ohne Retour (Jürgen 01.11.2026) */
     if (f.start === f.ziel && DREHFAHRTEN[f.start]) {
       var dlist = DREHFAHRTEN[f.start];
@@ -1141,7 +1159,7 @@ function submitEntry() {
       var rr = rrs.filter(function (x) { return x.id === f.retour.routeId; })[0] || rrs.filter(function (x) { return x.d; })[0] || rrs[0];
       if (rr) {
         var rleg = composeLeg(rr, f.retour.alws, f.retour.opts);
-        out.retour = { ziel: f.retour.ziel, routeId: rr.id, alws: f.retour.alws.slice(), opts: f.retour.opts.slice(), chain: rleg.chain, alwLabels: rleg.alwLabels, warnings: rleg.warnings };
+        out.retour = { ziel: f.retour.ziel, routeId: rr.id, zug: ((f.retour && f.retour.zug) || "").trim(), alws: f.retour.alws.slice(), opts: f.retour.opts.slice(), chain: rleg.chain, alwLabels: rleg.alwLabels, warnings: rleg.warnings };
       }
     }
     return out;
@@ -1465,7 +1483,21 @@ function viewForm() {
       '<button type="button" class="opt" onclick="weitereFahrt(' + s.i + ')">Ja, weitere Fahrt</button>' +
       '<button type="button" class="opt" onclick="keineWeitere(' + s.i + ')">Nein, das war alles</button></div>';
   } else if (s.k === "note") {
-    var cnt = state.w.fahrten.length;
+    /* Zugnummern (Jürgen 26.11.2026): pro Fahrt ein Feld, plus Retour-Feld wenn vorhanden */
+    html += '<div class="card"><div class="qlabel">🚆 Zugnummern (optional)</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:10px">Pro Fahrt ein Feld – leer lassen geht immer.</div>';
+    state.w.fahrten.forEach(function (f, fi) {
+      html += '<div style="margin-bottom:12px">' +
+        '<div style="font-size:14px;font-weight:600;color:#0f4c4c;margin-bottom:4px">Fahrt ' + (fi + 1) + ": " +
+        esc(HBF[f.start] || f.start || "?") + " → " + esc(HBF[f.ziel] || f.ziel || "?") + "</div>" +
+        '<input type="text" class="zug" autocapitalize="characters" placeholder="z. B. ICE 594" value="' + esc(f.zug || "") + '" oninput="setZug(' + fi + ',0,this.value)">';
+      if (f.retour && f.retour.ziel) {
+        html += '<div style="font-size:14px;font-weight:600;color:#0f4c4c;margin:8px 0 4px">Retour → ' + esc(HBF[f.retour.ziel] || f.retour.ziel) + "</div>" +
+          '<input type="text" class="zug" autocapitalize="characters" placeholder="z. B. ICE 597" value="' + esc((f.retour && f.retour.zug) || "") + '" oninput="setZug(' + fi + ',1,this.value)">';
+      }
+      html += "</div>";
+    });
+    html += "</div>";
     html += '<div class="card"><div class="qlabel">📝 Notiz (optional)</div>' +
       '<textarea rows="3" id="noteArea" placeholder="Z. B. Verspätung, besonderes Erlebnis …" oninput="setNote(this.value)"></textarea></div>';
     html += '<button class="btn-main" onclick="submitEntry()">Speichern 💾</button>';
@@ -1596,6 +1628,79 @@ function viewStats() {
   return html;
 }
 
+/* ---------- Statistik (Jürgen 26.11.2026): „Was ich so fahre" + „Wohin ich so fahre" ---------- */
+function setStatView(v) { state.statView = v; render(); window.scrollTo(0, 0); }
+function statRows(list, max) {
+  var h = "";
+  list.forEach(function (r) {
+    h += '<div class="stat-row"><span class="stat-name">' + esc(r.n) + "</span>" +
+      '<span class="stat-bar"><i style="width:' + (max ? Math.round(r.c / max * 100) : 0) + '%"></i></span>' +
+      '<span class="stat-cnt">' + r.c + "</span></div>";
+  });
+  return h;
+}
+function viewStatistik() {
+  var html = '<div class="content">';
+  if (!state.statView) {
+    var total = 0;
+    state.entries.forEach(function (e) { total += (e.fahrten || []).length; });
+    html += '<div class="card"><div class="qlabel">📈 Statistik</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:10px">Zwei Zahlen-Reihen aus deinen eingetragenen Fahrten' +
+      (total ? " – bisher " + total + " Fahrten erfasst." : ".") + "</div>" +
+      '<button type="button" class="opt" onclick="setStatView(\'was\')">🚆 Was ich so fahre<br><span class="muted" style="font-size:13px;font-weight:400">Baureihen & Strecken – wie oft</span></button>' +
+      '<button type="button" class="opt" onclick="setStatView(\'wohin\')">📍 Wohin ich so fahre<br><span class="muted" style="font-size:13px;font-weight:400">Zielbahnhöfe – wie oft (ohne München)</span></button></div>';
+    return html + "</div>";
+  }
+  html += '<button type="button" class="opt back" onclick="setStatView(null)">↩︎ Zurück</button>';
+  if (state.statView === "was") {
+    /* Baureihen: Anzahl Einträge MIT Fahrt (bereitgestellte Tage zählen nicht) */
+    var brCount = {};
+    state.entries.forEach(function (e) {
+      if (!(e.fahrten || []).length) return;
+      (e.baureihen || []).forEach(function (b) { brCount[b] = (brCount[b] || 0) + 1; });
+    });
+    var brList = [];
+    BR_GROUPS.forEach(function (grp, gi) {
+      var c = 0;
+      grp.forEach(function (b) { c += brCount[b] || 0; });
+      if (c) brList.push({ n: BR_LABELS[gi], c: c });
+    });
+    brList.sort(function (a, b) { return b.c - a.c; });
+    /* Strecken: wie oft jeder Abschnitt befahren wurde (inkl. Retour) */
+    var driven = collectDriven();
+    var secList = [];
+    Object.keys(driven).forEach(function (sid) {
+      secList.push({ n: SECTIONS[sid] ? SECTIONS[sid].n : sid, c: driven[sid].length });
+    });
+    secList.sort(function (a, b) { return b.c - a.c; });
+    var topSec = secList.slice(0, 12);
+    html += '<div class="card"><div class="qlabel">🚆 Was ich so fahre</div>' +
+      '<div class="stat-lbl">Baureihen (Anzahl Diensttage mit Fahrt)</div>' +
+      (brList.length ? statRows(brList, brList[0].c) : '<div class="muted" style="font-size:14px">Noch keine Fahrten erfasst.</div>') +
+      '<div class="stat-lbl">Strecken (Top 12 nach Fahrten)</div>' +
+      (topSec.length ? statRows(topSec, topSec[0].c) : '<div class="muted" style="font-size:14px">Noch keine Fahrten erfasst.</div>') +
+      "</div>";
+  } else {
+    /* Ziele: alle Hin-Fahrten nach Zielbahnhof; München (Heimfahrt) wird nicht gezählt (Jürgen 26.11.2026) */
+    var ziele = {}, mucCount = 0;
+    state.entries.forEach(function (e) {
+      (e.fahrten || []).forEach(function (f) {
+        if (!f.ziel) return;
+        if (MUC_HOFE.indexOf(f.ziel) >= 0) { mucCount++; return; }
+        ziele[f.ziel] = (ziele[f.ziel] || 0) + 1;
+      });
+    });
+    var zList = [];
+    Object.keys(ziele).forEach(function (z) { zList.push({ n: HBF[z] || z, c: ziele[z] }); });
+    zList.sort(function (a, b) { return b.c - a.c; });
+    html += '<div class="card"><div class="qlabel">📍 Wohin ich so fahre</div>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Alle Hin-Fahrten nach Zielbahnhof. Fahrten mit Ziel München (Heimfahrt) werden nicht mitgezählt: ' + mucCount + "</div>" +
+      (zList.length ? statRows(zList, zList[0].c) : '<div class="muted" style="font-size:14px">Noch keine Fahrten mit Ziel außerhalb München.</div>') +
+      "</div>";
+  }
+  return html + "</div>";
+}
+
 /* ---------- Verlauf ---------- */
 function viewLog() {
   if (!state.entries.length) {
@@ -1625,6 +1730,7 @@ function viewLog() {
         (e.fahrten || []).forEach(function (f) {
           html += '<div class="trip"><div class="rt-name" style="margin-top:4px">' +
             "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
+          if (f.zug) html += '<div class="muted" style="font-size:12px;margin-top:2px">🎫 Zug ' + esc(f.zug) + "</div>";
           if (f.dreh && f.drehName) {
             html += '<div class="muted" style="font-size:12px;margin-top:2px">🔄 ' + esc(f.drehName) + "</div>";
           }
@@ -1635,6 +1741,7 @@ function viewLog() {
           });
           if (f.retour) {
             html += '<div class="rt-name" style="margin-top:8px">↩️ Retour → ' + esc(HBF[f.retour.ziel]) + "</div>";
+            if (f.retour.zug) html += '<div class="muted" style="font-size:12px;margin-top:2px">🎫 Zug ' + esc(f.retour.zug) + "</div>";
             if (f.retour.chain) html += chainChips(f.retour.chain);
             (f.retour.alwLabels || []).forEach(function (l) {
               html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
@@ -1659,6 +1766,7 @@ function viewLog() {
     (e.fahrten || []).forEach(function (f, fi) {
       html += '<div class="trip"><div class="rt-name" style="margin-top:' + (fi ? 10 : 4) + 'px">' +
         "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
+      if (f.zug) html += '<div class="muted" style="font-size:12px;margin-top:2px">🎫 Zug ' + esc(f.zug) + "</div>";
       if (f.dreh && f.drehName) {
         html += '<div class="muted" style="font-size:12px;margin-top:2px">🔄 ' + esc(f.drehName) + "</div>";
       }
@@ -1669,6 +1777,7 @@ function viewLog() {
       });
       if (f.retour) {
         html += '<div class="rt-name" style="margin-top:8px">↩️ Retour → ' + esc(HBF[f.retour.ziel]) + "</div>";
+        if (f.retour.zug) html += '<div class="muted" style="font-size:12px;margin-top:2px">🎫 Zug ' + esc(f.retour.zug) + "</div>";
         if (f.retour.chain) html += chainChips(f.retour.chain);
         (f.retour.alwLabels || []).forEach(function (l) {
           html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
@@ -1821,12 +1930,12 @@ function buildExportWorkbook() {
     rows2.push([BR_LABELS[gi], lf ? fmtDate(lf) : "noch nicht eingetragen"].concat(chips));
   });
   sheets.push({ name: "Baureihen", rows: rows2, widths: [26, 16, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5] });
-  /* Blatt 3: Fahrten (Rohdaten) */
-  var rows3 = [["Datum", "Baureihen", "Fahrt", "Fahrweg", "Retour", "Notiz"]];
+  /* Blatt 3: Fahrten (Rohdaten, mit Zugnummern Jürgen 26.11.2026) */
+  var rows3 = [["Datum", "Baureihen", "Fahrt", "Zug", "Fahrweg", "Retour", "Notiz"]];
   state.entries.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).forEach(function (e) {
     var brs = brGruppenText(e.baureihen || []);
     if (!(e.fahrten || []).length) {
-      rows3.push([fmtDate(e.date), brs, "— ohne Fahrt (bereitgestellt)", "", "", e.note || ""]);
+      rows3.push([fmtDate(e.date), brs, "— ohne Fahrt (bereitgestellt)", "", "", "", e.note || ""]);
       return;
     }
     (e.fahrten || []).forEach(function (f) {
@@ -1835,13 +1944,13 @@ function buildExportWorkbook() {
       var weg = (f.chain || []).map(function (s) { return SECTIONS[s] ? SECTIONS[s].n : s; }).join(" · ");
       var ret = "";
       if (f.retour && f.retour.ziel) {
-        ret = "→ " + (HBF[f.retour.ziel] || f.retour.ziel) + " (" +
+        ret = (f.retour.zug ? f.retour.zug + " · " : "") + "→ " + (HBF[f.retour.ziel] || f.retour.ziel) + " (" +
           (f.retour.chain || []).map(function (s) { return SECTIONS[s] ? SECTIONS[s].n : s; }).join(" · ") + ")";
       }
-      rows3.push([fmtDate(e.date), brs, fahrt, weg, ret, e.note || ""]);
+      rows3.push([fmtDate(e.date), brs, fahrt, f.zug || "", weg, ret, e.note || ""]);
     });
   });
-  sheets.push({ name: "Fahrten", rows: rows3, widths: [11, 22, 30, 60, 55, 26] });
+  sheets.push({ name: "Fahrten", rows: rows3, widths: [11, 22, 30, 10, 60, 55, 26] });
   return sheets;
 }
 /* ---------- Mini-XLSX-Writer (pure JS, keine externe Bibliothek): ZIP ohne Kompression + SpreadsheetML ---------- */
@@ -2010,12 +2119,13 @@ function render() {
       }
     }
   }
-  var body = state.tab === "form" ? viewForm() : state.tab === "stats" ? viewStats() : viewLog();
+  var body = state.tab === "form" ? viewForm() : state.tab === "stats" ? viewStats() : state.tab === "statistik" ? viewStatistik() : viewLog();
   if (typeof body === "object" && body.skip) { state.w.steps.push(body.skip); return render(); }
   var tabs = [
     { id: "form", ico: "📝", label: "Eintragen" },
+    { id: "log", ico: "🗂️", label: "Verlauf" },
     { id: "stats", ico: "📊", label: "Auswertung" },
-    { id: "log", ico: "🗂️", label: "Verlauf" }
+    { id: "statistik", ico: "📈", label: "Statistik" }
   ];
   var tabbar = '<div class="tabbar">' + tabs.map(function (t) {
     return '<button type="button" class="tab' + (state.tab === t.id ? " on" : "") + '" onclick="go(\'' + t.id + '\')">' +
