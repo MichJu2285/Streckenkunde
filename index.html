@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-26: U94 – Zugnummer-Felder im Notiz-Schritt (pro Fahrt + Retour), Statistik-Tab („Was ich so fahre" / „Wohin ich so fahre"), Tab-Reihenfolge Eintragen/Verlauf/Auswertung/Statistik, Zug-Spalte im Excel-Fahrten-Blatt – Cache-Buster -->
+<!-- v2 build 2026-11-26a: U95 – Zugnummern im Verlauf nachträglich editierbar (Bearbeiten-Modus, Hin + Retour) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1727,10 +1727,10 @@ function viewLog() {
       if (!(e.fahrten || []).length) {
         html += '<div class="muted" style="font-size:12px;margin-bottom:4px">ohne Fahrt – nur Baureihen eingetragen</div>';
       } else {
-        (e.fahrten || []).forEach(function (f) {
+        (e.fahrten || []).forEach(function (f, fi) {
           html += '<div class="trip"><div class="rt-name" style="margin-top:4px">' +
             "🚆 " + esc(HBF[f.start] || f.start) + " → " + esc(HBF[f.ziel] || f.ziel) + "</div>";
-          if (f.zug) html += '<div class="muted" style="font-size:12px;margin-top:2px">🎫 Zug ' + esc(f.zug) + "</div>";
+          html += '<input type="text" class="zug" style="margin-top:6px;font-size:16px;padding:10px 14px" autocapitalize="characters" placeholder="🎫 Zugnummer nachtragen …" value="' + esc(f.zug || "") + '" onchange="editZug(' + fi + ',0,this.value)">';
           if (f.dreh && f.drehName) {
             html += '<div class="muted" style="font-size:12px;margin-top:2px">🔄 ' + esc(f.drehName) + "</div>";
           }
@@ -1741,7 +1741,7 @@ function viewLog() {
           });
           if (f.retour) {
             html += '<div class="rt-name" style="margin-top:8px">↩️ Retour → ' + esc(HBF[f.retour.ziel]) + "</div>";
-            if (f.retour.zug) html += '<div class="muted" style="font-size:12px;margin-top:2px">🎫 Zug ' + esc(f.retour.zug) + "</div>";
+            html += '<input type="text" class="zug" style="margin-top:6px;font-size:16px;padding:10px 14px" autocapitalize="characters" placeholder="🎫 Zugnummer nachtragen …" value="' + esc(f.retour.zug || "") + '" onchange="editZug(' + fi + ',1,this.value)">';
             if (f.retour.chain) html += chainChips(f.retour.chain);
             (f.retour.alwLabels || []).forEach(function (l) {
               html += '<div class="muted" style="font-size:12px;margin-top:3px">↪ ' + esc(l) + "</div>";
@@ -2092,6 +2092,17 @@ function editToggleBr(gi) {
   else grp.forEach(function (b) { if (e.baureihen.indexOf(b) < 0) e.baureihen.push(b); });
   persist();
   render();
+}
+/* Zugnummer im Bearbeiten-Modus nachtragen (Jürgen 26.11.2026): fi = Fahrt-Index, ret = 0 Hin / 1 Retour.
+   onchange (nicht oninput) + persist ohne render – sonst verliert das Feld den Fokus. */
+function editZug(fi, ret, v) {
+  var e = entryById(state.editId);
+  if (!e) return;
+  var f = (e.fahrten || [])[fi];
+  if (!f) return;
+  if (ret) { if (!f.retour) f.retour = {}; f.retour.zug = v; }
+  else f.zug = v;
+  persist();
 }
 /* Abbrechen: Bearbeiten-Modus verlassen (Jürgen 09.11.2026) */
 function editCancel() {
