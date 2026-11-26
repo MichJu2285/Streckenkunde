@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-26e: U99 – Statistik-Zeitraum: kein 2025 mehr wählbar (ältestes Eintragsjahr als Untergrenze, Auswertung unverändert) – Cache-Buster -->
+<!-- v2 build 2026-11-26f: U100 – Statistik-Label „Baureihen (Tage wo gefahren)" statt „Anzahl Diensttage mit Fahrt" (Jürgen-Wunsch) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1766,7 +1766,7 @@ function viewStatistik() {
     zugList.sort(function (a, b) { return b.c - a.c; });
     var topZug = zugList.slice(0, 15);
     html += '<div class="card"><div class="qlabel">🚆 Was ich so fahre</div>' +
-      '<div class="stat-lbl">Baureihen (Anzahl Diensttage mit Fahrt)</div>' +
+      '<div class="stat-lbl">Baureihen (Tage wo gefahren)</div>' +
       (brList.length ? statRows(brList, brList[0].c) : '<div class="muted" style="font-size:14px">Keine Fahrten im gewählten Zeitraum.</div>') +
       '<div class="stat-lbl">Züge (wie oft gefahren, Top 15)</div>' +
       (topZug.length ? statRows(topZug, topZug[0].c) : '<div class="muted" style="font-size:14px">Keine Zugnummern im gewählten Zeitraum erfasst.</div>') +
