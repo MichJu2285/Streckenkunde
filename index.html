@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-26a: U95 – Zugnummern im Verlauf nachträglich editierbar (Bearbeiten-Modus, Hin + Retour) – Cache-Buster -->
+<!-- v2 build 2026-11-26b: U96 – Statistik „Was ich so fahre": Baureihen + Zugnummern (Top 15), Strecken-Ranking entfernt (Jürgen-Wunsch) – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -1666,19 +1666,26 @@ function viewStatistik() {
       if (c) brList.push({ n: BR_LABELS[gi], c: c });
     });
     brList.sort(function (a, b) { return b.c - a.c; });
-    /* Strecken: wie oft jeder Abschnitt befahren wurde (inkl. Retour) */
-    var driven = collectDriven();
-    var secList = [];
-    Object.keys(driven).forEach(function (sid) {
-      secList.push({ n: SECTIONS[sid] ? SECTIONS[sid].n : sid, c: driven[sid].length });
+    /* Strecken-Ranking raus (Jürgen 26.11.2026: „Wie oft ich eine Strecke genau fahre ist eher unwichtig");
+       dafür Zugnummern: wie oft welcher Zug gefahren (Hin + Retour) */
+    var zugCount = {};
+    state.entries.forEach(function (e) {
+      (e.fahrten || []).forEach(function (f) {
+        [f.zug, f.retour && f.retour.zug].forEach(function (z) {
+          z = (z || "").trim();
+          if (z) zugCount[z] = (zugCount[z] || 0) + 1;
+        });
+      });
     });
-    secList.sort(function (a, b) { return b.c - a.c; });
-    var topSec = secList.slice(0, 12);
+    var zugList = [];
+    Object.keys(zugCount).forEach(function (z) { zugList.push({ n: z, c: zugCount[z] }); });
+    zugList.sort(function (a, b) { return b.c - a.c; });
+    var topZug = zugList.slice(0, 15);
     html += '<div class="card"><div class="qlabel">🚆 Was ich so fahre</div>' +
       '<div class="stat-lbl">Baureihen (Anzahl Diensttage mit Fahrt)</div>' +
       (brList.length ? statRows(brList, brList[0].c) : '<div class="muted" style="font-size:14px">Noch keine Fahrten erfasst.</div>') +
-      '<div class="stat-lbl">Strecken (Top 12 nach Fahrten)</div>' +
-      (topSec.length ? statRows(topSec, topSec[0].c) : '<div class="muted" style="font-size:14px">Noch keine Fahrten erfasst.</div>') +
+      '<div class="stat-lbl">Züge (wie oft gefahren, Top 15)</div>' +
+      (topZug.length ? statRows(topZug, topZug[0].c) : '<div class="muted" style="font-size:14px">Noch keine Zugnummern erfasst.</div>') +
       "</div>";
   } else {
     /* Ziele: alle Hin-Fahrten nach Zielbahnhof; München (Heimfahrt) wird nicht gezählt (Jürgen 26.11.2026) */
