@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2 build 2026-11-26b: U96 – Statistik „Was ich so fahre": Baureihen + Zugnummern (Top 15), Strecken-Ranking entfernt (Jürgen-Wunsch) – Cache-Buster -->
+<!-- v2 build 2026-11-26c: U97 – Statistik Zeitraum-Filter: Jahr / Halbjahr / Quartal / Monat mit Jahr-Umschalter, wirksam auf beide Ansichten – Cache-Buster -->
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -825,7 +825,13 @@ var state = {
   dateCustom: false, /* Erster Schritt: „Anderer Tag"-Eingabe offen */
   jahr: new Date().getFullYear(),
   block: null, /* Halbjahr-Block der Auswertung: null = automatisch (aktuelles Halbjahr), "H1" = Jan–Jun, "H2" = Jul–Dez (Jürgen 08.11.2026) */
-  statView: null /* Statistik-Tab (Jürgen 26.11.2026): null = Auswahl der zwei Felder, "was" = Baureihen/Strecken, "wohin" = Zielbahnhöfe */
+  statView: null, /* Statistik-Tab (Jürgen 26.11.2026): null = Auswahl der zwei Felder, "was" = Baureihen/Strecken, "wohin" = Zielbahnhöfe */
+  /* Zeitraum-Filter Statistik (Jürgen 26.11.2026): Jahr / Halbjahr / Quartal / Monat, wirksam auf beide Ansichten */
+  statZeit: "jahr",
+  statJahr: new Date().getFullYear(),
+  statHj: new Date().getMonth() >= 6 ? "H2" : "H1",
+  statQ: Math.floor(new Date().getMonth() / 3) + 1,
+  statM: new Date().getMonth() + 1
 };
 
 /* Migration U93 (Jürgen 17.11.2026): Bis Update 92 war die Süd 153 fix im Regelweg der
@@ -1629,6 +1635,73 @@ function viewStats() {
 }
 
 /* ---------- Statistik (Jürgen 26.11.2026): „Was ich so fahre" + „Wohin ich so fahre" ---------- */
+/* Zeitraum-Filter (Jürgen 26.11.2026): Jahr, Halbjahr, Quartal, einzelne Monate – über beide Ansichten */
+var MONATS_NAMEN = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+function zeitRange() {
+  var p2 = function (n) { return ("0" + n).slice(-2); };
+  var y = state.statJahr, t = state.statZeit;
+  if (t === "hj") {
+    return state.statHj === "H2"
+      ? { s: y + "-07-01", e: y + "-12-31", lbl: "Jul – Dez " + y }
+      : { s: y + "-01-01", e: y + "-06-30", lbl: "Jan – Jun " + y };
+  }
+  if (t === "q") {
+    var m0 = (state.statQ - 1) * 3;
+    var last = new Date(y, m0 + 3, 0).getDate();
+    return { s: y + "-" + p2(m0 + 1) + "-01", e: y + "-" + p2(m0 + 3) + "-" + p2(last), lbl: "Q" + state.statQ + " " + y };
+  }
+  if (t === "m") {
+    var last2 = new Date(y, state.statM, 0).getDate();
+    return { s: y + "-" + p2(state.statM) + "-01", e: y + "-" + p2(state.statM) + "-" + p2(last2), lbl: MONATS_NAMEN[state.statM - 1] + " " + y };
+  }
+  return { s: y + "-01-01", e: y + "-12-31", lbl: "Jahr " + y };
+}
+/* Nur Einträge im gewählten Zeitraum (Datum-Vergleich als ISO-String) */
+function zeitEntries() {
+  var r = zeitRange();
+  return state.entries.filter(function (e) { return e.date >= r.s && e.date <= r.e; });
+}
+function setStatZeit(a) { state.statZeit = a; render(); }
+function setStatJahr(d) {
+  var cur = new Date().getFullYear();
+  var y = state.statJahr + d;
+  if (y < cur - 1 || y > cur) return;
+  state.statJahr = y; render();
+}
+function setStatVal(id) {
+  if (id.charAt(0) === "H") state.statHj = id;
+  else if (id.charAt(0) === "q") state.statQ = +id.slice(1);
+  else if (id.charAt(0) === "m") state.statM = +id.slice(1);
+  render();
+}
+function zeitChip(id, label, on) {
+  return '<button class="chip' + (on ? " on" : "") + '" onclick="setStatVal(\'' + id + '\')">' + label + "</button>";
+}
+function zeitFilterCard() {
+  var cur = new Date().getFullYear();
+  var h = '<div class="card"><div class="qlabel">📅 Zeitraum</div>' +
+    '<div class="chips wrap" style="padding:0">' +
+    [["jahr", "Jahr"], ["hj", "Halbjahr"], ["q", "Quartal"], ["m", "Monat"]].map(function (a) {
+      return '<button class="chip' + (state.statZeit === a[0] ? " on" : "") + '" onclick="setStatZeit(\'' + a[0] + '\')">' + a[1] + "</button>";
+    }).join("") + "</div>" +
+    '<div class="chips wrap" style="padding:0;margin-top:8px">' +
+    '<button class="chip"' + (state.statJahr <= cur - 1 ? ' disabled style="opacity:.45"' : "") + ' onclick="setStatJahr(-1)">◀ ' + (state.statJahr - 1) + "</button>" +
+    '<span class="chip" style="background:var(--akzent);border-color:var(--akzent);color:#0f172a;cursor:default">' + state.statJahr + "</span>" +
+    '<button class="chip"' + (state.statJahr >= cur ? ' disabled style="opacity:.45"' : "") + ' onclick="setStatJahr(1)">' + (state.statJahr + 1) + " ▶</button></div>";
+  var werte = '<div class="chips wrap" style="padding:0;margin-top:8px">';
+  if (state.statZeit === "hj") {
+    werte += zeitChip("H1", "Jan – Jun", state.statHj !== "H2") + zeitChip("H2", "Jul – Dez", state.statHj === "H2");
+  } else if (state.statZeit === "q") {
+    [1, 2, 3, 4].forEach(function (q) { werte += zeitChip("q" + q, "Q" + q, state.statQ === q); });
+  } else if (state.statZeit === "m") {
+    MONATS_NAMEN.forEach(function (mn, i) { werte += zeitChip("m" + (i + 1), mn, state.statM === i + 1); });
+  }
+  werte += "</div>";
+  if (state.statZeit !== "jahr") h += werte;
+  var r = zeitRange();
+  h += '<div class="muted" style="font-size:12px;margin-top:6px">Angezeigt: ' + r.lbl + "</div></div>";
+  return h;
+}
 function setStatView(v) { state.statView = v; render(); window.scrollTo(0, 0); }
 function statRows(list, max) {
   var h = "";
@@ -1641,13 +1714,15 @@ function statRows(list, max) {
 }
 function viewStatistik() {
   var html = '<div class="content">';
+  html += zeitFilterCard();
+  var zEntries = zeitEntries();
   if (!state.statView) {
     var total = 0;
-    state.entries.forEach(function (e) { total += (e.fahrten || []).length; });
+    zEntries.forEach(function (e) { total += (e.fahrten || []).length; });
     html += '<div class="card"><div class="qlabel">📈 Statistik</div>' +
       '<div class="muted" style="font-size:13px;margin-bottom:10px">Zwei Zahlen-Reihen aus deinen eingetragenen Fahrten' +
-      (total ? " – bisher " + total + " Fahrten erfasst." : ".") + "</div>" +
-      '<button type="button" class="opt" onclick="setStatView(\'was\')">🚆 Was ich so fahre<br><span class="muted" style="font-size:13px;font-weight:400">Baureihen & Strecken – wie oft</span></button>' +
+      (total ? " – " + total + " Fahrten im gewählten Zeitraum." : " – im gewählten Zeitraum keine Fahrten erfasst.") + "</div>" +
+      '<button type="button" class="opt" onclick="setStatView(\'was\')">🚆 Was ich so fahre<br><span class="muted" style="font-size:13px;font-weight:400">Baureihen & Züge – wie oft</span></button>' +
       '<button type="button" class="opt" onclick="setStatView(\'wohin\')">📍 Wohin ich so fahre<br><span class="muted" style="font-size:13px;font-weight:400">Zielbahnhöfe – wie oft (ohne München)</span></button></div>';
     return html + "</div>";
   }
@@ -1655,7 +1730,7 @@ function viewStatistik() {
   if (state.statView === "was") {
     /* Baureihen: Anzahl Einträge MIT Fahrt (bereitgestellte Tage zählen nicht) */
     var brCount = {};
-    state.entries.forEach(function (e) {
+    zEntries.forEach(function (e) {
       if (!(e.fahrten || []).length) return;
       (e.baureihen || []).forEach(function (b) { brCount[b] = (brCount[b] || 0) + 1; });
     });
@@ -1666,10 +1741,9 @@ function viewStatistik() {
       if (c) brList.push({ n: BR_LABELS[gi], c: c });
     });
     brList.sort(function (a, b) { return b.c - a.c; });
-    /* Strecken-Ranking raus (Jürgen 26.11.2026: „Wie oft ich eine Strecke genau fahre ist eher unwichtig");
-       dafür Zugnummern: wie oft welcher Zug gefahren (Hin + Retour) */
+    /* Zugnummern: wie oft welcher Zug gefahren (Hin + Retour), im gewählten Zeitraum */
     var zugCount = {};
-    state.entries.forEach(function (e) {
+    zEntries.forEach(function (e) {
       (e.fahrten || []).forEach(function (f) {
         [f.zug, f.retour && f.retour.zug].forEach(function (z) {
           z = (z || "").trim();
@@ -1683,14 +1757,14 @@ function viewStatistik() {
     var topZug = zugList.slice(0, 15);
     html += '<div class="card"><div class="qlabel">🚆 Was ich so fahre</div>' +
       '<div class="stat-lbl">Baureihen (Anzahl Diensttage mit Fahrt)</div>' +
-      (brList.length ? statRows(brList, brList[0].c) : '<div class="muted" style="font-size:14px">Noch keine Fahrten erfasst.</div>') +
+      (brList.length ? statRows(brList, brList[0].c) : '<div class="muted" style="font-size:14px">Keine Fahrten im gewählten Zeitraum.</div>') +
       '<div class="stat-lbl">Züge (wie oft gefahren, Top 15)</div>' +
-      (topZug.length ? statRows(topZug, topZug[0].c) : '<div class="muted" style="font-size:14px">Noch keine Zugnummern erfasst.</div>') +
+      (topZug.length ? statRows(topZug, topZug[0].c) : '<div class="muted" style="font-size:14px">Keine Zugnummern im gewählten Zeitraum erfasst.</div>') +
       "</div>";
   } else {
     /* Ziele: alle Hin-Fahrten nach Zielbahnhof; München (Heimfahrt) wird nicht gezählt (Jürgen 26.11.2026) */
     var ziele = {}, mucCount = 0;
-    state.entries.forEach(function (e) {
+    zEntries.forEach(function (e) {
       (e.fahrten || []).forEach(function (f) {
         if (!f.ziel) return;
         if (MUC_HOFE.indexOf(f.ziel) >= 0) { mucCount++; return; }
@@ -1702,7 +1776,7 @@ function viewStatistik() {
     zList.sort(function (a, b) { return b.c - a.c; });
     html += '<div class="card"><div class="qlabel">📍 Wohin ich so fahre</div>' +
       '<div class="muted" style="font-size:13px;margin-bottom:8px">Alle Hin-Fahrten nach Zielbahnhof. Fahrten mit Ziel München (Heimfahrt) werden nicht mitgezählt: ' + mucCount + "</div>" +
-      (zList.length ? statRows(zList, zList[0].c) : '<div class="muted" style="font-size:14px">Noch keine Fahrten mit Ziel außerhalb München.</div>') +
+      (zList.length ? statRows(zList, zList[0].c) : '<div class="muted" style="font-size:14px">Keine Fahrten im gewählten Zeitraum.</div>') +
       "</div>";
   }
   return html + "</div>";
